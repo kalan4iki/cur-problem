@@ -1,0 +1,19 @@
+{% extends "layout/basic.html" %}
+{% block name %}Главная{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col">
+      test
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="https://dobrodel.mosreg.ru/claims/{{prob.nomdobr}}" name="mainFrame" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
