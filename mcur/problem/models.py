@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls import reverse
+
 
 # Create your models here.
 
@@ -13,6 +15,9 @@ class Curator(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("curators", args=(self.pk,))
 
 class Minis(models.Model):
     name = models.CharField(max_length=40, help_text='ЦИОГВ',
@@ -51,3 +56,6 @@ class Problem(models.Model):
 
     def __str__(self):
         return self.nomdobr
+
+    def get_absolute_url(self):
+        return reverse("problem", args=(self.pk,))

@@ -37,11 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'problem.apps.ProblemConfig',
-    'django_tables2',
+    'bootstrap3',
     'bootstrap4',
+    'django_tables2',
     'rest_framework',
     'corsheaders',
+    'problem.apps.ProblemConfig',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ ROOT_URLCONF = 'mcur.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['problem/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,12 +131,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = '/staticroot/'
-
+STATIC_URL = '/problem/static/'
+STATIC_ROOT = ''
+#    'C:/GitHub/cur-problem/mcur/problem/static',
 STATICFILES_DIRS = [
-    'C:/GitHub/cur-problem/mcur/problem/static',
+    os.path.join(BASE_DIR, 'static'),
 ]
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"mail_admins": {"level": "ERROR", "class": "django.utils.log.AdminEmailHandler"}},
+    "loggers": {
+        "django.request": {"handlers": ["mail_admins"], "level": "ERROR", "propagate": True}
+    },
+}
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

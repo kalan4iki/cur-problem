@@ -1,6 +1,5 @@
 {% extends "layout/basic.html" %}
 {% load render_table from django_tables2 %}
-{% load bootstrap4 %}
 {% block name %}Главная{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -12,13 +11,13 @@
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         {% for i in curat %}
-        <a class="dropdown-item{{ i.1 }}" href="{% url 'curators' i.0.pk %}">{{ i.0.name }}</a>
+        <a class="dropdown-item" href="{% url 'curators' i.pk %}">{{ i.name }}</a>
         {% endfor %}
         <a class="dropdown-item" href="{% url 'index' %}">Все</a>
       </div>
     </div>
     <div class="btn-group mr-2">
-      <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Добавить</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Изменить/Добавить</button>
     </div>
   </div>
 </div>
@@ -43,7 +42,7 @@
     </div>
   </div>
 </div>
-
-{% render_table table %}
-
+{% for table in tables %}
+  {% render_table table %}
+  {% endfor %}
 {% endblock %}

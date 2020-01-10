@@ -1,17 +1,55 @@
 {% extends "layout/basic.html" %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
 {% block name %}Главная{% endblock %}
 {% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<h1 class="h2">Жалоба №{{ np }}</h1>
+</div>
 <div class="container">
   <div class="row">
     <div class="col">
-      test
+      <form method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col">
+            {{ formset.temat|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.adres|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.status|as_crispy_field }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            {{ formset.ciogv|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.curat|as_crispy_field }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            {{ formset.datecre|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.datecrok|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.dateotv|as_crispy_field }}
+          </div>
+        </div>
+        {{ formset.text|as_crispy_field }}
+        <input class="btn btn-success" type="submit" name="" value="Сохранить">
+      <a class="btn btn-primary" href='https://dobrodel.mosreg.ru/claims/{{ np }}' role="button" target="_blank">Перейти на добродел</a>
+      </form>
     </div>
   </div>
   <div class="row">
     <div class="col">
-      <div class="embed-responsive embed-responsive-16by9">
-        <iframe class="embed-responsive-item" src="https://dobrodel.mosreg.ru/claims/{{prob.nomdobr}}" name="mainFrame" allowfullscreen></iframe>
-      </div>
+
     </div>
   </div>
 </div>
