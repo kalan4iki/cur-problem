@@ -1,0 +1,37 @@
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load static %}
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <title>Вход</title>
+  {% bootstrap_css %}
+  {% bootstrap_javascript jquery='full' %}
+  <link href="{% static 'problem/login.css' %}" rel="stylesheet">
+  <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+  </style>
+</head>
+<body>
+  <form class="form-signin">
+    <img class="mb-4" src="/docs/4.4/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+    <h1 class="h3 mb-3 font-weight-normal">Пожалуйста войдите</h1>
+      {% csrf_token %}
+      {{ form|crispy }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+  </form>
+</body>

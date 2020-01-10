@@ -26,53 +26,32 @@
   </style>
 </head>
 <body>
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Жалобы</a>
-<input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-<ul class="navbar-nav px-3">
-<li class="nav-item text-nowrap">
-<a class="nav-link" href="#">Sign out</a>
-</li>
-</ul>
-</nav>
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-        <div class="sidebar-sticky">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" href="{% url 'index' %}">
-              <span data-feather="home"></span>
-              Главная <span class="sr-only">(current)</span>
-            </a>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="{% url 'index' %}">Жалобы</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'index' %}">Главная <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file"></span>
-              Меню 1
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="shopping-cart"></span>
-              Меню 2
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="users"></span>
-              Меню 3
-            </a>
+            <a class="nav-link" href="#">Кураторы</a>
           </li>
         </ul>
+        <div class="form-inline mt-2 mt-md-0">
+          <a class="btn btn-outline-success my-2 my-sm-0" type="button" href="{% url 'login' %}">Вход</a>
         </div>
-      </nav>
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      </div>
+    </nav>
+  </header>
+
+      <main role="main" class="flex-shrink-0">
         {% block content %}
         {% endblock %}
       </main>
-    </div>
-  </div>
 
 </body>
 </html>

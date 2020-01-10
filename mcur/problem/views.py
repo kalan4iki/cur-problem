@@ -12,6 +12,7 @@ from django_tables2.paginators import LazyPaginator
 from .models import Problem, Curator
 from .tables import ProblemTable
 from .forms import PrSet
+import random
 
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,6 +42,8 @@ class CuratorsMenu:
                 temp.append([i, ''])
         return temp
 
+
+
 @api_view(['GET'])
 def api_problem(request):
     if request.method == 'GET':
@@ -60,7 +63,7 @@ def index(request):
     prob = Problem.objects.all()
     curat = Curator.objects.all()
     curats = CuratorsMenu(curat).codes('-1')
-    config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 15})
+    config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
     table = ProblemTable(prob)
     config.configure(table)
     return render(request, 'problem/index.html', {'table': table, 'curat': curats})
@@ -69,7 +72,7 @@ def curator(request, pk):
     prob = Problem.objects.filter(curat=Curator.objects.get(pk=pk))
     curat = Curator.objects.all()
     curats = CuratorsMenu(curat).codes(pk)
-    config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 15})
+    config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
     table = ProblemTable(prob)
     config.configure(table)
     return render(request, 'problem/index.html', {'table': table, 'curat': curats})
@@ -85,3 +88,10 @@ def prob(request, pk):
     else:
         formset = PrSet(instance=prob)
     return render(request, 'problem/problem.html', {'formset': formset, 'np': prob.nomdobr})
+
+def zaptable(request):
+    for i in range(0,51):
+        temp = random.randint(3000000,4000000)
+        a = Problem()
+        a.nomdobr = temp
+        a.save()
