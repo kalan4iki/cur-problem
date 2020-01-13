@@ -1,0 +1,12 @@
+<form class="form-signin" method="POST" action="{% url 'login' %}">
+  <h1 class="h3 mb-3 font-weight-normal">Пожалуйста войдите</h1>
+  {% csrf_token %}
+  <div id="div_id_username" class="form-group">
+    <input class="textinput textInput form-control" type="text" name="username" maxlength="30" id="id_username" required autofocus>
+  </div>
+  <div id="div_id_password" class="form-group">
+    <input class="textinput textInput form-control" type="password" name="password" id="id_password" required>
+  </div>
+  <input type="hidden" name="next" value="{{ request.path }}">
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+</form>

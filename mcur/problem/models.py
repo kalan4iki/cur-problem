@@ -38,8 +38,8 @@ class Problem(models.Model):
                             verbose_name = 'Тематика', blank=True, null=True)
     ciogv = models.ForeignKey(Minis, on_delete = models.PROTECT, blank=True,
                             help_text='ЦИОГВ', verbose_name = 'ЦИОГВ', null=True)
-    curat = models.ForeignKey(Curator, on_delete = models.PROTECT, blank=True,
-                            help_text='Куратор', verbose_name = 'Куратор', null=True)
+    curat = models.ManyToManyField(Curator, blank=True, null=True,
+                            help_text='Куратор', verbose_name = 'Куратор')
     text = models.TextField(help_text='Текст проблемы', verbose_name = 'Текст', blank=True, null=True)
     adres = models.CharField(max_length=255, help_text='Адрес проблемы',
                             verbose_name = 'Адрес', blank=True, null=True)

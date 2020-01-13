@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect
 from django_tables2 import RequestConfig
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.forms import inlineformset_factory, modelform_factory
 from django.urls import reverse
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib import auth
+from django.template.context_processors import csrf
+from django.views import View
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import serializers
@@ -11,8 +15,13 @@ from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
 from .models import Problem, Curator
 from .tables import ProblemTable
-from .forms import PrSet
+from .forms import PrSet, AuthenticationForm, PrAdd
 import random
+
+class CurLogin(LoginView):
+    template_name = 'problem/login.html'
+    #authentication_form=AuthenticationForm
+    redirect_field_name='next'
 
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +51,45 @@ class CuratorsMenu:
                 temp.append([i, ''])
         return temp
 
+class ELoginView(View):
+
+    def get(self, request):
+        # если пользователь авторизован, то делаем редирект на главную страницу
+        if auth.get_user(request).is_authenticated:
+            return redirect('/')
+        else:
+            # Иначе формируем контекст с формой авторизации и отдаём страницу
+            # с этим контекстом.
+            # работает, как для url - /admin/login/ так и для /accounts/login/
+            context = create_context_username_csrf(request)
+            return render_to_response('accounts/login.html', context=context)
+
+    def post(self, request):
+        # получив запрос на авторизацию
+        form = AuthenticationForm(request, data=request.POST)
+
+        # проверяем правильность формы, что есть такой пользователь
+        # и он ввёл правильный пароль
+        if form.is_valid():
+            # в случае успеха авторизуем пользователя
+            auth.login(request, form.get_user())
+            # получаем предыдущий url
+            next = urlparse(get_next_url(request)).path
+            # и если пользователь из числа персонала и заходил через url /admin/login/
+            # то перенаправляем пользователя в админ панель
+            if next == '/admin/login/' and request.user.is_staff:
+                return redirect('/admin/')
+            # иначе делаем редирект на предыдущую страницу,
+            # в случае с /accounts/login/ произойдёт ещё один редирект на главную страницу
+            # в случае любого другого url, пользователь вернётся на данный url
+            return redirect(next)
+
+        # если данные не верны, то пользователь окажется на странице авторизации
+        # и увидит сообщение об ошибке
+        context = create_context_username_csrf(request)
+        context['login_form'] = form
+
+        return render_to_response('accounts/login.html', context=context)
 
 
 @api_view(['GET'])
@@ -65,8 +113,9 @@ def index(request):
     curats = CuratorsMenu(curat).codes('-1')
     config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
     table = ProblemTable(prob)
+    forms = AuthenticationForm
     config.configure(table)
-    return render(request, 'problem/index.html', {'table': table, 'curat': curats})
+    return render(request, 'problem/index.html', {'table': table, 'curat': curats, 'loginform': forms})
 
 def curator(request, pk):
     prob = Problem.objects.filter(curat=Curator.objects.get(pk=pk))
@@ -79,15 +128,17 @@ def curator(request, pk):
 
 def prob(request, pk):
     prob = Problem.objects.get(pk=pk)
-#    PrForm = modelform_factory(Problem, fields={'temat', 'ciogv', 'curat', 'text', 'adres', 'status', 'datecre', 'datecrok', 'dateotv'})
-    if request.method == 'POST':
-        formset = PrSet(request.POST, instance=prob)
-        if formset.is_valid():
-            formset.save()
-            return redirect("index")
+    if request.user.has_perm('problem.edit_Problem'):
+        if request.method == 'POST':
+            formset = PrSet(request.POST, instance=prob)
+            if formset.is_valid():
+                formset.save()
+                return redirect("index")
+        else:
+            formset = PrSet(instance=prob)
+        return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob.nomdobr, 'prob': prob})
     else:
-        formset = PrSet(instance=prob)
-    return render(request, 'problem/problem.html', {'formset': formset, 'np': prob.nomdobr})
+        return render(request, 'problem/problem.html', {'auth': False, 'np': prob.nomdobr, 'prob': prob})
 
 def zaptable(request):
     for i in range(0,51):
@@ -95,3 +146,23 @@ def zaptable(request):
         a = Problem()
         a.nomdobr = temp
         a.save()
+
+def login(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = auth.authenticate(username=username, password=password)
+    if user is not None and user.is_active:
+        auth.login(request, user)
+        return HttpResponseRedirect('index')
+
+def add(request):
+    if request.user.has_perm('problem.add_Problem'):
+        if request.method == 'POST':
+            formadd = PrAdd(request.POST)
+            if formadd.is_valid():
+                formadd.save()
+                return redirect("problem", pk= Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
+            else:
+                return redirect("index")
+        else:
+            return redirect("index")

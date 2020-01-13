@@ -1,12 +1,17 @@
 {% extends "layout/basic.html" %}
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
-{% block name %}Главная{% endblock %}
+{% block name %}Жалоба №{{ np }}{% endblock %}
 {% block content %}
+{% if auth %}
 <form method="post">
   {% csrf_token %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-<h1 class="h2">Жалоба №{{ np }}</h1>
+  <h1 class="h2">Жалоба №{{ np }} </h1>
+  <h1 class="h2">Кураторы: {% for i in prob.curat.all %}
+  "{{i}}"
+  {% if not forloop.last %},{% endif %}
+  {% endfor %}</h1>
 <div class="btn-group mr-2">
   <input type="submit" class="btn btn-sm btn-outline-secondary" name='' value="Сохранить">
   <a type="button" class="btn btn-sm btn-outline-secondary" role='button' href='https://dobrodel.mosreg.ru/claims/{{ np }}' target="_blank">Перейти на добродел</a>
@@ -50,4 +55,90 @@
   </div>
 </div>
 </form>
+{% else %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Жалоба №{{ np }} </h1>
+  <h1 class="h2">Кураторы: {% for i in prob.curat.all %}
+  "{{i}}"
+  {% if not forloop.last %},{% endif %}
+  {% endfor %}</h1>
+<div class="btn-group mr-2">
+  <a type="button" class="btn btn-sm btn-outline-secondary" role='button' href='https://dobrodel.mosreg.ru/claims/{{ np }}' target="_blank">Перейти на добродел</a>
+</div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col">
+        <div class="row">
+          <div class="col">
+            <div id="div_id_temat" class="form-group">
+              <label for="id_temat" class="">Тематика</label>
+              <div class="">
+                <input type="text" name="temat" maxlength="20" class="textinput textInput form-control" id="id_temat" value="{{ prob.temat }}" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div id="div_id_adres" class="form-group">
+              <label for="id_adres" class="">Адрес</label>
+              <div class="">
+                <input type="text" name="adres" maxlength="255" class="textinput textInput form-control" id="id_adres" value="{{ prob.adres }}" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div id="div_id_status" class="form-group">
+              <label for="id_status" class="">Статус</label>
+              <div class="">
+                <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_status" value="{{ prob.status }}" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div id="div_id_ciogv" class="form-group">
+              <label for="id_ciogv" class="">ЦИОГВ</label>
+              <div class="">
+                <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_ciogv" value="{{ prob.ciogv }}" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div id="div_id_datecre" class="form-group">
+              <label for="id_datecre" class="">Дата создания</label>
+              <div class="">
+                <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_datecre" value="{{ prob.datecre }}" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div id="div_id_datecrok" class="form-group">
+              <label for="id_datecrok" class="">Срок задачи</label>
+              <div class="">
+                <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_datecrok" value="{{ prob.datecrok }}" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div id="div_id_dateotv" class="form-group">
+              <label for="id_dateotv" class="">Дата ответа исполнителя</label>
+              <div class="">
+                <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_dateotv" value="{{ prob.dateotv }}" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="div_id_text" class="form-group">
+          <label for="id_text" class="">Текст жалобы</label>
+          <div class="">
+            <textarea name="text" cols="40" rows="10" class="textarea form-control" id="id_text" values="{{ prob.text }}" readonly></textarea>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

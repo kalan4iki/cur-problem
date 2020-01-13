@@ -7,6 +7,11 @@ from django.forms.widgets import Select
 import datetime
 from .models import Problem
 
+class PrAdd(ModelForm):
+    class Meta:
+        model = Problem
+        fields = {'nomdobr'}
+
 class PrSet(ModelForm):
     class Meta:
         model = Problem

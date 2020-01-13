@@ -25,7 +25,10 @@ SECRET_KEY = 'fqovv=(m$_j)qy)exjeo1#z(1u0r-s1@*(=^)%xgh^od%cf_)3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+'127.0.0.1',
+'192.168.1.64'
+]
 
 
 # Application definition
@@ -62,7 +65,7 @@ ROOT_URLCONF = 'mcur.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['problem/templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,3 +159,5 @@ LOGGING = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_REDIRECT_URL =  '/index/'

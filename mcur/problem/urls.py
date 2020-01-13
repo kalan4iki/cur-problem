@@ -1,7 +1,7 @@
-from django.urls import path
-from django.contrib.auth.views import LoginView
-from .views import index, api_problem, api_problem_detail, curator, prob, ProblemTableView, zaptable
-from .forms import AuthenticationForm
+from django.urls import path, include
+from django.contrib.auth.views import LoginView, LogoutView
+from .views import index, api_problem, api_problem_detail, curator, prob, ProblemTableView, zaptable, CurLogin, ELoginView, add
+
 #Login = LoginView(template_name = 'problem/login.html')
 
 urlpatterns = [
@@ -11,6 +11,8 @@ urlpatterns = [
     path('api/problem/<int:np>', api_problem_detail),
     path('curators/<int:pk>', curator, name='curators'),
     path('problem/<int:pk>', prob, name='problem'),
+    path('add/', add, name='add'),
     path('zap', zaptable),
-    path('login', LoginView.as_view(template_name = 'problem/login.html', authentication_form=AuthenticationForm), name='login')
+    path('login/', CurLogin.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='index'), name='logout')
 ]

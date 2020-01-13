@@ -3,8 +3,8 @@ from .models import Curator, Minis, Problem
 # Register your models here.
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ('nomdobr', 'temat', 'ciogv', 'curat', 'text', 'adres', 'status',)
-    list_display_links = ('nomdobr', 'temat', 'ciogv', 'curat', 'text', 'adres', 'status',)
+    list_display = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status',)
+    list_display_links = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status',)
     search_fields = ('date',)
 
 @admin.register(Curator)

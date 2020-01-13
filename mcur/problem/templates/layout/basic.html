@@ -1,4 +1,5 @@
 {% load bootstrap4 %}
+{% load crispy_forms_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
@@ -38,12 +39,23 @@
             <a class="nav-link" href="{% url 'index' %}">Главная <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Кураторы</a>
+            <a class="nav-link" href="">Статистика</a>
           </li>
+          {% if user.is_staff %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">Панель администратора</a>
+          </li>
+          {% endif %}
         </ul>
+        {% if not user.is_authenticated %}
         <div class="form-inline mt-2 mt-md-0">
-          <a class="btn btn-outline-success my-2 my-sm-0" type="button" href="{% url 'login' %}">Вход</a>
+          <button type="button" class="btn btn-outline-success my-2 my-sm-0" data-toggle="modal" data-target="#loginModal">Вход</button>
         </div>
+        {% else %}
+        <div class="form-inline mt-2 mt-md-0">
+          <a class="btn btn-outline-success my-2 my-sm-0" type="button" href="{% url 'logout' %}">Выход</a>
+        </div>
+        {% endif %}
       </div>
     </nav>
   </header>
@@ -53,5 +65,21 @@
         {% endblock %}
       </main>
 
+      <!-- Modal -->
+      <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Форма входа</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {% include "problem/formlogin.html" %}
+            </div>
+          </div>
+        </div>
+      </div>
 </body>
 </html>
