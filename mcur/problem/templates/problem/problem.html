@@ -5,15 +5,21 @@
 {% block name %}Жалоба №{{ np }}{% endblock %}
 {% block content %}
 {% if auth %}
+<style media="screen">
+  .textarea {
+    height: 4em!important;
+  }
+</style>
 <form method="post">
   {% csrf_token %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <h1 class="h2">Жалоба №{{ np }} </h1>
-  <h1 class="h2">Кураторы: {% for i in prob.curat.all %}
-  "{{i}}"
+  <h1 class="h2">Кураторы жалобы: {% for i in srok %}
+  "{{i.curat}}"
   {% if not forloop.last %},{% endif %}
   {% endfor %}</h1>
 <div class="btn-group mr-2">
+  <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#termModal">Добавить срок</button>
   <input type="submit" class="btn btn-sm btn-outline-secondary" name='' value="Сохранить">
   <a type="button" class="btn btn-sm btn-outline-secondary" role='button' href='https://dobrodel.mosreg.ru/claims/{{ np }}' target="_blank">Перейти на добродел</a>
 </div>
@@ -36,8 +42,6 @@
           <div class="col">
             {{ formset.ciogv|as_crispy_field }}
           </div>
-        </div>
-        <div class="row">
           <div class="col">
             {{ formset.datecre|as_crispy_field }}
           </div>
@@ -46,6 +50,29 @@
           </div>
         </div>
         {{ formset.text|as_crispy_field }}
+        <div id="div_id_table" class="form-group">
+          <label for="id_table" class="">Сроки выполнения:</label>
+          <div class="table-container">
+            <table class="table table-hover table-bordered table-striped">
+              <thead class="thead-light">
+                <tr>
+                  <th class="orderable">Срок до</th>
+                  <th class="orderable">Куратор</th>
+                  <th class="orderable">Описание</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in srok %}
+                <tr class="even">
+                  <td>{{i.date}}</td>
+                  <td>{{i.curat}}</td>
+                  <td>{{i.desk}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
     </div>
   </div>
 </div>
@@ -53,8 +80,8 @@
 {% else %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <h1 class="h2">Жалоба №{{ np }} </h1>
-  <h1 class="h2">Кураторы: {% for i in prob.curat.all %}
-  "{{i}}"
+  <h1 class="h2">Кураторы жалобы: {% for i in srok %}
+  "{{i.curat}}"
   {% if not forloop.last %},{% endif %}
   {% endfor %}</h1>
 <div class="btn-group mr-2">
@@ -99,21 +126,11 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
           <div class="col">
             <div id="div_id_datecre" class="form-group">
               <label for="id_datecre" class="">Дата создания</label>
               <div class="">
                 <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_datecre" value="{{ prob.datecre }}" readonly>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div id="div_id_datecrok" class="form-group">
-              <label for="id_datecrok" class="">Срок задачи</label>
-              <div class="">
-                <input type="text" name="status" maxlength="50" class="textinput textInput form-control" id="id_datecrok" value="{{ prob.datecrok }}" readonly>
               </div>
             </div>
           </div>
@@ -129,15 +146,57 @@
         <div id="div_id_text" class="form-group">
           <label for="id_text" class="">Текст жалобы</label>
           <div class="">
-            <textarea name="text" cols="40" rows="10" class="textarea form-control" id="id_text" values="{{ prob.text }}" readonly></textarea>
+            <textarea name="text" cols="20" rows="3" class="textarea form-control" id="id_text" values="{{ prob.text }}" readonly></textarea>
           </div>
         </div>
         <div id="div_id_table" class="form-group">
           <label for="id_table" class="">Сроки выполнения:</label>
-          <div class="">
-            {% render_table tabledate %}
+          <div class="table-container">
+            <table class="table table-hover table-bordered table-striped">
+              <thead class="thead-light">
+                <tr>
+                  <th class="orderable">Срок до</th>
+                  <th class="orderable">Куратор</th>
+                  <th class="orderable">Описание</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in srok %}
+                <tr class="even">
+                  <td>{{i.date}}</td>
+                  <td>{{i.curat}}</td>
+                  <td>{{i.desk}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="termModal" tabindex="-1" role="dialog" aria-labelledby="termModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Добавить срок выполнения задачи</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="" action="{% url 'add' %}" method="post">
+          {% csrf_token %}
+          <div id="div_id_date" class="form-group">
+            <label for="id_date" class="">Срок до</label>
+            <input class="textinput textInput form-control" type="date" name="date" maxlength="30" id="id_date" required autofocus>
+          </div>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+        <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

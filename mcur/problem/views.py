@@ -118,7 +118,7 @@ def index(request):
     return render(request, 'problem/index.html', {'table': table, 'curat': curats, 'loginform': forms})
 
 def curator(request, pk):
-    prob = Problem.objects.filter(curat=Curator.objects.get(pk=pk))
+    prob = Term.objects.filter(curat=Curator.objects.get(pk=pk))
     curat = Curator.objects.all()
     curats = CuratorsMenu(curat).codes(pk)
     config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
@@ -128,6 +128,7 @@ def curator(request, pk):
 
 def prob(request, pk):
     prob = Problem.objects.get(pk=pk)
+    a = prob.datecrok.all()
     if request.user.has_perm('problem.edit_Problem'):
         if request.method == 'POST':
             formset = PrSet(request.POST, instance=prob)
@@ -136,13 +137,9 @@ def prob(request, pk):
                 return redirect("index")
         else:
             formset = PrSet(instance=prob)
-        return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob.nomdobr, 'prob': prob})
+        return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob.nomdobr, 'prob': prob, 'srok': a})
     else:
-        a = prob.datecrok.all()
-        tabledate = TermTable(a)
-        config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
-        config.configure(tabledate)
-        return render(request, 'problem/problem.html', {'auth': False, 'np': prob.nomdobr, 'prob': prob, 'tebledate': tabledate})
+        return render(request, 'problem/problem.html', {'auth': False, 'np': prob.nomdobr, 'prob': prob, 'srok': a})
 
 def zaptable(request):
     for i in range(0,51):

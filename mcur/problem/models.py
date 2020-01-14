@@ -35,7 +35,7 @@ class Term(models.Model):
     date = models.DateField(help_text='Срок', verbose_name = 'Срок', null=True)
     curat = models.ForeignKey(Curator, on_delete = models.PROTECT, blank=True,
                             help_text='Куратор', verbose_name = 'Куратор', null=True)
-    desck = models.TextField(help_text='Текст проблемы', verbose_name = 'Текст', blank=True, null=True)
+    desck = models.TextField(help_text='Описание', verbose_name = 'Описание', blank=True, null=True)
 
     class Meta:
         ordering = ['date']
