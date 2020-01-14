@@ -15,9 +15,9 @@ class PrAdd(ModelForm):
 class PrSet(ModelForm):
     class Meta:
         model = Problem
-        fields= ('temat', 'ciogv', 'curat', 'text', 'adres', 'status', 'datecre', 'datecrok', 'dateotv')
-        field_classes = {'datecre': DateField, 'datecrok': DateField, 'dateotv': DateField}
-        widgets = {'datecre': DateInput(format='%d.%m.%Y'), 'datecrok': DateInput(), 'dateotv': DateInput()}
+        fields= ('temat', 'ciogv', 'text', 'adres', 'status', 'datecre', 'dateotv')
+        field_classes = {'datecre': DateField, 'dateotv': DateField}
+        widgets = {'datecre': DateInput(format='%d.%m.%Y'), 'dateotv': DateInput()}
 
 class AuthenticationForm(forms.Form):
     """

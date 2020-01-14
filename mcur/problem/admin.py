@@ -1,11 +1,14 @@
 from django.contrib import admin
-from .models import Curator, Minis, Problem
+from .models import Curator, Minis, Problem, Term
 # Register your models here.
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status',)
+    list_display = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status', 'get_datecrok',)
     list_display_links = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status',)
     search_fields = ('date',)
+
+    def get_datecrok(self, obj):
+        return "\n".join([f'({p.curat} - {p.date.day}.{p.date.month}.{p.date.year})  ' for p in obj.datecrok.all()])
 
 @admin.register(Curator)
 class CuratorAdmin(admin.ModelAdmin):
@@ -18,6 +21,12 @@ class MinisAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_display_links = ('name',)
     search_fields = ('name',)
+
+@admin.register(Term)
+class TermAdmin(admin.ModelAdmin):
+    list_display = ('date', 'curat', 'desck',)
+    list_display_links = ('date', 'curat', 'desck',)
+    search_fields = ('date', 'curat', 'desck',)
 
     #exclude = ('day', 'month', 'year',)
     #actions = ('sootv',)

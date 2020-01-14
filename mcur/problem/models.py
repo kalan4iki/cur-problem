@@ -31,6 +31,21 @@ class Minis(models.Model):
     def __str__(self):
         return self.name
 
+class Term(models.Model):
+    date = models.DateField(help_text='Срок', verbose_name = 'Срок', null=True)
+    curat = models.ForeignKey(Curator, on_delete = models.PROTECT, blank=True,
+                            help_text='Куратор', verbose_name = 'Куратор', null=True)
+    desck = models.TextField(help_text='Текст проблемы', verbose_name = 'Текст', blank=True, null=True)
+
+    class Meta:
+        ordering = ['date']
+        verbose_name = 'срок жалобы'
+        verbose_name_plural = 'сроки жалоб'
+
+    def __str__(self):
+        temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
+        return temp
+
 class Problem(models.Model):
     nomdobr = models.CharField(max_length=20, help_text='Номер проблемы',
                             verbose_name = 'Номер')
@@ -38,14 +53,12 @@ class Problem(models.Model):
                             verbose_name = 'Тематика', blank=True, null=True)
     ciogv = models.ForeignKey(Minis, on_delete = models.PROTECT, blank=True,
                             help_text='ЦИОГВ', verbose_name = 'ЦИОГВ', null=True)
-    curat = models.ManyToManyField(Curator, blank=True, null=True,
-                            help_text='Куратор', verbose_name = 'Куратор')
     text = models.TextField(help_text='Текст проблемы', verbose_name = 'Текст', blank=True, null=True)
     adres = models.CharField(max_length=255, help_text='Адрес проблемы',
                             verbose_name = 'Адрес', blank=True, null=True)
     url = models.URLField(help_text='URL проблемы', verbose_name = 'URL', blank=True, null=True)
     datecre = models.DateField(help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
-    datecrok = models.DateField(help_text='Срок задачи', verbose_name = 'Срок задачи', blank=True, null=True)
+    datecrok = models.ManyToManyField(Term, help_text='Срок задачи', verbose_name = 'Срок задачи', blank=True, null=True)
     dateotv = models.DateField(help_text='Дата ответа исполнителя', verbose_name = 'Дата ответа исполнителя', blank=True, null=True)
     status = models.CharField(max_length=50, help_text='Статус проблемы',
                             verbose_name = 'Статус', blank=True, null=True)
