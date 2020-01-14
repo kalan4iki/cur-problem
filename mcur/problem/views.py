@@ -14,7 +14,7 @@ from rest_framework import serializers
 from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
 from .models import Problem, Curator
-from .tables import ProblemTable
+from .tables import ProblemTable, TermTable
 from .forms import PrSet, AuthenticationForm, PrAdd
 import random
 
@@ -138,7 +138,11 @@ def prob(request, pk):
             formset = PrSet(instance=prob)
         return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob.nomdobr, 'prob': prob})
     else:
-        return render(request, 'problem/problem.html', {'auth': False, 'np': prob.nomdobr, 'prob': prob})
+        a = prob.datecrok.all()
+        tabledate = TermTable(a)
+        config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
+        config.configure(tabledate)
+        return render(request, 'problem/problem.html', {'auth': False, 'np': prob.nomdobr, 'prob': prob, 'tebledate': tabledate})
 
 def zaptable(request):
     for i in range(0,51):
