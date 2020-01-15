@@ -13,9 +13,9 @@ from rest_framework.decorators import api_view
 from rest_framework import serializers
 from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
-from .models import Problem, Curator
+from .models import Problem, Curator, Term
 from .tables import ProblemTable, TermTable
-from .forms import PrSet, AuthenticationForm, PrAdd
+from .forms import PrSet, AuthenticationForm, PrAdd, TermForm
 import random
 
 class CurLogin(LoginView):
@@ -118,7 +118,10 @@ def index(request):
     return render(request, 'problem/index.html', {'table': table, 'curat': curats, 'loginform': forms})
 
 def curator(request, pk):
-    prob = Term.objects.filter(curat=Curator.objects.get(pk=pk))
+    term = Term.objects.filter(curat=Curator.objects.get(pk=pk))
+    prob = []
+    for i in term:
+        prob.append(Problem.objects.get(datecrok=i))
     curat = Curator.objects.all()
     curats = CuratorsMenu(curat).codes(pk)
     config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
@@ -137,9 +140,9 @@ def prob(request, pk):
                 return redirect("index")
         else:
             formset = PrSet(instance=prob)
-        return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob.nomdobr, 'prob': prob, 'srok': a})
+        return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob, 'prob': prob, 'srok': a})
     else:
-        return render(request, 'problem/problem.html', {'auth': False, 'np': prob.nomdobr, 'prob': prob, 'srok': a})
+        return render(request, 'problem/problem.html', {'auth': False, 'np': prob, 'prob': prob, 'srok': a})
 
 def zaptable(request):
     for i in range(0,51):
@@ -147,6 +150,7 @@ def zaptable(request):
         a = Problem()
         a.nomdobr = temp
         a.save()
+    return redirect('index')
 
 def login(request):
     username = request.POST['username']
@@ -167,3 +171,24 @@ def add(request):
                 return redirect("index")
         else:
             return redirect("index")
+
+def termadd(request, pk):
+    prob = Problem.objects.get(pk=pk)
+    if request.user.has_perm('problem.edit_Problem'):
+        if request.method == 'POST':
+            formadd = TermForm(request.POST)
+            if formadd.is_valid():
+                a = formadd.save()
+                print(a)
+                prob.datecrok.add(a)
+                return redirect("problem", pk=pk)
+        else:
+            formadd = TermForm()
+        return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
+    else:
+        return render(request, 'problem/termadd.html', {'auth': False, 'np': prob, 'prob': prob})
+
+def delterm(request, pk, pkp):
+    b = Term.objects.get(pk=pk)
+    b.delete()
+    return redirect("problem", pk=pkp)

@@ -7,7 +7,7 @@ class ProblemTable(tables.Table):
     nomdobr = tables.Column(linkify=True)
     #curat = tables.Column(linkify=True)
     #curat = tables.ManyToManyColumn(linkify_item=True)
-    datecrok = tables.ManyToManyColumn(linkify_item=False)
+    datecrok = tables.ManyToManyColumn(linkify_item=True)
     class Meta:
         model = Problem
         template_name = "django_tables2/bootstrap4.html"

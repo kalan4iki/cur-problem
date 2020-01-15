@@ -5,7 +5,13 @@ from django.utils.text import capfirst
 from django import forms
 from django.forms.widgets import Select
 import datetime
-from .models import Problem
+from .models import Problem, Term
+
+class TermForm(ModelForm):
+    class Meta:
+        model = Term
+        fields = {'date', 'curat', 'desck'}
+
 
 class PrAdd(ModelForm):
     class Meta:

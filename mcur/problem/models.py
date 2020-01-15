@@ -46,6 +46,9 @@ class Term(models.Model):
         temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
         return temp
 
+    def get_absolute_url(self):
+        return reverse("curators", args=(self.curat.pk,))
+
 class Problem(models.Model):
     nomdobr = models.CharField(max_length=20, help_text='Номер проблемы',
                             verbose_name = 'Номер')

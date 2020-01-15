@@ -1,0 +1,39 @@
+{% extends "layout/basic.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% block name %}Добавление срока{% endblock %}
+{% block content %}
+{% if auth %}
+<form method="post">
+  {% csrf_token %}
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Добавление срока для жалобы №{{ np.nomdobr }} </h1>
+    <div class="btn-group mr-2">
+      <input type="submit" class="btn btn-sm btn-outline-secondary" value="Добавить">
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+          <div class="row">
+            <div class="col">
+              <div id="div_id_date" class="form-group">
+                <label for="id_date" class="">Срок<span class="asteriskField">*</span></label>
+                <div class="">
+                  <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date" required>
+                  <small id="hint_id_date"></small>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              {{ formadd.curat|as_crispy_field }}
+            </div>
+          </div>
+          {{ formadd.desck|as_crispy_field }}
+      </div>
+    </div>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
