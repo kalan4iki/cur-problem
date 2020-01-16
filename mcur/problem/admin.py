@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Curator, Minis, Problem, Term
+from .models import Curator, Minis, Problem, Term, Access
 # Register your models here.
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
@@ -31,6 +31,11 @@ class TermAdmin(admin.ModelAdmin):
     #exclude = ('day', 'month', 'year',)
     #actions = ('sootv',)
 
+@admin.register(Access)
+class AccessAdmin(admin.ModelAdmin):
+    list_display = ('user',)
+    list_display_links = ('user',)
+    search_fields = ('user',)
 '''
     def procall(self, rec):
         return f'{round(((int(rec.complete) + int(rec.netreb)) * 100) / int(rec.allz))}'

@@ -16,7 +16,7 @@ class ProblemTable(tables.Table):
                 'thead': {
                     'class': 'thead-light'
                 }}
-        exclude = ("id", "text","url",)
+        exclude = ("id", "text","url","parsing",)
 
 class TermTable(tables.Table):
     class Meta:
