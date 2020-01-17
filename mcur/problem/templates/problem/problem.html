@@ -2,7 +2,7 @@
 {% load render_table from django_tables2 %}
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
-{% block name %}Жалоба №{{ np.nomdobr }}{% endblock %}
+{% block title %}Жалоба №{{ np.nomdobr }}{% endblock %}
 {% block content %}
 {% if auth %}
 <form method="post">

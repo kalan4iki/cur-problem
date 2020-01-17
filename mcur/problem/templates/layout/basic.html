@@ -29,7 +29,6 @@
 <body>
   <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -39,7 +38,16 @@
             <a class="nav-link" href="{% url 'index' %}">Главная <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">Личный кабинет</a>
+            <div class="dropdown">
+              <button class="btn  dropdown-toggle nav-link" type="button" id="dropdownMenuButtonlk" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="10,20">
+              Личный кабинет
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonlk">
+              <a class="dropdown-item" href="{% url 'lk' %}">Профиль</a>
+              <a class="dropdown-item" href="">Жалобы</a>
+              <a class="dropdown-item" href="">Ответы</a>
+              </div>
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="">Календарь</a>

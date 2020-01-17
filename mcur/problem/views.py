@@ -5,6 +5,7 @@ from django.views.generic.base import TemplateView
 from django.forms import inlineformset_factory, modelform_factory
 from django.urls import reverse
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.models import User
 from django.contrib import auth
 from django.template.context_processors import csrf
 from django.views import View
@@ -192,3 +193,7 @@ def delterm(request, pk, pkp):
     b = Term.objects.get(pk=pk)
     b.delete()
     return redirect("problem", pk=pkp)
+
+def lk(request):
+    a = User.objects.get(username=request.user)
+    return render(request, 'problem/lk.html', {'userr': a})
