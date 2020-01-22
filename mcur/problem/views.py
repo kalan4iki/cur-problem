@@ -195,5 +195,8 @@ def delterm(request, pk, pkp):
     return redirect("problem", pk=pkp)
 
 def lk(request):
-    a = User.objects.get(username=request.user)
-    return render(request, 'problem/lk.html', {'userr': a})
+    if request.user.is_authenticated:
+        a = User.objects.get(username=request.user)
+        return render(request, 'problem/lk.html', {'userr': a})
+    else:
+        return redirect('index')
