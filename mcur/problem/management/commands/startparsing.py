@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from sys import platform
 #from bot.models import KNDhistor, DIPhistor, MKDhistor, Usersbot
 #from gis.settings import DEBUG, username_knd, password_knd, path_driver, logi
+from problem.models import Problem
 import lxml
 import time
 import datetime
@@ -59,6 +60,7 @@ def parser():
                     vraboteproc= proc[0], dostproc= proc[1], completeproc= proc[2], netrebproc= proc[3])
     a.save()
 '''
+
 def StartBrowser():
     opts = Options()
     driver = webdriver.Chrome('C:\chromedriver.exe', options=opts)
@@ -93,7 +95,6 @@ def loginDobrodel(brow, url, date, vxod):
         time.sleep(5)
     except:
         print(traceback.format_exc())
-        temp = ''
     return browser
 
 if __name__ == '__main__':
@@ -108,5 +109,27 @@ class Command(BaseCommand):
         now = datetime.datetime.now()
         a = True
         loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.10.2019', {'username': 'smsv@istra-adm.ru', 'password': 'qwerty5512222'})
-        time.sleep(10)
+        try:
+            source = browser.page_source
+            bs = BeautifulSoup(source, 'lxml')
+            table = bs.find_all('tr', class_ = 'jtable-data-row')
+            for i in table:
+                temp = i.find_all('td')
+                temp2 = []
+                iter = 0
+                for j in temp:
+                    if iter == 3:
+                        temp2.append(j.find('a').attrs['data-hint'])
+                    else:
+                        temp2.append(j.text)
+                    iter += 1
+                date = temp2[9].split('.')
+                prob = Problem(nomdobr=temp2[0],temat=temp2[5] + '. ' + temp2[6],text=temp2[3],adres=temp2[2],datecre=f'{date[2]}-{date[1]}-{date[0]}',status=temp2[13])
+                prob.save()
+                print(temp2)
+            #print(table[0])
+            print(len(table))
+        except:
+            print(traceback.format_exc())
+        time.sleep(5)
         browser.quit()
