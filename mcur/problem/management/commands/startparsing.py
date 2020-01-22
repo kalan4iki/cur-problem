@@ -4,24 +4,19 @@ from django.core.management.base import BaseCommand, CommandError
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import Select
 from xml.dom.minidom import parseString
 from bs4 import BeautifulSoup
 from sys import platform
-from bot.models import KNDhistor, DIPhistor, MKDhistor, Usersbot
-from gis.settings import DEBUG, username_knd, password_knd, path_driver, logi
+#from bot.models import KNDhistor, DIPhistor, MKDhistor, Usersbot
+#from gis.settings import DEBUG, username_knd, password_knd, path_driver, logi
 import lxml
 import time
 import datetime
 import logging
 import argparse
 import traceback
-
-if platform == 'linux' or platform == 'linux2':
-    logging.basicConfig(filename=logi['linux']['direct']+logi['linux']['parser'], level=logging.INFO)
-elif platform == 'win32':
-    logging.basicConfig(filename=logi['win']['direct']+logi['win']['parser'], level=logging.INFO)
-
-
+'''
 def parser():
     now = datetime.datetime.now()
     times = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
@@ -63,22 +58,55 @@ def parser():
                     vrabote= temp[0], dost= temp[1], complete= temp[2], netreb= temp[3],
                     vraboteproc= proc[0], dostproc= proc[1], completeproc= proc[2], netrebproc= proc[3])
     a.save()
+'''
+def StartBrowser():
+    opts = Options()
+    driver = webdriver.Chrome('C:\chromedriver.exe', options=opts)
+    return driver
+    '''
+    if platform == 'linux' or platform == 'linux2':
+        opts.add_argument('headless')
+        opts.add_argument('--no-sandbox')
+        opts.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(path_driver['linux'],options=opts)
+    elif platform == 'win32':
+        driver = webdriver.Chrome(path_driver['win'], options=opts)
+    '''
+
+def loginDobrodel(brow, url, date, vxod):
+    browser = brow
+    try:
+        browser.get(url)
+        time.sleep(2)
+        browser.find_element_by_name('j_username').send_keys(vxod['username'])
+        browser.find_element_by_name('j_password').send_keys(vxod['password'])
+        browser.find_element_by_xpath('/html/body/div/div[2]/div/form/div/div[5]').click()
+        time.sleep(5)
+        browser.find_element_by_id('datefrom').clear()
+        browser.find_element_by_id('datefrom').send_keys(date)
+        browser.find_element_by_id('deadlineFrom').clear()
+        browser.find_element_by_id('deadlineFrom').send_keys(date)
+        browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[1]/form/div[10]/button').click()
+        time.sleep(7)
+        a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
+        a.select_by_value('25')
+        time.sleep(5)
+    except:
+        print(traceback.format_exc())
+        temp = ''
+    return browser
 
 if __name__ == '__main__':
     parser()
 
 class Command(BaseCommand):
-    help = 'Команда запуска парсера KND'
+    help = 'Команда запуска парсера vmeste.mosreg.ru'
 
     def handle(self, *args, **options):
+        #Инициализация браузера
+        browser = StartBrowser()
         now = datetime.datetime.now()
         a = True
-        while a:
-            now = datetime.datetime.now()
-            times = str(now.hour) + ':' + str(now.minute) + ':' + str(now.second)
-            if now.hour < 21 or now.hour > 6:
-                try:
-                    parser()
-                except:
-                    logging.error('Parser ' + times + " Error data: " + traceback.format_exc())
-                time.sleep(900)
+        loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.10.2019', {'username': 'smsv@istra-adm.ru', 'password': 'qwerty5512222'})
+        time.sleep(10)
+        browser.quit()
