@@ -1,11 +1,38 @@
 from django.contrib import admin
-from .models import Curator, Minis, Problem, Term, Access
+from .models import Curator, Minis, Problem, Term, Access, Answer, UserProfile
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 # Register your models here.
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('nomobr', 'status', 'datecre', 'datebzm', 'images',)
+    list_display_links = ('status', 'datecre', 'datebzm','images',)
+    search_fields = ('status', 'datecre', 'datebzm','images',)
+
+    def nomobr(self, answ):
+        if answ.otvs.all().exists():
+            if answ.otvs.all()[0].terms.all().exists():
+                return answ.otvs.all()[0].terms.all()[0].nomdobr
+            else:
+                return 'Нет'
+        else:
+            return 'Нет'
+    nomobr.short_description = "Номер жалобы"
+    
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status', 'get_datecrok',)
     list_display_links = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status',)
-    search_fields = ('date',)
+    search_fields = ('nomdobr',)
+    list_filter = ('ciogv__name', 'status', 'parsing')
+    actions = ('pars',)
+
+    def pars(self, request, queryset):
+        for prob in queryset:
+            prob.parsing = '0'
+            prob.save()
+        self.message_user(request, 'Действие выполнено')
+    pars.short_description = 'Отправить на уточнение'
 
     def get_datecrok(self, obj):
         return "\n".join([f'({p.curat} - {p.date.day}.{p.date.month}.{p.date.year})  ' for p in obj.datecrok.all()])
@@ -24,10 +51,20 @@ class MinisAdmin(admin.ModelAdmin):
 
 @admin.register(Term)
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('date', 'curat', 'desck',)
+    #fiels = ('nomobr', 'date', 'curat', 'desck',)
+    list_display = ('nomobr', 'date', 'curat', 'desck',)
     list_display_links = ('date', 'curat', 'desck',)
-    search_fields = ('date', 'curat', 'desck',)
+    search_fields = ('pk',)
+    list_filter = ('curat__name', 'date',)
 
+    def nomobr(self, srok):
+        if srok.terms.all().exists():
+            return srok.terms.all()[0].nomdobr
+        else:
+            return 'Нет'
+    nomobr.short_description = "Номер жалобы"
+
+    #nomobr.short_description = 'Номер жалобы'
     #exclude = ('day', 'month', 'year',)
     #actions = ('sootv',)
 
@@ -36,6 +73,20 @@ class AccessAdmin(admin.ModelAdmin):
     list_display = ('user',)
     list_display_links = ('user',)
     search_fields = ('user',)
+
+class UserInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'Доп. информация'
+
+# Определяем новый класс настроек для модели User
+class UserAdmin(UserAdmin):
+    inlines = (UserInline, )
+
+# Перерегистрируем модель User
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
 '''
     def procall(self, rec):
         return f'{round(((int(rec.complete) + int(rec.netreb)) * 100) / int(rec.allz))}'

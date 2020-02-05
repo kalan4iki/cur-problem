@@ -73,11 +73,22 @@ def parsTable(source):
                     temp2.append(j.text)
                 iter += 1
             date = temp2[9].split('.')
+            date2 = temp2[11].split('.')
             if not Problem.objects.filter(nomdobr=temp2[0]).exists():
-                prob = Problem(nomdobr=temp2[0],temat=temp2[5] + '. ' + temp2[6],text=temp2[3],adres=temp2[2],datecre=f'{date[2]}-{date[1]}-{date[0]}',status=temp2[13])
+                prob = Problem(nomdobr=temp2[0],temat=temp2[5] + '. ' + temp2[6],text=temp2[3],adres=temp2[2],datecre=f'{date[2]}-{date[1]}-{date[0]}',status=temp2[13], parsing='1', dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}')
+            else:
+                prob = Problem.objects.get(nomdobr=temp2[0])
+                prob.temat = temp2[5] + '. ' + temp2[6]
+                prob.text = temp2[3]
+                prob.adres = temp2[2]
+                prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
+                prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
+                prob.status = temp2[13]
+                prob.parsing = '1'
             prob.save()
     except:
         print(traceback.format_exc())
+
 if __name__ == '__main__':
     parser()
 
@@ -88,7 +99,7 @@ class Command(BaseCommand):
         #Инициализация браузера
         browser = StartBrowser()
         now = datetime.datetime.now()
-        kolvo = loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.10.2019', {'username': 'smsv@istra-adm.ru', 'password': 'qwerty5512222'})
+        kolvo = loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.10.2019', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
         print(kolvo)
         for i in kolvo:
             sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))

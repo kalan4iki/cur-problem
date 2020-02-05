@@ -3,19 +3,27 @@
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
 {% block name %}Добавление срока{% endblock %}
+{% block nav1 %}active{% endblock %}
+{% block nav101 %}active{% endblock %}
 {% block content %}
 {% if auth %}
-<form method="post">
-  {% csrf_token %}
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Добавление срока для жалобы №{{ np.nomdobr }} </h1>
-    <div class="btn-group mr-2">
-      <input type="submit" class="btn btn-sm btn-outline-secondary" value="Добавить">
-    </div>
-  </div>
-  <div class="container">
-    <div class="row">
-      <div class="col">
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Добавление срока для жалобы №{{ np.nomdobr }}</h1>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<section class="content">
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title"> </h3>
+        </div>
+        <form role="form" method="post">
+          {% csrf_token %}
+          <div class="card-body">
           <div class="row">
             <div class="col">
               <div id="div_id_date" class="form-group">
@@ -31,9 +39,9 @@
             </div>
           </div>
           {{ formadd.desck|as_crispy_field }}
+          </div>
+        </form>
       </div>
-    </div>
-  </div>
-</form>
+</section>
 {% endif %}
 {% endblock %}

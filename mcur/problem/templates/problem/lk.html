@@ -3,11 +3,105 @@
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
 {% block title %}Профиль{% endblock %}
+{% block nav2 %}active{% endblock %}
 {% block content %}
-<div class="border shadow p-3 mb-1 bg-white rounded">
-<h1 class="h2">Пользователь: {{userr.username}}</h1>
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Пользователь: {{user.first_name}} {{user.last_name}}</h1>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
 </div>
-{% if auth %}
-
-{% endif %}
+<section class="content">
+  <div class="row">
+    {% if perms.problem.view_problem %}
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>{{ kolvo.kolall }}</h3>
+          <p>Не распределенные жалобы</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-info"></i>
+        </div>
+        <a href="{% url 'allproblem' %}" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="small-box bg-success">
+        <div class="inner">
+          <h3>{{ kolvo.kolclose }}</h3>
+          <p>Закрытых жалоб</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-check"></i>
+        </div>
+        <a href="{% url 'closed' %}" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>{{ kolvo.kolall }}</h3>
+          <p>Всего не закрытых жалоб</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-info"></i>
+        </div>
+        <a href="{% url 'allproblem' %}" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="small-box bg-warning">
+        <div class="inner">
+          <h3>0</h3>
+          <p>Подходит срок жалоб</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <a href="#" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="small-box bg-danger">
+        <div class="inner">
+          <h3>0</h3>
+          <p>Просроченных жалоб</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-ban"></i>
+        </div>
+        <a href="#" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Личная информация:</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group row">
+            <label for="inputEmail3" class="col-sm-2 col-form-label"><ion-icon name="briefcase"></ion-icon> Организация: </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputEmail3" value="{{ user.userprofile.org}}" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+</section>
 {% endblock %}

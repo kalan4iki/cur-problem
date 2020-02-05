@@ -1,0 +1,99 @@
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <title>{% block title %}Главная{% endblock %}</title>
+  {% bootstrap_css %}
+  {% bootstrap_javascript jquery='full' %}
+  <link href="{% static 'problem/basic.css' %}" rel="stylesheet">
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'index' %}">Главная <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <div class="dropdown">
+              <button class="btn  dropdown-toggle nav-link" type="button" id="dropdownMenuButtonlk" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="10,20">
+              Личный кабинет
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButtonlk">
+              <a class="dropdown-item" href="{% url 'lk' %}">Профиль</a>
+              <a class="dropdown-item" href="">Жалобы</a>
+              <a class="dropdown-item" href="">Ответы</a>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="">Календарь</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="">Статистика</a>
+          </li>
+          {% if user.is_staff %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">Панель администратора</a>
+          </li>
+          {% endif %}
+        </ul>
+        {% if not user.is_authenticated %}
+        <div class="form-inline mt-2 mt-md-0">
+          <button type="button" class="btn btn-outline-success my-2 my-sm-0" data-toggle="modal" data-target="#loginModal">Вход</button>
+        </div>
+        {% else %}
+        <div class="form-inline mt-2 mt-md-0">
+          <a class="btn btn-outline-success my-2 my-sm-0" type="button" href="{% url 'logout' %}">Выход</a>
+        </div>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+      <main role="main" class="flex-shrink-0" style='margin-left: 2%; margin-right: 2%; margin-top: 1%;'>
+        {% block content %}
+        {% endblock %}
+      </main>
+
+      <!-- Modal -->
+      <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Форма входа</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {% include "problem/formlogin.html" %}
+            </div>
+          </div>
+        </div>
+      </div>
+</body>
+</html>

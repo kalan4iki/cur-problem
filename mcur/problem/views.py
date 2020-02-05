@@ -14,9 +14,10 @@ from rest_framework.decorators import api_view
 from rest_framework import serializers
 from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
-from .models import Problem, Curator, Term
+from .models import Problem, Curator, Term, Answer
 from .tables import ProblemTable, TermTable
 from .forms import PrSet, AuthenticationForm, PrAdd, TermForm
+from django.contrib import messages
 import random
 import mcur.settings as settings
 
@@ -62,7 +63,7 @@ def api_problem_detail(request, np):
         prob = Problem.objects.get(nomdobr=np)
         serializer = ProblemSerializer(prob)
         return Response(serializer.data)
-
+'''
 # Create your views here.
 def index(request):
     if not request.user.is_authenticated:
@@ -75,8 +76,8 @@ def index(request):
         table = ProblemTable(prob)
         forms = AuthenticationForm
         config.configure(table)
-        return render(request, 'problem/index.html', {'table': table, 'curat': curats, 'loginform': forms})
-
+        return render(request, 'problem/allproblem.html', {'table': table, 'curat': curats, 'loginform': forms})
+'''
 def curator(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -97,19 +98,13 @@ def prob(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        prob = Problem.objects.get(pk=pk)
-        a = prob.datecrok.all()
-        if request.user.has_perm('problem.edit_Problem'):
-            if request.method == 'POST':
-                formset = PrSet(request.POST, instance=prob)
-                if formset.is_valid():
-                    formset.save()
-                    return redirect("index")
-            else:
-                formset = PrSet(instance=prob)
-            return render(request, 'problem/problem.html', {'auth': True, 'formset': formset, 'np': prob, 'prob': prob, 'srok': a})
+        if Problem.objects.filter(nomdobr=pk).exists():
+            prob = Problem.objects.get(nomdobr=pk)
+            a = prob.datecrok.all()
+            termadd = TermForm()
+            return render(request, 'problem/problem.html', {'formadd': termadd, 'np': prob, 'srok': a})
         else:
-            return render(request, 'problem/problem.html', {'auth': False, 'np': prob, 'prob': prob, 'srok': a})
+            return redirect('index')
 
 def zaptable(request):
     for i in range(0,51):
@@ -132,15 +127,21 @@ def add(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if request.user.has_perm('problem.add_Problem'):
-            if request.method == 'POST':
-                formadd = PrAdd(request.POST)
-                if formadd.is_valid():
-                    formadd.save()
-                    return redirect("problem", pk= Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
+            if not Problem.objects.filter(nomdobr=request.POST['nomdobr']).exists():
+                if request.method == 'POST':
+                    formadd = PrAdd(request.POST)
+                    if formadd.is_valid():
+                        formadd.save()
+                        return redirect("problem", pk= Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
+                    else:
+                        return redirect("index")
                 else:
+                    #if not Problem.objects.filter(nomdobr=request.POST['nomdobr']).exists():
+                    #    messages.error(request, 'Данная жалоба существует.')
+                    #    return redirect("problem", pk= Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
                     return redirect("index")
             else:
-                return redirect("index")
+                return redirect("problem", pk=Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
 
 def termadd(request, pk):
     if not request.user.is_authenticated:
@@ -152,9 +153,9 @@ def termadd(request, pk):
                 formadd = TermForm(request.POST)
                 if formadd.is_valid():
                     a = formadd.save()
-                    print(a)
                     prob.datecrok.add(a)
-                    return redirect("problem", pk=pk)
+                    nd = Problem.objects.get(pk=pk)
+                    return redirect("problem", pk=nd.nomdobr)
             else:
                 formadd = TermForm()
             return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
@@ -163,12 +164,67 @@ def termadd(request, pk):
 
 def delterm(request, pk, pkp):
     b = Term.objects.get(pk=pk)
+    nd = b.terms.all()[0]
     b.delete()
-    return redirect("problem", pk=pkp)
+    return redirect("problem", pk=nd.nomdobr)
 
 def lk(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        a = User.objects.get(username=request.user)
-        return render(request, 'problem/lk.html', {'userr': a})
+        userlk = User.objects.get(username=request.user.username)
+        kolvo = {}
+        kolvo['kolclose'] = len(Answer.objects.filter(user=request.user))
+        if request.user.has_perm('problem.view_problem'):
+            temp = len(Problem.objects.filter(status='Закрыто'))
+            kolvo['kolall'] = len(Problem.objects.all()) - temp
+        elif userlk.userprofile.org != None:
+        #elif request.user.UserProfile.org != None:
+            kolvo['kolall'] = (len(Term.objects.filter(curat=userlk.userprofile.org, status='0')) +
+                len(Term.objects.filter(curat=userlk.userprofile.org, status='1')))
+        return render(request, 'problem/lk.html', {'kolvo': kolvo})
+
+def closedproblem(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        name = 'Закрытые жалобы'
+        userlk = User.objects.get(username=request.user.username)
+        otv = Answer.objects.filter(user=userlk)
+        #terms = Term.objects.filter(curat=userlk.userprofile.org)
+        prob = []
+        for i in otv:
+            a = i.otvs.all()
+            for j in a:
+                c = j.terms.all()
+                for h in c:
+                    prob.append(h)
+        kolvo = len(prob)
+        config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
+        table = ProblemTable(prob)
+        config.configure(table)
+        return render(request, 'problem/allproblem.html', {'table': table, 'name': name, 'kolvo': kolvo})
+
+def allproblem(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        name = 'Все жалобы'
+        userlk = User.objects.get(username=request.user.username)
+        prob = []
+        if request.user.has_perm('problem.view_problem'):
+            temp = Problem.objects.all()
+            for i in temp:
+                if i.status != 'Закрыто':
+                    prob.append(i)
+        else:
+            terms = Term.objects.filter(curat=userlk.userprofile.org)
+            for i in terms:
+                a = i.terms.all()
+                for j in a:
+                    prob.append(a)
+        dop = f'Всего: {len(prob)}.'
+        config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
+        table = ProblemTable(prob)
+        config.configure(table)
+        return render(request, 'problem/allproblem.html', {'table': table, 'name': name, 'dop': dop})
