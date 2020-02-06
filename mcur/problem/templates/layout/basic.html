@@ -5,6 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="icon" href="{% static 'adminlte/dist/img/logo.png' %}" type="image/x-icon">
   <title>ЕСУМ - {% block title %}Главная{% endblock %}</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,9 +47,10 @@
       </li>
     </ul>
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3">
+    <form action="{% url 'search' %}" method="post" class="form-inline ml-3">
+      {% csrf_token %}
       <div class="input-group input-group-sm " style="top: 10px;">
-        <input class="form-control form-control-navbar" type="search" placeholder="Поиск" aria-label="Search">
+        <input name="pk" id="id_pk" class="form-control form-control-navbar" type="search" placeholder="Поиск" aria-label="Search">
         <div class="input-group-append">
           <button class="btn btn-navbar" type="submit">
             <i class="fas fa-search"></i>
@@ -66,7 +68,7 @@
           <!-- User image -->
           <li class="user-header bg-primary" style="height: 100px;">
             <p>
-              {{ request.user.first_name }} {{ request.user.last_name }} - Роль
+              {{ request.user.first_name }} {{ request.user.last_name }} - {{ request.users.groups.0.name }}
               <small>{{ request.user.email }}</small>
             </p>
           </li>
@@ -113,7 +115,8 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{% url 'index' %}" class="brand-link">
-      <span class="brand-text font-weight-light">ЕСУМ</span>
+      <img src="{% static 'adminlte/dist/img/logo.png' %}" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light"><b>ЕСУМ</b></span>
     </a>
 
     <!-- Sidebar -->
@@ -167,7 +170,6 @@
               </p>
             </a>
           </li>
-
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

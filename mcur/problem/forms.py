@@ -1,16 +1,24 @@
-from django.forms import modelform_factory, DecimalField, ModelForm, DateField, DateInput
+from django.forms import (modelform_factory, DecimalField, ModelForm, DateField,
+                        DateInput, TextInput, ModelChoiceField)
 from django.contrib.auth import authenticate, get_user_model
 from crispy_forms.helper import FormHelper
 from django.utils.text import capfirst
 from django import forms
 from django.forms.widgets import Select
 import datetime
-from .models import Problem, Term
+from .models import Problem, Term, Answer
+
+class AnswerForm(ModelForm):
+    #image = ModelChoiceField()
+    class Meta:
+        model = Answer
+        fields = {'text'}
 
 class TermForm(ModelForm):
     class Meta:
         model = Term
         fields = {'date', 'curat', 'desck'}
+        widgets = {'desck': TextInput}
 
 
 class PrAdd(ModelForm):

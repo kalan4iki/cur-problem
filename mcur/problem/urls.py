@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import (api_problem, api_problem_detail, curator, prob, ProblemTableView,
-                zaptable, add, termadd, delterm, lk, closedproblem, allproblem)
+from .views import (api_problem, api_problem_detail, prob, ProblemTableView,
+                zaptable, add, termadd, delterm, lk, closedproblem, allproblem, search)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from mcur import settings
@@ -11,7 +11,6 @@ urlpatterns = [
     path('test', ProblemTableView.as_view(), name='multitableview'),
     path('api/problem/', api_problem),
     path('api/problem/<int:np>', api_problem_detail),
-    path('curators/<int:pk>', curator, name='curators'),
     path('problem/<int:pk>', prob, name='problem'),
     path('add/', add, name='add'),
     path('zap', zaptable),
@@ -23,7 +22,8 @@ urlpatterns = [
     path('', lk, name='index'),
     path('', lk, name='lk'),
     path('closed/', closedproblem, name='closed'),
-    path('allproblem/', allproblem, name='allproblem')
+    path('allproblem/', allproblem, name='allproblem'),
+    path('search/', search, name='search')
 ]
 
 

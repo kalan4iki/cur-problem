@@ -1,13 +1,20 @@
 from django.contrib import admin
-from .models import Curator, Minis, Problem, Term, Access, Answer, UserProfile
+from .models import Curator, Minis, Problem, Term, Access, Answer, UserProfile, Image
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
+
+class ImageInline(admin.StackedInline):
+    model = Image
+    can_delete = False
+    verbose_name_plural = 'Фотографии'
+
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ('nomobr', 'status', 'datecre', 'datebzm', 'images',)
-    list_display_links = ('status', 'datecre', 'datebzm','images',)
-    search_fields = ('status', 'datecre', 'datebzm','images',)
+    list_display = ('nomobr', 'status', 'datecre', 'datebzm',)
+    list_display_links = ('status', 'datecre', 'datebzm',)
+    search_fields = ('status', 'datecre', 'datebzm',)
+    inlines = (ImageInline,)
 
     def nomobr(self, answ):
         if answ.otvs.all().exists():
@@ -18,7 +25,7 @@ class AnswerAdmin(admin.ModelAdmin):
         else:
             return 'Нет'
     nomobr.short_description = "Номер жалобы"
-    
+
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status', 'get_datecrok',)

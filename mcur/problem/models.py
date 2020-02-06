@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 # TODO: Модель ответов,
+
 class Curator(models.Model):
     name = models.CharField(max_length=40, help_text='Куратор проблемы',
                             verbose_name = 'Куратор')
@@ -23,6 +24,7 @@ class Curator(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     org = models.ForeignKey(Curator, on_delete=models.PROTECT, verbose_name='Организация')
+    post = models.CharField(max_length=100, help_text='Должность', verbose_name = 'Должность', default=None, null=True)
 
     def __unicode__(self):
         return self.user
@@ -66,10 +68,10 @@ class Minis(models.Model):
 class Answer(models.Model):
     stats = {
         ('0','На согласовании'),
-        ('1','Утверждено'),
+        ('1','Дан ответ'),
+        ('2','Утверждено'),
     }
     text = models.TextField(help_text='Комментарий', verbose_name = 'Текст', null=True)
-    images = models.ImageField(upload_to='photos', null=True)
     datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
     datebzm = models.DateField(auto_now=True, help_text='Дата изменения', verbose_name = 'Дата изменения', blank=True, null=True)
     status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
@@ -85,6 +87,18 @@ class Answer(models.Model):
     #def __str__(self):
     def get_absolute_url(self):
         return reverse() # TODO: Доработать
+
+class Image(models.Model):
+    otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='img', blank=True,
+                            verbose_name='Ответ')
+    file = models.ImageField(upload_to='photos', null=True)
+
+    def __str__(self):
+        return str(self.pk)
+
+    class Meta:
+        verbose_name = 'фотография'
+        verbose_name_plural = 'фотографии'
 
 class Term(models.Model):
     stats = {

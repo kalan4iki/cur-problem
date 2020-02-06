@@ -21,7 +21,6 @@ from django.contrib import messages
 import random
 import mcur.settings as settings
 
-
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
@@ -63,36 +62,6 @@ def api_problem_detail(request, np):
         prob = Problem.objects.get(nomdobr=np)
         serializer = ProblemSerializer(prob)
         return Response(serializer.data)
-'''
-# Create your views here.
-def index(request):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        prob = Problem.objects.all()
-        curat = Curator.objects.all()
-        curats = CuratorsMenu(curat).codes('-1')
-        config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
-        table = ProblemTable(prob)
-        forms = AuthenticationForm
-        config.configure(table)
-        return render(request, 'problem/allproblem.html', {'table': table, 'curat': curats, 'loginform': forms})
-'''
-def curator(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        term = Term.objects.filter(curat=Curator.objects.get(pk=pk))
-        prob = []
-        for i in term:
-            prob.append(Term.objects.filter(problem__pk=i.pk))
-            #prob.append(Problem.objects.get(datecrok=i))
-        curat = Curator.objects.all()
-        curats = CuratorsMenu(curat).codes(pk)
-        config = RequestConfig(request, paginate={'paginator_class': LazyPaginator, 'per_page': 10})
-        table = ProblemTable(prob)
-        config.configure(table)
-        return render(request, 'problem/index.html', {'table': table, 'curat': curats})
 
 def prob(request, pk):
     if not request.user.is_authenticated:
@@ -228,3 +197,16 @@ def allproblem(request):
         table = ProblemTable(prob)
         config.configure(table)
         return render(request, 'problem/allproblem.html', {'table': table, 'name': name, 'dop': dop})
+
+def search(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.method == 'POST':
+            nd = request.POST['pk']
+            if Problem.objects.filter(nomdobr=nd).exists():
+                prob = Problem.objects.get(nomdobr=nd)
+                return redirect("problem", pk=prob.nomdobr)
+            else:
+                return redirect('index')
+        return redirect('index')
