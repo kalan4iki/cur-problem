@@ -9,14 +9,15 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.template.context_processors import csrf
 from django.views import View
+from django.core.files.base import ContentFile
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import serializers
 from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
-from .models import Problem, Curator, Term, Answer
+from .models import Problem, Curator, Term, Answer, Image
 from .tables import ProblemTable, TermTable
-from .forms import PrSet, AuthenticationForm, PrAdd, TermForm
+from .forms import PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm
 from django.contrib import messages
 import random
 import mcur.settings as settings
@@ -71,7 +72,8 @@ def prob(request, pk):
             prob = Problem.objects.get(nomdobr=pk)
             a = prob.datecrok.all()
             termadd = TermForm()
-            return render(request, 'problem/problem.html', {'formadd': termadd, 'np': prob, 'srok': a})
+            answeradd = AnswerForm()
+            return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'srok': a})
         else:
             return redirect('index')
 
@@ -210,3 +212,28 @@ def search(request):
             else:
                 return redirect('index')
         return redirect('index')
+
+def addanswer(request, pk):
+    term = Term.objects.get(pk=pk)
+    print(request.POST)
+    print(request.FILES)
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.method == 'POST':
+            formadd = AnswerForm(request.POST, request.FILES)
+            if formadd.is_valid():
+                answr = Answer.objects.create(text=formadd.cleaned_data['text'], user=request.user)
+                for f in request.FILES.getlist('image'):
+                    data = f.read()
+                    photo = Image(otv=answr)
+                    photo.file.save(f.name, ContentFile(data))
+                    photo.save()
+                term.otv = answr
+                term.status = '1'
+                return redirect("problem", pk=term.terms.all()[0].nomdobr)
+            else:
+                print(formadd.errors)
+                return redirect('index')
+        else:
+            return redirect('index')

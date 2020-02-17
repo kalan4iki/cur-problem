@@ -1,25 +1,33 @@
-from django.forms import (modelform_factory, DecimalField, ModelForm, DateField,
-                        DateInput, TextInput, ModelChoiceField)
+from django.forms import (modelform_factory, DecimalField, ModelForm, DateField, Form,
+                        DateInput, TextInput, ModelChoiceField, ImageField, Textarea, CharField)
 from django.contrib.auth import authenticate, get_user_model
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 from django.utils.text import capfirst
 from django import forms
 from django.forms.widgets import Select
 import datetime
 from .models import Problem, Term, Answer
 
-class AnswerForm(ModelForm):
-    #image = ModelChoiceField()
-    class Meta:
-        model = Answer
-        fields = {'text'}
+class AnswerForm(Form):
+    text = CharField(label=u'Комментарий')
+    image = ImageField(label=u'Фотографии', widget=forms.FileInput(attrs={'multiple': 'multiple'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
 
 class TermForm(ModelForm):
     class Meta:
         model = Term
         fields = {'date', 'curat', 'desck'}
-        widgets = {'desck': TextInput}
+        TA = Textarea
+        TA.template_name="widgets/textarea.html"
+        widgets = {'desck': TA}
 
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.helper = FormHelper()
 
 class PrAdd(ModelForm):
     class Meta:

@@ -68,8 +68,7 @@ class Minis(models.Model):
 class Answer(models.Model):
     stats = {
         ('0','На согласовании'),
-        ('1','Дан ответ'),
-        ('2','Утверждено'),
+        ('1','Утверждено'),
     }
     text = models.TextField(help_text='Комментарий', verbose_name = 'Текст', null=True)
     datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'problem.apps.ProblemConfig',
     'crispy_forms',
+    'tinymce',
 ]
 
 MIDDLEWARE = [

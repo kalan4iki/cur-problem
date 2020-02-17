@@ -1,6 +1,6 @@
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import (api_problem, api_problem_detail, prob, ProblemTableView,
+from .views import (api_problem, api_problem_detail, prob, ProblemTableView, addanswer,
                 zaptable, add, termadd, delterm, lk, closedproblem, allproblem, search)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -23,7 +23,8 @@ urlpatterns = [
     path('', lk, name='lk'),
     path('closed/', closedproblem, name='closed'),
     path('allproblem/', allproblem, name='allproblem'),
-    path('search/', search, name='search')
+    path('search/', search, name='search'),
+    path('addanswer/<int:pk>', addanswer, name='addanswer')
 ]
 
 

@@ -41,6 +41,9 @@
                 {% endif %}
               </td>
             </tr>
+            <tr>
+              <td colspan="5">Описание назначения: <b>{{ i.desck }}</b></td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
@@ -103,13 +106,14 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form role="form" action="{% url 'termadd' np.pk %}" method="post">
+          <form role="form" action="{% url 'addanswer' i.pk %}" method="post">
             <div class="modal-body">
-                <a href="#">test</a>
+              {% csrf_token %}
+              {{ answeradd|crispy }}
             </div>
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-              <button type="submit" class="btn btn-primary">Добавить</button>
+              <button type="submit" class="btn btn-primary">Ответить</button>
             </div>
           </form>
         </div>
