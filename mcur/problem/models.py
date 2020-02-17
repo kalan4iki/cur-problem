@@ -4,6 +4,43 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 # TODO: Модель ответов,
+class Category(models.Model):
+    name = models.CharField(max_length=100, help_text='Категория проблемы',
+                            verbose_name = 'Категория')
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'категория проблемы'
+        verbose_name_plural = 'категории проблем'
+
+    def __str__(self):
+        return self.name
+
+class Podcategory(models.Model):
+    name = models.CharField(max_length=100, help_text='Подкатегория проблемы',
+                            verbose_name = 'Подкатегория')
+    categ = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Категория проблемы',
+                            verbose_name = 'Категория')
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'подкатегория проблемы'
+        verbose_name_plural = 'подкатегории проблем'
+
+    def __str__(self):
+        return self.name
+
+class Status(models.Model):
+    name = models.CharField(max_length=100, help_text='Статус проблемы',
+                            verbose_name = 'Статус')
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'статус проблемы'
+        verbose_name_plural = 'статусы проблем'
+
+    def __str__(self):
+        return self.name
 
 class Curator(models.Model):
     name = models.CharField(max_length=40, help_text='Куратор проблемы',
@@ -13,7 +50,6 @@ class Curator(models.Model):
         ordering = ['name']
         verbose_name = 'куратор проблемы'
         verbose_name_plural = 'кураторы проблем'
-        #permissions = {"", }
 
     def __str__(self):
         return self.name
@@ -24,7 +60,7 @@ class Curator(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     org = models.ForeignKey(Curator, on_delete=models.PROTECT, verbose_name='Организация')
-    post = models.CharField(max_length=100, help_text='Должность', verbose_name = 'Должность', default=None, null=True)
+    post = models.CharField(max_length=100, help_text='Должность', verbose_name = 'Должность', default=' ', null=True, blank=True)
 
     def __unicode__(self):
         return self.user
@@ -64,6 +100,82 @@ class Minis(models.Model):
     def __str__(self):
         return self.name
 
+class Problem(models.Model):
+    pars = {
+        ('0','На обновлении'),
+        ('1','Обновлено'),
+    }
+    vis = {
+        ('0','Не показывать'),
+        ('1','Показывать'),
+    }
+    stat = {
+        ('0','Закрыто'),
+        ('1','В работе'),
+        ('2','На модерации'),
+    }
+    nomdobr = models.CharField(max_length = 20, help_text = 'Номер проблемы',
+                            verbose_name = 'Номер', unique = True)
+    temat = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Тематика проблемы',
+                            verbose_name = 'Тематика', blank=True, null=True)
+    podcat = models.ForeignKey(Podcategory, on_delete=models.PROTECT, help_text='Подкатегория проблемы',
+                            verbose_name = 'Подкатегория', blank=True, null=True)
+    ciogv = models.ForeignKey(Minis, on_delete = models.PROTECT, blank=True,
+                            help_text='ЦИОГВ', verbose_name = 'ЦИОГВ', null=True)
+    text = models.TextField(help_text='Текст проблемы', verbose_name = 'Текст', blank=True, null=True)
+    adres = models.CharField(max_length=255, help_text='Адрес проблемы',
+                            verbose_name = 'Адрес', blank=True, null=True)
+    url = models.URLField(help_text='URL проблемы', verbose_name = 'URL', blank=True, null=True)
+    datecre = models.DateField(help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
+    dateotv = models.DateField(help_text='Дата ответа по доброделу', verbose_name = 'Дата ответа по доброделу', blank=True, null=True)
+    status = models.ForeignKey(Status, on_delete=models.PROTECT, help_text='Статус в доброделе',
+                            verbose_name = 'Статус в доброделе', blank=True, null=True)
+    statussys = models.CharField(max_length=70, help_text='Статус проблемы',
+                            verbose_name = 'Статус', default='2',choices=stat)
+    parsing = models.CharField(max_length=50, help_text='Статус парсинга',
+                            verbose_name = 'Статус парсинга', default='0', choices=pars)
+    visible = models.CharField(max_length=50, help_text='Режим показа на сайте',
+                            verbose_name = 'Режим', default='1', choices=vis)
+
+    class Meta:
+        ordering = ['nomdobr']
+        verbose_name = 'жалоба'
+        verbose_name_plural = 'жалобы'
+
+    def __str__(self):
+        return self.nomdobr
+
+    def get_absolute_url(self):
+        return reverse("problem", args=(self.nomdobr,))
+
+    def is_upperclass(self):
+        return self.year_in_school in (self.JUNIOR, self.SENIOR)
+
+class Term(models.Model):
+    stats = {
+        ('0','На исполнении'),
+        ('1','На согласовании'),
+        ('2','Исполнено'),
+    }
+    date = models.DateField(help_text='Срок', verbose_name = 'Срок', null=True)
+    curat = models.ForeignKey(Curator, on_delete = models.PROTECT,
+                            help_text='Куратор', verbose_name = 'Куратор')
+    desck = models.TextField(help_text='Описание', verbose_name = 'Описание', blank=True, null=True)
+    status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True,
+                            verbose_name = 'Проблема', related_name='terms')
+
+    class Meta:
+        ordering = ['date']
+        verbose_name = 'срок жалобы'
+        verbose_name_plural = 'сроки жалоб'
+
+    def __str__(self):
+        temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
+        return temp
+
+    def get_absolute_url(self):
+        return reverse("curators", args=(self.curat.pk,))
 
 class Answer(models.Model):
     stats = {
@@ -75,6 +187,7 @@ class Answer(models.Model):
     datebzm = models.DateField(auto_now=True, help_text='Дата изменения', verbose_name = 'Дата изменения', blank=True, null=True)
     status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text='Кто дал ответ', verbose_name = 'Отвечающий')
+    term = models.OneToOneField(Term, on_delete=models.CASCADE, null=True, verbose_name = 'Назначение', related_name='answers')
 
     class Meta:
         ordering = ['pk']
@@ -98,63 +211,3 @@ class Image(models.Model):
     class Meta:
         verbose_name = 'фотография'
         verbose_name_plural = 'фотографии'
-
-class Term(models.Model):
-    stats = {
-        ('0','На исполнении'),
-        ('1','На согласовании'),
-        ('2','Исполнено'),
-    }
-    date = models.DateField(help_text='Срок', verbose_name = 'Срок', null=True)
-    curat = models.ForeignKey(Curator, on_delete = models.PROTECT,
-                            help_text='Куратор', verbose_name = 'Куратор')
-    desck = models.TextField(help_text='Описание', verbose_name = 'Описание', blank=True, null=True)
-    status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
-    otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='otvs', blank=True,
-                            verbose_name='Ответ')
-
-    class Meta:
-        ordering = ['date']
-        verbose_name = 'срок жалобы'
-        verbose_name_plural = 'сроки жалоб'
-
-    def __str__(self):
-        temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
-        return temp
-
-    def get_absolute_url(self):
-        return reverse("curators", args=(self.curat.pk,))
-
-class Problem(models.Model):
-    pars = {
-        ('0','На обновлении'),
-        ('1','Обновлено'),
-    }
-    nomdobr = models.CharField(max_length = 20, help_text = 'Номер проблемы',
-                            verbose_name = 'Номер', unique = True)
-    temat = models.CharField(max_length=255, help_text='Тематика проблемы',
-                            verbose_name = 'Тематика', blank=True, null=True)
-    ciogv = models.ForeignKey(Minis, on_delete = models.PROTECT, blank=True,
-                            help_text='ЦИОГВ', verbose_name = 'ЦИОГВ', null=True)
-    text = models.TextField(help_text='Текст проблемы', verbose_name = 'Текст', blank=True, null=True)
-    adres = models.CharField(max_length=255, help_text='Адрес проблемы',
-                            verbose_name = 'Адрес', blank=True, null=True)
-    url = models.URLField(help_text='URL проблемы', verbose_name = 'URL', blank=True, null=True)
-    datecre = models.DateField(help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
-    datecrok = models.ManyToManyField(Term, help_text='Сроки задачи', verbose_name = 'Сроки задачи', blank=True, null=True, related_name='terms')
-    dateotv = models.DateField(help_text='Дата ответа по доброделу', verbose_name = 'Дата ответа по доброделу', blank=True, null=True)
-    status = models.CharField(max_length=50, help_text='Статус проблемы',
-                            verbose_name = 'Статус', blank=True, null=True)
-    parsing = models.CharField(max_length=50, help_text='Статус парсинга',
-                            verbose_name = 'Статус парсинга', default='0', choices=pars)
-
-    class Meta:
-        ordering = ['nomdobr']
-        verbose_name = 'жалоба'
-        verbose_name_plural = 'жалобы'
-
-    def __str__(self):
-        return self.nomdobr
-
-    def get_absolute_url(self):
-        return reverse("problem", args=(self.nomdobr,))

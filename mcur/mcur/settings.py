@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'problem.apps.ProblemConfig',
     'crispy_forms',
     'tinymce',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

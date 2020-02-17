@@ -20,13 +20,13 @@
     <div class="col-12 col-sm-6 col-md-3">
       <div class="small-box bg-info">
         <div class="inner">
-          <h3>{{ kolvo.kolall }}</h3>
+          <h3>{{ kolvo.kolno }}</h3>
           <p>Не распределенные жалобы</p>
         </div>
         <div class="icon">
           <i class="fas fa-info"></i>
         </div>
-        <a href="{% url 'allproblem' %}" class="small-box-footer">
+        <a href="{% url 'noproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
@@ -64,13 +64,13 @@
     <div class="col-12 col-sm-6 col-md-3">
       <div class="small-box bg-warning">
         <div class="inner">
-          <h3>0</h3>
+          <h3>{{ kolvo.podx }}</h3>
           <p>Подходит срок жалоб</p>
         </div>
         <div class="icon">
           <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <a href="#" class="small-box-footer">
+        <a href="{% url 'podxproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
@@ -78,13 +78,13 @@
     <div class="col-12 col-sm-6 col-md-3">
       <div class="small-box bg-danger">
         <div class="inner">
-          <h3>0</h3>
+          <h3>{{ kolvo.prosr }}</h3>
           <p>Просроченных жалоб</p>
         </div>
         <div class="icon">
           <i class="fas fa-ban"></i>
         </div>
-        <a href="#" class="small-box-footer">
+        <a href="{% url 'prosrproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>

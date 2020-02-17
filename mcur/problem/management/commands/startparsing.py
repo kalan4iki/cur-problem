@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import Select
 from xml.dom.minidom import parseString
 from bs4 import BeautifulSoup
 from sys import platform
-from problem.models import Problem
+from problem.models import Problem, Category, Podcategory, Status
 import lxml
 import time
 import datetime
@@ -74,17 +74,33 @@ def parsTable(source):
                 iter += 1
             date = temp2[9].split('.')
             date2 = temp2[11].split('.')
+
+            if not Category.objects.filter(name=temp2[5]).exists():
+                cat = Category(name=temp2[5])
+                cat.save()
+            print(Category.objects.get(name=temp2[5]))
+            if not Podcategory.objects.filter(name=temp2[6]).exists():
+                podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
+                podcat.save()
+            if not Status.objects.filter(name=temp2[13]).exists():
+                stat = Status(name=temp2[13])
+                stat.save()
+            visi = '1'
+            if temp2[13] == 'Закрыто' and temp2[13] == 'Решено' and temp2[13] == 'Получен ответ':
+                visi = '0'
             if not Problem.objects.filter(nomdobr=temp2[0]).exists():
-                prob = Problem(nomdobr=temp2[0],temat=temp2[5] + '. ' + temp2[6],text=temp2[3],adres=temp2[2],datecre=f'{date[2]}-{date[1]}-{date[0]}',status=temp2[13], parsing='1', dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}')
+                prob = Problem(nomdobr=temp2[0],temat=Category.objects.get(name=temp2[5]), podcat = Podcategory.objects.get(name=temp2[6]), text=temp2[3],adres=temp2[2],datecre=f'{date[2]}-{date[1]}-{date[0]}',status=Status.objects.get(name=temp2[13]), parsing='1', dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible = visi)
             else:
                 prob = Problem.objects.get(nomdobr=temp2[0])
-                prob.temat = temp2[5] + '. ' + temp2[6]
+                prob.temat = Category.objects.get(name=temp2[5])
+                prob.podcat = Podcategory.objects.get(name=temp2[6])
                 prob.text = temp2[3]
                 prob.adres = temp2[2]
                 prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
                 prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
-                prob.status = temp2[13]
+                prob.status = Status.objects.get(name=temp2[13])
                 prob.parsing = '1'
+                prob.visible = visi
             prob.save()
     except:
         print(traceback.format_exc())

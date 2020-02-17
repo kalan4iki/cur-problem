@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Curator, Minis, Problem, Term, Access, Answer, UserProfile, Image
+from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile,
+                    Image, Category, Podcategory, Status)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
@@ -8,6 +9,30 @@ class ImageInline(admin.StackedInline):
     model = Image
     can_delete = False
     verbose_name_plural = 'Фотографии'
+
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ('file',)
+    list_display_links = ('file',)
+
+@admin.register(Status)
+class StatusAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    list_display_links = ('name',)
+    search_fields = ('name',)
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    list_display_links = ('name',)
+    search_fields = ('name',)
+
+@admin.register(Podcategory)
+class PodcategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    list_display_links = ('name',)
+    search_fields = ('name',)
+    list_filter = ('categ__name',)
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
@@ -28,11 +53,11 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status', 'get_datecrok',)
-    list_display_links = ('nomdobr', 'temat', 'ciogv', 'text', 'adres', 'status',)
+    list_display = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
+    list_display_links = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
     search_fields = ('nomdobr',)
-    list_filter = ('ciogv__name', 'status', 'parsing')
-    actions = ('pars',)
+    list_filter = ('ciogv__name', 'status__name', 'parsing', 'temat')
+    actions = ('pars', 'novisib', 'visib')
 
     def pars(self, request, queryset):
         for prob in queryset:
@@ -41,8 +66,22 @@ class ProblemAdmin(admin.ModelAdmin):
         self.message_user(request, 'Действие выполнено')
     pars.short_description = 'Отправить на уточнение'
 
-    def get_datecrok(self, obj):
-        return "\n".join([f'({p.curat} - {p.date.day}.{p.date.month}.{p.date.year})  ' for p in obj.datecrok.all()])
+    def novisib(self, request, queryset):
+        for prob in queryset:
+            prob.visible = '0'
+            prob.save()
+        self.message_user(request, 'Действие выполнено')
+    novisib.short_description = 'Убрать с сайта'
+
+    def visib(self, request, queryset):
+        for prob in queryset:
+            prob.visible = '1'
+            prob.save()
+        self.message_user(request, 'Действие выполнено')
+    visib.short_description = 'Показать на сайте'
+
+#    def get_datecrok(self, obj):
+#        return "\n".join([f'({p.curat} - {p.date.day}.{p.date.month}.{p.date.year})  ' for p in obj.datecrok.all()])
 
 @admin.register(Curator)
 class CuratorAdmin(admin.ModelAdmin):
@@ -65,10 +104,11 @@ class TermAdmin(admin.ModelAdmin):
     list_filter = ('curat__name', 'date',)
 
     def nomobr(self, srok):
-        if srok.terms.all().exists():
-            return srok.terms.all()[0].nomdobr
-        else:
+        if srok.problem == None:
             return 'Нет'
+        else:
+            return srok.problem.nomdobr
+
     nomobr.short_description = "Номер жалобы"
 
     #nomobr.short_description = 'Номер жалобы'

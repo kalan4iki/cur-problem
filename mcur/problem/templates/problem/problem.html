@@ -128,7 +128,7 @@
     <div class="col-md-6">
       <div class="card">
           <div class="card-header ui-sortable-handle">
-            <h3 class="card-title">Жалоба №{{ np.nomdobr }}. Статус: <strong>{{ np.status }}</strong></h3>
+            <h3 class="card-title">Жалоба №{{ np.nomdobr }}. Статус в доброделе: <strong>{{ np.status }}</strong>. Статус: <strong>{{ np.get_statussys_display }}</strong></h3>
             <div class="card-tools">
               {% if user.is_staff %}
               <a type="button" href="http://127.0.0.1:8000/admin/problem/problem/{{np.pk}}/change/" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="В кабинете администратора" target="_blank">

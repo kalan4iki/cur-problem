@@ -7,7 +7,6 @@ class ProblemTable(tables.Table):
     nomdobr = tables.Column(verbose_name='Номер добродел', linkify=True)
     #curat = tables.Column(linkify=True)
     #curat = tables.ManyToManyColumn(linkify_item=True)
-    datecrok = tables.ManyToManyColumn(verbose_name='Срок жалобы')
     class Meta:
         model = Problem
         template_name = "django_tables2/bootstrap4.html"
@@ -16,7 +15,7 @@ class ProblemTable(tables.Table):
                 'thead': {
                     'class': 'thead-light'
                 }}
-        exclude = ("id", "text","url","parsing",)
+        exclude = ("id", "text","url","parsing", "visible")
 
 class TermTable(tables.Table):
     class Meta:

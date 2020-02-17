@@ -1,7 +1,8 @@
 {% extends "layout/basic.html" %}
 {% load render_table from django_tables2 %}
 {% load bootstrap4 %}
-{% block title %}Закрытые жалобы{% endblock %}
+{% load crispy_forms_tags %}
+{% block title %}{{ title }}{% endblock %}
 {% block nav2 %}active{% endblock %}
 {% block content %}
 <!-- Content Header (Page header) -->
@@ -29,6 +30,21 @@
     <div class="col-12">
       <div class="card">
         <div class="card-body">
+          {% if filter %}
+          <form action="" method="get">
+          <div class="row">
+            <div class="col-2">
+              {{ filter.form.temat|as_crispy_field }}
+            </div>
+            <div class="col-2">
+              {{ filter.form.status|as_crispy_field }}
+            </div>
+            <div class="col-1" style="top: 20px;">
+              <button class="btn btn-block btn-primary">Фильтр</button>
+            </div>
+          </div>
+          </form>
+          {% endif %}
           {% render_table table %}
         </div>
       </div>
