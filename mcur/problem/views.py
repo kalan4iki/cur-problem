@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django_tables2 import RequestConfig
 from django_filters.views import FilterView
@@ -245,8 +246,8 @@ def termadd(request, pk):
 
 def delterm(request, pk, pkp):
     b = Term.objects.get(pk=pk)
-    b.delete()
     nd = b.problem
+    b.delete()
     if len(nd.terms.all()) == 0:
         nd.statussys = '2'
         nd.save()
@@ -313,8 +314,6 @@ def search(request):
 
 def addanswer(request, pk):
     term = Term.objects.get(pk=pk)
-    print(request.POST)
-    print(request.FILES)
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
@@ -327,11 +326,38 @@ def addanswer(request, pk):
                     photo = Image(otv=answr)
                     photo.file.save(f.name, ContentFile(data))
                     photo.save()
-                term.otv = answr
+                answr.term = term
+                answr.save()
                 term.status = '1'
-                return redirect("problem", pk=term.terms.all()[0].nomdobr)
+                term.anwr = True
+                term.save()
+                return redirect("problem", pk=term.problem.nomdobr)
             else:
-                print(formadd.errors)
+                return redirect('index')
+        else:
+            return redirect('index')
+
+def termview(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if Term.objects.filter(pk=pk).exists():
+            terr = Term.objects.get(pk=pk)
+            answ = []
+            try:
+                answ = terr.answers
+            except ObjectDoesNotExist:
+                answ = []
+            userr = User.objects.get(username=request.user.username)
+            c = False
+            if terr.curat == userr.userprofile.org:
+                c = True
+            if request.user.has_perm('problem.view_term'):
+                c = True
+            print(answ)
+            if c:
+                return render(request, 'problem/term.html', {'term': terr, 'answers': answ})
+            else:
                 return redirect('index')
         else:
             return redirect('index')

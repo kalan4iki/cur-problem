@@ -1,6 +1,6 @@
 <div class="login-box">
   <div class="login-logo">
-    <a"><b>ЕСУР</b></a>
+    <a"><b>ЕСУМ</b></a>
   </div>
   <!-- /.login-logo -->
   <div class="card">
@@ -10,7 +10,7 @@
       <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="input-group mb-3">
-          <input name="username" type="text" class="form-control" placeholder="">
+          <input name="username" type="text" class="form-control" placeholder="Логин">
           <div class="input-group-append">
             <div class="input-group-text">
               <ion-icon name="contact"></ion-icon>
@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input name="password" type="password" class="form-control" placeholder="Password">
+          <input name="password" type="password" class="form-control" placeholder="Пароль">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>

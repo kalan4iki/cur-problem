@@ -36,20 +36,20 @@ class PodcategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ('nomobr', 'status', 'datecre', 'datebzm',)
+    list_display = ('status', 'datecre', 'datebzm',)
     list_display_links = ('status', 'datecre', 'datebzm',)
     search_fields = ('status', 'datecre', 'datebzm',)
     inlines = (ImageInline,)
 
-    def nomobr(self, answ):
-        if answ.otvs.all().exists():
-            if answ.otvs.all()[0].terms.all().exists():
-                return answ.otvs.all()[0].terms.all()[0].nomdobr
-            else:
-                return 'Нет'
-        else:
-            return 'Нет'
-    nomobr.short_description = "Номер жалобы"
+    #def nomobr(self, answ):
+    #    if answ.otvs.all().exists():
+    #        if answ.otvs.all()[0].terms.all().exists():
+    #            return answ.otvs.all()[0].terms.all()[0].nomdobr
+    #        else:
+    #            return 'Нет'
+    #    else:
+    #        return 'Нет'
+    #nomobr.short_description = "Номер жалобы"
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):

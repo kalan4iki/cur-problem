@@ -148,8 +148,6 @@ class Problem(models.Model):
     def get_absolute_url(self):
         return reverse("problem", args=(self.nomdobr,))
 
-    def is_upperclass(self):
-        return self.year_in_school in (self.JUNIOR, self.SENIOR)
 
 class Term(models.Model):
     stats = {
@@ -164,6 +162,7 @@ class Term(models.Model):
     status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True,
                             verbose_name = 'Проблема', related_name='terms')
+    anwr = models.BooleanField(default=False, verbose_name = 'Наличие ответа')
 
     class Meta:
         ordering = ['date']
@@ -175,19 +174,20 @@ class Term(models.Model):
         return temp
 
     def get_absolute_url(self):
-        return reverse("curators", args=(self.curat.pk,))
+        return reverse("termview", args=(self.pk,))
 
 class Answer(models.Model):
     stats = {
         ('0','На согласовании'),
         ('1','Утверждено'),
+        ('2','Ответ отклонен')
     }
     text = models.TextField(help_text='Комментарий', verbose_name = 'Текст', null=True)
     datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
     datebzm = models.DateField(auto_now=True, help_text='Дата изменения', verbose_name = 'Дата изменения', blank=True, null=True)
     status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text='Кто дал ответ', verbose_name = 'Отвечающий')
-    term = models.OneToOneField(Term, on_delete=models.CASCADE, null=True, verbose_name = 'Назначение', related_name='answers')
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, null=True, verbose_name = 'Назначение', related_name='answers')
 
     class Meta:
         ordering = ['pk']
@@ -203,7 +203,7 @@ class Answer(models.Model):
 class Image(models.Model):
     otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='img', blank=True,
                             verbose_name='Ответ')
-    file = models.ImageField(upload_to='photos', null=True)
+    file = models.ImageField(upload_to='photos', null=True, verbose_name = 'Фотография')
 
     def __str__(self):
         return str(self.pk)
