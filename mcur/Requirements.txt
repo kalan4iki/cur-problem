@@ -8,7 +8,7 @@ django-cors-headers
 django-crispy-forms
 django-debug-toolbar
 django-filter
--e django-tables2
+django-tables2
 django-tinymce
 djangorestframework
 lxml
