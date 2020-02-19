@@ -13,11 +13,11 @@ ServerAlias 192.168.10.25
 ServerAdmin vvk@istra-adm.ru
 DocumentRoot /var/www/cur-problem/mcur
 Alias /static/ /var/www/cur-problem/mcur/problem/static
-Alias /media/ /var/www/cur-problem/mcur/files/media
+Alias /media/ /home/media
 <Directory /var/www/cur-problem/mcur/problem/static>
 Require all granted
 </Directory>
-<Directory /var/www/cur-problem/mcur/files/media>
+<Directory /home/media>
 Require all granted
 </Directory>
 <Directory /var/www/cur-problem/mcur/mcur>
