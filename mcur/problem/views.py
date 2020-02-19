@@ -345,9 +345,10 @@ def termview(request, pk):
             terr = Term.objects.get(pk=pk)
             answ = []
             try:
-                answ = terr.answers
+                answ = terr.answers.all()
             except ObjectDoesNotExist:
                 answ = []
+            print(answ)
             userr = User.objects.get(username=request.user.username)
             c = False
             if terr.curat == userr.userprofile.org:

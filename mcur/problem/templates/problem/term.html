@@ -65,11 +65,11 @@
               </tr>
             </thead>
             <tbody>
-              {% for i in answ %}
+              {% for i in answers %}
               <tr>
-                <td>{{ i.pk }}</td>
-                <td>{{ i.date }}</td>
-                <td>{{ i.curat }}</td>
+                <td>{{ i.datecre }}</td>
+                <td>{{ i.status }}</td>
+                <td>{{ i.user }}</td>
                 <td>
                   {% if user.is_staff %}
                   <a class="btn btn-sm btn-info" href="">Утвердить</a>

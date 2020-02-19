@@ -1,0 +1,9 @@
+<Location "/var/www/project1">
+    SetHandler python-project1
+    PythonHandler django.core.handlers.modpython
+    SetEnv DJANGO_SETTINGS_MODULE testproject.settings
+    PythonDebug Off
+</Location>
+UPDATE mysql.user SET authentication_string=PASSWORD('Vad211563'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost';
+FLUSH PRIVILEGES;
+CREATE DATABASE 'mcur' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
