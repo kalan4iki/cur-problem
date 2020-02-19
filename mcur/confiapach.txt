@@ -8,19 +8,30 @@ UPDATE mysql.user SET authentication_string=PASSWORD('Vad211563'), plugin='mysql
 FLUSH PRIVILEGES;
 CREATE DATABASE 'mcur' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 <VirtualHost *:80>
-    . . .
-
-    Alias /static /www/cur-problem/mcur/problem/static
-    <Directory /www/cur-problem/mcur/problem/static>
-        Require all granted
-    </Directory>
-    <Directory /www/cur-problem/mcur>
-        <Files wsgi.py>
-            Require all granted
-        </Files>
-    </Directory>
-
-    WSGIDaemonProcess mcur python-home=/usr/lib/python3 python-path=/www/cur-problem/mcur
-    WSGIProcessGroup mcur
-    WSGIScriptAlias / /www/cur-problem/mcur/mcur
+ServerName Mcur
+ServerAlias 192.168.10.25
+ServerAdmin vvk@istra-adm.ru
+DocumentRoot /var/www/cur-problem/mcur
+Alias /static/ /var/www/cur-problem/mcur/problem/static
+Alias /media/ /var/www/cur-problem/mcur/files/media
+<Directory /var/www/cur-problem/mcur/problem/static>
+Require all granted
+</Directory>
+<Directory /var/www/cur-problem/mcur/files/media>
+Require all granted
+</Directory>
+<Directory /var/www/cur-problem/mcur/mcur>
+<Files wsgi.py>
+Require all granted
+</Files>
+</Directory>
+WSGIDaemonProcess mcur python-home=/home/env python-path=/www/cur-problem/mcur
+WSGIProcessGroup mcur
+WSGIScriptAlias / /var/www/cur-problem/mcur/mcur/wsgi.py
 </VirtualHost>
+
+sudo nano /etc/apache2/apache2.conf
+sudo nano /etc/apache2/sites-enabled/000-default.conf
+sudo service apache2 restart
+sudo nano /var/log/apache2/error.log
+./configure --with-apxs=/usr/local/apache/bin/apxs   --with-python=/usr/local/bin/python3.6
