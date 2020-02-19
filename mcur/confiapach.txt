@@ -7,3 +7,20 @@
 UPDATE mysql.user SET authentication_string=PASSWORD('Vad211563'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost';
 FLUSH PRIVILEGES;
 CREATE DATABASE 'mcur' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+<VirtualHost *:80>
+    . . .
+
+    Alias /static /www/cur-problem/mcur/problem/static
+    <Directory /www/cur-problem/mcur/problem/static>
+        Require all granted
+    </Directory>
+    <Directory /www/cur-problem/mcur>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+
+    WSGIDaemonProcess mcur python-home=/usr/lib/python3 python-path=/www/cur-problem/mcur
+    WSGIProcessGroup mcur
+    WSGIScriptAlias / /www/cur-problem/mcur/mcur
+</VirtualHost>
