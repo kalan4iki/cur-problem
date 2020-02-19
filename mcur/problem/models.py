@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 # TODO: Модель ответов,
 class Category(models.Model):
-    name = models.CharField(max_length=100, help_text='Категория проблемы',
+    name = models.CharField(max_length=255, help_text='Категория проблемы',
                             verbose_name = 'Категория')
 
     class Meta:
@@ -17,7 +17,7 @@ class Category(models.Model):
         return self.name
 
 class Podcategory(models.Model):
-    name = models.CharField(max_length=100, help_text='Подкатегория проблемы',
+    name = models.CharField(max_length=255, help_text='Подкатегория проблемы',
                             verbose_name = 'Подкатегория')
     categ = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Категория проблемы',
                             verbose_name = 'Категория')
@@ -43,7 +43,7 @@ class Status(models.Model):
         return self.name
 
 class Curator(models.Model):
-    name = models.CharField(max_length=40, help_text='Куратор проблемы',
+    name = models.CharField(max_length=100, help_text='Куратор проблемы',
                             verbose_name = 'Куратор')
 
     class Meta:

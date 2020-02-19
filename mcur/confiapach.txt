@@ -1,5 +1,5 @@
-<Location "/var/www/project1">
-    SetHandler python-project1
+<Location "/var/www/cur-problem/mcur">
+    SetHandler python-mcur
     PythonHandler django.core.handlers.modpython
     SetEnv DJANGO_SETTINGS_MODULE testproject.settings
     PythonDebug Off
