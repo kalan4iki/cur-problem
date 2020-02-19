@@ -199,7 +199,8 @@ class Answer(models.Model):
     #def __str__(self):
     def get_absolute_url(self):
         return reverse() # TODO: Доработать
-
+    def get_status_display(self):
+        return stats[self.status] # TODO: Доработать
     #def get_status_display(self):
     #    return self.stats['self.status']
 

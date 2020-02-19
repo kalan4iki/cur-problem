@@ -68,7 +68,7 @@
               {% for i in answers %}
               <tr>
                 <td>{{ i.datecre }}</td>
-                <td>{{ i.status }}</td>
+                <td>{{ i.get_status_display }}</td>
                 <td>{{ i.user }}</td>
                 <td>
                   {% if user.is_staff %}
