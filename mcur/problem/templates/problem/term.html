@@ -69,7 +69,7 @@
               <tr>
                 <td>{{ i.datecre }}</td>
                 <td>{{ i.get_status_display }}</td>
-                <td>{{ i.user }}</td>
+                <td>{{i.user.first_name}} {{i.user.last_name}}</td>
                 <td>
                   {% if user.is_staff %}
                   <a class="btn btn-sm btn-info" href="">Утвердить</a>
@@ -78,7 +78,8 @@
                 </td>
               </tr>
               <tr>
-                <td colspan="4">Текст ответа: <b>{{ i.text }}</b></td>
+                <td>Текст ответа:</td>
+                <td colspan="3"><b>{{ i.text }}</b></td>
               </tr>
               {% endfor %}
             </tbody>
