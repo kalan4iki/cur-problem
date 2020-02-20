@@ -10,6 +10,7 @@ from mcur import settings
 #Login = LoginView(template_name = 'problem/login.html')
 #path('', index, name = 'index'),
 urlpatterns = [
+    url(r'^$', lk, name='lk'),
     path('api/problem/', api_problem),
     path('api/problem/<int:np>', api_problem_detail),
     path('problem/<int:pk>', prob, name='problem'),
@@ -20,9 +21,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('termadd/<int:pk>', termadd, name='termadd'),
     path('delterm/<int:pk>/<int:pkp>', delterm, name='termdel'),
-    path('index', lk, name='index'),
-    path('', lk, name='lk'),
-    path('closed/', closedproblem, name='closed'),
+    path('index/', lk, name='index'),
     path('search/', search, name='search'),
     path('addanswer/<int:pk>', addanswer, name='addanswer'),
     url(r'allproblem/', ProblemListView.as_view(), name='allproblem'),
