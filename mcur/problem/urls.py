@@ -2,7 +2,7 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, prob, addanswer, ProblemNoListView,
                 zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView,
-                ProblemPodxListView, ProblemProsrListView, termview)
+                ProblemPodxListView, ProblemProsrListView, termview, exportxls)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'noproblem/', ProblemNoListView.as_view(), name='noproblem'),
     url(r'podxproblem/', ProblemPodxListView.as_view(), name='podxproblem'),
     url(r'prosrproblem/', ProblemProsrListView.as_view(), name='prosrproblem'),
-    url(r'^export/xls/$', views.exportxls, name='exportxls'),
+    url(r'^export/xls/$', exportxls, name='exportxls'),
     path('term/<int:pk>', termview, name='termview'),
 ]
 #    path('allproblem/', allproblem, name='allproblem'),
