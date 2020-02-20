@@ -104,11 +104,12 @@
                 <td>{{ i.get_status_display }}</td>
                 <td>{{i.user.first_name}} {{i.user.last_name}}</td>
                 <td>
-                  {% if user.is_staff %}
+                  {% if perms.problem.change_answer %}
                     {% if i.status != '2' %}
                       <a class="btn btn-sm btn-info" href="{% url 'answer_approve' i.pk %}">Утвердить</a>
                       <a class="btn btn-sm btn-danger" href="{% url 'answer_modify' i.pk %}">На доработку</a>
                     {% endif %}
+                    <a class="btn btn-sm btn-success" href="">Фотографии</a>
                   {% endif %}
                 </td>
               </tr>
