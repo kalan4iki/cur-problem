@@ -385,7 +385,7 @@ def exportxls(request):
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
 
-    rows = User.objects.all().values_list('pk', 'nomdobr', 'temat', 'podcat', 'text', 'adres', 'datecre', 'dateotv', 'status', 'statussys')
+    rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat', 'podcat', 'text', 'adres', 'datecre', 'dateotv', 'status', 'statussys')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
