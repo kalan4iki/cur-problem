@@ -151,7 +151,7 @@ USE_TZ = True
 MEDIA_ROOT = '/home/media/' #Linux media
 MEDIA_URL = '/problem/media/'
 
-STATIC_URL = 'http://skiog.ru/static/'
+STATIC_URL = '/problem/static/'
 STATIC_ROOT = '/var/www/cur-problem/mcur/problem/static/'
 #    'C:/GitHub/cur-problem/mcur/problem/static',
 STATICFILES_DIRS = [
