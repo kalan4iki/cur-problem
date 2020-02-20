@@ -163,29 +163,30 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             context['title'] = 'Просроченные'
         return context
 
-class AnswerAction:
-    def proverka(request):
-        if not request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-        else:
-            if not request.user.has_perm('problem.change_answer'):
-                return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+def proverka(request, term):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if not request.user.has_perm(''):
+            return redirect('index')
 
-    def Approve(request, pk):
-        self.proverka(request)
-        anw = Answer.objects.get(pk=pk)
-        anw.status = '1'
-        anw.term.status = '2'
-        anw.save()
-        return redirect('term',pk=anw.term.pk)
+def Answer_approve(request, pk):
+    term = 'problem.change_answer'
+    self.proverka(request, term)
+    anw = Answer.objects.get(pk=pk)
+    anw.status = '1'
+    anw.term.status = '2'
+    anw.save()
+    return redirect('term',pk=anw.term.pk)
 
-    def Modify(request,pk):
-        self.proverka(request)
-        anw = Answer.objects.get(pk=pk)
-        anw.status = '2'
-        anw.term.status = '0'
-        anw.save()
-        return redirect('term',pk=anw.term.pk)
+def Answer_modify(request,pk):
+    term = 'problem.change_answer'
+    self.proverka(request, term)
+    anw = Answer.objects.get(pk=pk)
+    anw.status = '2'
+    anw.term.status = '0'
+    anw.save()
+    return redirect('term',pk=anw.term.pk)
 
 def prob(request, pk):
     if not request.user.is_authenticated:
