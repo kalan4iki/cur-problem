@@ -180,3 +180,5 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL =  '/index/'
 
 LOGIN_URL = '/login/'
+
+handler = 'problem.views.custom404'
