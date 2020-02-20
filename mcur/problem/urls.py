@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'noproblem/', ProblemNoListView.as_view(), name='noproblem'),
     url(r'podxproblem/', ProblemPodxListView.as_view(), name='podxproblem'),
     url(r'prosrproblem/', ProblemProsrListView.as_view(), name='prosrproblem'),
+    url(r'^export/xls/$', views.exportxls, name='exportxls'),
     path('term/<int:pk>', termview, name='termview'),
 ]
 #    path('allproblem/', allproblem, name='allproblem'),

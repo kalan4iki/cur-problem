@@ -14,7 +14,7 @@
       </div><!-- /.col -->
       <div class="col-sm-6 ">
         {% if user.is_authenticated %}
-        <a class="btn btn-app float-sm-right">
+        <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right">
               <i class="fas fa-download"></i> Выгрузить
         </a>
         {% endif %}
