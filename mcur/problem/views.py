@@ -26,6 +26,7 @@ from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
 from django.contrib import messages
 import random
+import xlwt
 import mcur.settings as settings
 
 class ProblemSerializer(serializers.ModelSerializer):

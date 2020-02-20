@@ -36,3 +36,4 @@ sudo service apache2 restart
 sudo nano /var/log/apache2/error.log
 ./configure --with-apxs=/usr/local/apache/bin/apxs   --with-python=/usr/local/bin/python3.6
 sudo /home/env/bin/python3 -m pip install
+source /home/env/bin/activate
