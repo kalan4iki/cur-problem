@@ -200,9 +200,6 @@ class Answer(models.Model):
     def get_absolute_url(self):
         return reverse() # TODO: Доработать
 
-    def get_status_display(self):
-        return self.status
-
 class Image(models.Model):
     otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='img', blank=True,
                             verbose_name='Ответ')
