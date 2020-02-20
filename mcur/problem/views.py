@@ -172,7 +172,7 @@ def proverka(request, term):
 
 def Answer_approve(request, pk):
     term = 'problem.change_answer'
-    self.proverka(request, term)
+    proverka(request, term)
     anw = Answer.objects.get(pk=pk)
     anw.status = '1'
     anw.term.status = '2'
@@ -181,7 +181,7 @@ def Answer_approve(request, pk):
 
 def Answer_modify(request, pk):
     term = 'problem.change_answer'
-    self.proverka(request, term)
+    proverka(request, term)
     anw = Answer.objects.get(pk=pk)
     anw.status = '2'
     anw.term.status = '0'
