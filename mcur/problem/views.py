@@ -402,3 +402,6 @@ def exportxls(request):
 
     wb.save(response)
     return response
+
+def custom404(request):
+    render(request, 'problem/404.html')
