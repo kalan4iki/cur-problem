@@ -72,8 +72,8 @@
                 <td>{{i.user.first_name}} {{i.user.last_name}}</td>
                 <td>
                   {% if user.is_staff %}
-                  <a class="btn btn-sm btn-info" href="{% url 'term_approve' i.pk %}">Утвердить</a>
-                  <a class="btn btn-sm btn-danger" href="{% url 'term_modify' i.pk %}">На доработку</a>
+                  <a class="btn btn-sm btn-info" href="{% url 'answer_approve' i.pk %}">Утвердить</a>
+                  <a class="btn btn-sm btn-danger" href="{% url 'answer_modify' i.pk %}">На доработку</a>
                   {% endif %}
                 </td>
               </tr>
