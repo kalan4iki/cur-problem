@@ -179,7 +179,7 @@ def Answer_approve(request, pk):
     anw.save()
     return redirect('term',pk=anw.term.pk)
 
-def Answer_modify(request,pk):
+def Answer_modify(request, pk):
     term = 'problem.change_answer'
     self.proverka(request, term)
     anw = Answer.objects.get(pk=pk)

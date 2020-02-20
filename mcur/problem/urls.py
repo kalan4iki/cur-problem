@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'prosrproblem/', ProblemProsrListView.as_view(), name='prosrproblem'),
     url(r'^export/xls/$', exportxls, name='exportxls'),
     path('term/<int:pk>', termview, name='termview'),
-    url(r'answer/action/aprrove/<int:pk>', Answer_approve, name='answer_approve'),
+    path('answer/action/aprrove/<int:pk>', Answer_approve, name='answer_approve'),
     path('answer/action/modify/<int:pk>', Answer_modify, name='answer_modify'),
 ]
 #    path('allproblem/', allproblem, name='allproblem'),
