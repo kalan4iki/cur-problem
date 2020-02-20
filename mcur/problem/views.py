@@ -163,6 +163,14 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             context['title'] = 'Просроченные'
         return context
 
+class AnswerAction(request):
+
+    def Approve(self):
+        return redirect()
+
+    def Modify(self):
+        return redirect()
+
 def prob(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
