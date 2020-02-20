@@ -156,6 +156,7 @@ STATIC_ROOT = 'problem/static/'
 #    'C:/GitHub/cur-problem/mcur/problem/static',
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    '/var/www/cur-problem/mcur/problem/static',
 ]
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -180,5 +181,3 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL =  '/index/'
 
 LOGIN_URL = '/login/'
-
-handler = 'problem.views.custom404'
