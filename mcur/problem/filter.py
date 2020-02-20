@@ -14,5 +14,4 @@ class ProblemListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
     template_name = "template.html"
-
     filterset_class = ProblemFilter
