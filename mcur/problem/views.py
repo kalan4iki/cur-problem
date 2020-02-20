@@ -211,8 +211,10 @@ def prob(request, pk):
                 answeradd = AnswerForm()
                 return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'srok': a})
             else:
+                messages.warning(request, 'Нет прав для просмотра проблемы.')
                 return redirect('index')
         else:
+            messages.warning(request, 'Данной проблемы нет в системе.')
             return redirect('index')
 
 def zaptable(request):
