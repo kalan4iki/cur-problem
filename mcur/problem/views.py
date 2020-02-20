@@ -164,12 +164,28 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
         return context
 
 class AnswerAction:
+    def proverka(request):
+        if not request.user.is_authenticated:
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+        else:
+            if not request.user.has_perm('problem.change_answer'):
+                return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
-    def Approve(self):
-        return redirect()
+    def Approve(request,self, pk):
+        self.proverka(request)
+        anw = Answer.objects.get(pk=pk)
+        anw.status = '1'
+        anw.term.status = '2'
+        anw.save()
+        return redirect('term',pk=anw.term.pk)
 
-    def Modify(self):
-        return redirect()
+    def Modify(request,pk):
+        self.proverka(request)
+        anw = Answer.objects.get(pk=pk)
+        anw.status = '2'
+        anw.term.status = '0'
+        anw.save()
+        return redirect('term',pk=anw.term.pk)
 
 def prob(request, pk):
     if not request.user.is_authenticated:
