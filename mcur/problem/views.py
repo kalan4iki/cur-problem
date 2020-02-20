@@ -176,6 +176,7 @@ def Answer_approve(request, pk):
     anw = Answer.objects.get(pk=pk)
     anw.status = '1'
     anw.term.status = '2'
+    anw.term.anwr = True
     anw.save()
     anw.term.save()
     return redirect('termview',pk=anw.term.pk)
@@ -186,6 +187,7 @@ def Answer_modify(request, pk):
     anw = Answer.objects.get(pk=pk)
     anw.status = '2'
     anw.term.status = '0'
+    anw.term.anwr = False
     anw.save()
     anw.term.save()
     return redirect('termview',pk=anw.term.pk)
