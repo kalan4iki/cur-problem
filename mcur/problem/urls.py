@@ -11,6 +11,7 @@ from mcur import settings
 #path('', index, name = 'index'),
 urlpatterns = [
     url(r'^$', lk, name='lk'),
+
     path('api/problem/', api_problem),
     path('api/problem/<int:np>', api_problem_detail),
     path('problem/<int:pk>', prob, name='problem'),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('index/', lk, name='index'),
     path('search/', search, name='search'),
     path('addanswer/<int:pk>', addanswer, name='addanswer'),
+    path('closed/', closedproblem, name='closed'),
     url(r'allproblem/', ProblemListView.as_view(), name='allproblem'),
     url(r'noproblem/', ProblemNoListView.as_view(), name='noproblem'),
     url(r'podxproblem/', ProblemPodxListView.as_view(), name='podxproblem'),
