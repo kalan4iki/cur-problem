@@ -109,7 +109,7 @@
                       <a class="btn btn-sm btn-info" href="{% url 'answer_approve' i.pk %}">Утвердить</a>
                       <a class="btn btn-sm btn-danger" href="{% url 'answer_modify' i.pk %}">На доработку</a>
                     {% endif %}
-                    <a class="btn btn-sm btn-success" href="">Фотографии</a>
+                    <a class="btn btn-sm btn-success" href="" data-toggle="modal" data-target="#modal-answerphoto-{{ i.pk }}">Фотографии</a>
                   {% endif %}
                 </td>
               </tr>
@@ -124,7 +124,27 @@
       </div>
     </div>
   </div>
-
-
+{% for i in answers %}
+  <div class="modal fade" id="modal-answerphoto-{{ i.pk }}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Фотографии ответа {{ i.pk }}</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+          <div class="modal-body">
+            <h1>В разработке.</h1>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+{% endfor %}
 </section>
 {% endblock %}
