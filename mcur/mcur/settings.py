@@ -152,12 +152,12 @@ MEDIA_ROOT = '/home/media/' #Linux media
 MEDIA_URL = '/problem/media/'
 
 STATIC_URL = '/problem/static/'
-STATIC_ROOT = '/var/www/cur-problem/mcur/problem/static/'
+STATIC_ROOT = '/problem/static/'
 #    'C:/GitHub/cur-problem/mcur/problem/static',
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    '/var/www/cur-problem/mcur/problem/static',
 ]
+#'/var/www/cur-problem/mcur/problem/static',
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
