@@ -387,7 +387,8 @@ def termview(request, pk):
                 c = True
             print(answ)
             if c:
-                return render(request, 'problem/term.html', {'term': terr, 'answers': answ})
+                answeradd = AnswerForm()
+                return render(request, 'problem/term.html', {'term': terr, 'answers': answ, 'answeradd': answeradd})
             else:
                 return redirect('index')
         else:

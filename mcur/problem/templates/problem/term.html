@@ -11,8 +11,38 @@
       <div class="col-sm-6">
         <h1 class="m-0 text-dark">Назначение № <b>{{ term.pk }}</b></h1>
       </div><!-- /.col -->
+      <div class="col-sm-6 ">
+        <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-answer-{{ term.pk }}">
+              <i class="fas fa-download"></i> Выгрузить
+        </a>
+      </div><!-- /.col -->
     </div><!-- /.row -->
   </div><!-- /.container-fluid -->
+</div>
+<div class="modal fade" id="modal-answer-{{ term.pk }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Ответ на назначение №{{ term.pk }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'addanswer' term.pk %}" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          {% csrf_token %}
+          {{ answeradd.text|as_crispy_field }}
+          {{ answeradd.image|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Ответить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
 </div>
 <section class="content">
   <div class="row">
