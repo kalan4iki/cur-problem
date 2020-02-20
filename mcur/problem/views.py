@@ -163,7 +163,7 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             context['title'] = 'Просроченные'
         return context
 
-class AnswerAction(request):
+class AnswerAction:
 
     def Approve(self):
         return redirect()
