@@ -247,9 +247,7 @@ def add(request):
                     else:
                         return redirect("index")
                 else:
-                    #if not Problem.objects.filter(nomdobr=request.POST['nomdobr']).exists():
-                    #    messages.error(request, 'Данная жалоба существует.')
-                    #    return redirect("problem", pk= Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
+                    messages.warning(request, 'Данная жалоба существует.')
                     return redirect("index")
             else:
                 return redirect("problem", pk=Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
