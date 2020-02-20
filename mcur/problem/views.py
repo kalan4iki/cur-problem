@@ -174,7 +174,6 @@ def Answer_approve(request, pk):
     term = 'problem.change_answer'
     proverka(request, term)
     anw = Answer.objects.get(pk=pk)
-    term =
     anw.status = '1'
     anw.term.status = '2'
     anw.save()
