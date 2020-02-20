@@ -4,7 +4,7 @@ from django.db.models import Q
 from django_tables2 import RequestConfig
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.views.generic.base import TemplateView
 from django.forms import inlineformset_factory, modelform_factory
 from django.urls import reverse
