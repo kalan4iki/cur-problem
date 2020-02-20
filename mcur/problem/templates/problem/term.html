@@ -12,8 +12,11 @@
         <h1 class="m-0 text-dark">Назначение № <b>{{ term.pk }}</b></h1>
       </div><!-- /.col -->
       <div class="col-sm-6 ">
-        <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-answer-{{ term.pk }}">
-              <i class="fas fa-download"></i> Выгрузить
+        <a href="{% url 'problem' term.problem.pk %}" class="btn btn-app float-sm-right"">
+              <i class="fas fa-download"></i> К проблеме
+        </a>
+        <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-answer-{{ term.pk }}">
+              <i class="fas fa-download"></i> Ответить
         </a>
       </div><!-- /.col -->
     </div><!-- /.row -->
