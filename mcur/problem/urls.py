@@ -2,7 +2,7 @@ from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, prob, addanswer, ProblemNoListView,
                 zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView,
-                ProblemPodxListView, ProblemProsrListView, termview, exportxls, AnswerAction)
+                ProblemPodxListView, ProblemProsrListView, termview, exportxls, Answer_approve, Answer_modify)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -30,8 +30,8 @@ urlpatterns = [
     url(r'prosrproblem/', ProblemProsrListView.as_view(), name='prosrproblem'),
     url(r'^export/xls/$', exportxls, name='exportxls'),
     path('term/<int:pk>', termview, name='termview'),
-    url(r'answer/action/aprrove/<int:pk>', AnswerAction.Approve, name='term_approve'),
-    path('answer/action/modify/<int:pk>', AnswerAction.Modify, name='term_modify'),
+    url(r'answer/action/aprrove/<int:pk>', Approve, name='term_approve'),
+    path('answer/action/modify/<int:pk>', Modify, name='term_modify'),
 ]
 #    path('allproblem/', allproblem, name='allproblem'),
 
