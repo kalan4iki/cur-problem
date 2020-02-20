@@ -171,7 +171,7 @@ class AnswerAction:
             if not request.user.has_perm('problem.change_answer'):
                 return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
-    def Approve(request,self, pk):
+    def Approve(request, pk):
         self.proverka(request)
         anw = Answer.objects.get(pk=pk)
         anw.status = '1'
