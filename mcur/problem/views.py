@@ -281,7 +281,6 @@ def delterm(request, pk, pkp):
     if len(nd.terms.all()) == 0:
         nd.statussys = '2'
         nd.save()
-
     return redirect("problem", pk=nd.nomdobr)
 
 def lk(request):
@@ -378,14 +377,12 @@ def termview(request, pk):
                 answ = terr.answers.all()
             except ObjectDoesNotExist:
                 answ = []
-            print(answ)
             userr = User.objects.get(username=request.user.username)
             c = False
             if terr.curat == userr.userprofile.org:
                 c = True
             if request.user.has_perm('problem.view_term'):
                 c = True
-            print(answ)
             if c:
                 answeradd = AnswerForm()
                 return render(request, 'problem/term.html', {'term': terr, 'answers': answ, 'answeradd': answeradd})
@@ -426,4 +423,6 @@ def exportxls(request):
     return response
 
 def custom404(request):
-    render(request, 'problem/404.html')
+    return render(request, 'problem/404.html')
+def development(request):
+    return render(request, 'problem/development.html')

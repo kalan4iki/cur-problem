@@ -18,6 +18,7 @@
       </div>
       <!-- /.card-header -->
       <div class="card-body">
+        {% if srok %}
         <table class="table table-bordered">
           <thead class="thead-light">
             <tr>
@@ -51,6 +52,7 @@
             {% endfor %}
           </tbody>
         </table>
+        {% endif %}
       </div>
       <!-- /.card-body -->
       {% if perms.problem.add_term %}

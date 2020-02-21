@@ -1,7 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
-
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 # Create your models here.
 # TODO: Модель ответов,
 class Category(models.Model):
@@ -175,6 +176,22 @@ class Term(models.Model):
 
     def get_absolute_url(self):
         return reverse("termview", args=(self.pk,))
+
+class Resolution(models.Model):
+    text = models.TextField(help_text='Текст резолюции', verbose_name = 'Описание', null=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_objects = GenericForeignKey(ct_field='content_type', fk_field='object_id')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)
+
+    class Meta:
+        ordering = ['object_id']
+        verbose_name = 'резолюция'
+        verbose_name_plural = 'резолюции'
+
+    #def __str__(self):
+    #    temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
+    #    return temp
 
 class Answer(models.Model):
     stats = {

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'problem.apps.ProblemConfig',
+    'parsers.apps.ParsersConfig',
     'crispy_forms',
     'tinymce',
     'django_filters',

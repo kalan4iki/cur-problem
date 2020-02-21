@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile,
-                    Image, Category, Podcategory, Status)
+                    Image, Category, Podcategory, Status, Resolution)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
@@ -9,6 +9,12 @@ class ImageInline(admin.StackedInline):
     model = Image
     can_delete = False
     verbose_name_plural = 'Фотографии'
+
+@admin.register(Resolution)
+class ResolutionAdmin(admin.ModelAdmin):
+    list_display = ('text',)
+    list_display_links = ('text',)
+
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
