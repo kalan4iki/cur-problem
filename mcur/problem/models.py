@@ -197,8 +197,8 @@ class Answer(models.Model):
     def __str__(self):
         return f'{self.datecre.day}.{self.datecre.month}.{self.datecre.year}'
 
-    def get_absolute_url(self):
-        return reverse() # TODO: Доработать
+    #def get_absolute_url(self):
+    #    return reverse() # TODO: Доработать
 
 class Image(models.Model):
     otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='img', blank=True,
