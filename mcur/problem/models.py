@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 # Create your models here.
 # TODO: Модель ответов,
 class Category(models.Model):
@@ -49,8 +49,8 @@ class Curator(models.Model):
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'куратор проблемы'
-        verbose_name_plural = 'кураторы проблем'
+        verbose_name = 'организация'
+        verbose_name_plural = 'организации'
 
     def __str__(self):
         return self.name
@@ -58,9 +58,22 @@ class Curator(models.Model):
     def get_absolute_url(self):
         return reverse("curators", args=(self.pk,))
 
+class Department(models.Model):
+    name = models.CharField(max_length=100, verbose_name = 'Отдел')
+    org = models.ForeignKey(Curator, on_delete=models.CASCADE, verbose_name='Организация', related_name='departments')
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'отдел'
+        verbose_name_plural = 'отделы'
+
+    def __str__(self):
+        return f'{self.org.name}, {self.name}'
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    org = models.ForeignKey(Curator, on_delete=models.PROTECT, verbose_name='Организация')
+    org = models.ForeignKey(Curator, on_delete=models.SET_NULL, verbose_name='Организация', null=True)
+    dep = models.ForeignKey(Department, on_delete=models.SET_NULL, verbose_name='Отдел', default=None, null=True)
     post = models.CharField(max_length=100, help_text='Должность', verbose_name = 'Должность', default=' ', null=True, blank=True)
 
     def __unicode__(self):
@@ -156,19 +169,25 @@ class Term(models.Model):
         ('1','На согласовании'),
         ('2','Исполнено'),
     }
+    datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
     date = models.DateField(help_text='Срок', verbose_name = 'Срок', null=True)
-    curat = models.ForeignKey(Curator, on_delete = models.PROTECT,
-                            help_text='Куратор', verbose_name = 'Куратор')
+    org = models.ForeignKey(Curator, on_delete = models.SET_NULL,
+                            verbose_name = 'Организация', blank=True, null=True)
+    curat = models.ForeignKey(Department, on_delete = models.SET_NULL,
+                            verbose_name = 'Отдел', blank=True, null=True)
+    curatuser = models.ForeignKey(User, on_delete = models.SET_NULL,  related_name='curatuser',
+                            verbose_name = 'Сотрудник', blank=True, null=True)
     desck = models.TextField(help_text='Описание', verbose_name = 'Описание', blank=True, null=True)
     status = models.CharField(max_length=50, help_text= 'Статус ответа', verbose_name = 'Статус', default='0',choices=stats)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True,
                             verbose_name = 'Проблема', related_name='terms')
     anwr = models.BooleanField(default=False, verbose_name = 'Наличие ответа')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True)
 
     class Meta:
         ordering = ['date']
-        verbose_name = 'срок жалобы'
-        verbose_name_plural = 'сроки жалоб'
+        verbose_name = 'назначение'
+        verbose_name_plural = 'назначения'
 
     def __str__(self):
         temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
@@ -177,15 +196,18 @@ class Term(models.Model):
     def get_absolute_url(self):
         return reverse("termview", args=(self.pk,))
 
-class Resolution(models.Model):
+class Termhistory(models.Model):
     text = models.TextField(help_text='Текст резолюции', verbose_name = 'Описание', null=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_objects = GenericForeignKey(ct_field='content_type', fk_field='object_id')
+    datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
+    curat = models.ForeignKey(Department, on_delete = models.SET_NULL, related_name='curaters',
+                            verbose_name = 'Отдел', blank=True, null=True)
+    curatuser = models.ForeignKey(User, on_delete = models.SET_NULL,  related_name='curatuserterm',
+                            verbose_name = 'Сотрудник', blank=True, null=True)
+    term = models.ForeignKey(Term, on_delete=models.CASCADE, default=None, null=True, related_name='resolutions')
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)
 
     class Meta:
-        ordering = ['object_id']
+        ordering = ['user']
         verbose_name = 'резолюция'
         verbose_name_plural = 'резолюции'
 

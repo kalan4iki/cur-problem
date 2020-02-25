@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile,
-                    Image, Category, Podcategory, Status, Resolution)
+                    Image, Category, Podcategory, Status, Termhistory, Department)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
@@ -10,11 +10,16 @@ class ImageInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Фотографии'
 
-@admin.register(Resolution)
-class ResolutionAdmin(admin.ModelAdmin):
-    list_display = ('text',)
+@admin.register(Termhistory)
+class TermhistoryAdmin(admin.ModelAdmin):
+    list_display = ('text','datecre', 'user', )
     list_display_links = ('text',)
+    list_filter = ('datecre', 'user',)
 
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'org')
+    list_display_links = ('name',)
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):

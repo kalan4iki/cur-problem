@@ -2,167 +2,275 @@
 {% load render_table from django_tables2 %}
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block title %}Жалоба №{{ np.nomdobr }}{% endblock %}
 {% block nav2 %}active{% endblock %}
 {% block content %}
+<!-- Content Header (Page header) -->
 <div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+
+      </div><!-- /.col -->
+      <div class="col-sm-6 ">
+        {% if user.is_authenticated %}
+        <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm">
+              <i class="fas fa-download"></i> Добавить назначение
+        </a>
+        {% endif %}
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
 </div>
+<!-- /.content-header -->
+
+<div class="modal fade" id="modal-addterm">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Добавление срока для жалобы №{{ np.nomdobr }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'termadd' np.pk %}" method="post">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col">
+                <div id="div_id_date" class="form-group">
+                  <label for="id_date" class="">Срок<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+              <div class="card card-primary card-outline card-outline-tabs">
+              <div class="card-header p-0 border-bottom-0">
+                <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#formadd-tabs-three-org" role="tab" aria-controls="formadd-tabs-three-org" aria-selected="true">Организация</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#formadd-tabs-three-curat" role="tab" aria-controls="formadd-tabs-three-curat" aria-selected="false">Отдел</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="custom-tabs-three-messages-tab" data-toggle="pill" href="#formadd-tabs-three-curatuser" role="tab" aria-controls="formadd-tabs-three-curatuser" aria-selected="false">Сотрудник</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="card-body">
+                <div class="tab-content" id="custom-tabs-three-tabContent">
+                  <div class="tab-pane fade active show" id="formadd-tabs-three-org" role="tabpanel" aria-labelledby="formadd-tabs-three-org-tab">
+                    {{ formadd.org|as_crispy_field }}
+                  </div>
+                  <div class="tab-pane fade" id="formadd-tabs-three-curat" role="tabpanel" aria-labelledby="formadd-tabs-three-curat-tab">
+                    {{ formadd.curat|as_crispy_field }}
+                  </div>
+                  <div class="tab-pane fade" id="formadd-tabs-three-curatuser" role="tabpanel" aria-labelledby="formadd-tabs-three-curatuser-tab">
+                    {{ formadd.curatuser|as_crispy_field }}
+                  </div>
+                </div>
+              </div>
+              <!-- /.card -->
+            </div>
+            </div>
+            </div>
+            {{ formadd.desck|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% for i in terms %}
+{% if not i.answers.all %}
+<div class="modal fade" id="modal-answer-{{ i.pk }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Ответ на назначение №{{ i.pk }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'addanswer' i.pk %}" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          {% csrf_token %}
+          {{ answeradd.text|as_crispy_field }}
+          {{ answeradd.image|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Ответить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal-resolution-{{ i.pk }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Резолюция на назначение №{{ i.pk }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'resolutionadd' i.pk %}" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+            <div class="card card-primary card-outline card-outline-tabs">
+            <div class="card-header p-0 border-bottom-0">
+              <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#resform-tabs-three-curat" role="tab" aria-controls="resform-tabs-three-curat" aria-selected="false">Отдел</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#resform-tabs-three-curatuser" role="tab" aria-controls="resform-tabs-three-curatuser" aria-selected="false">Отдел</a>
+                </li>
+              </ul>
+            </div>
+            <div class="card-body">
+              <div class="tab-content" id="custom-tabs-three-tabContent">
+                <div class="tab-pane fade active show" id="resform-tabs-three-curat" role="tabpanel" aria-labelledby="cresform-tabs-three-curat-tab">
+                  {{ resform.curat|as_crispy_field }}
+                </div>
+                <div class="tab-pane fade" id="resform-tabs-three-curatuser" role="tabpanel" aria-labelledby="resform-tabs-three-curatuser-tab">
+                  {{ resform.curatuser|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+            <!-- /.card -->
+          </div>
+          </div>
+          </div>
+          {{ resform.text|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Ответить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endif %}
+{% endfor %}
+
 <section class="content">
   <div class="row">
     <div class="col-md-6">
-      <div class="card">
-      <div class="card-header ui-sortable-handle">
-        <h3 class="card-title">Сроки жалобы</h3>
-        <div class="card-tools">
-        </div>
-      </div>
-      <!-- /.card-header -->
-      <div class="card-body">
-        {% if srok %}
-        <table class="table table-bordered">
-          <thead class="thead-light">
-            <tr>
-              <th class="orderable">№</th>
-              <th class="orderable">Срок до</th>
-              <th class="orderable">Куратор</th>
-              <th class="orderable">Статус</th>
-              <th class="orderable">Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for i in srok %}
-            <tr>
-              <td>{{ i.pk }}</td>
-              <td>{{ i.date }}</td>
-              <td>{{ i.curat }}</td>
-              <td>{{ i.get_status_display }}</td>
-              <td>
-                <a class="btn btn-sm btn-info" href="{% url 'termview' i.pk %}">Карточка назначения</a>
-                {% if not i.anwr %}
-                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#modal-answer-{{ i.pk }}">Ответить</button>
-                {% endif %}
-                {% if user.is_staff %}
-                <a type="button" class="btn btn-sm btn-danger" href="{% url 'termdel' i.pk np.pk %}">Удалить</a>
-                {% endif %}
-              </td>
-            </tr>
-            <tr>
-              <td colspan="5">Описание назначения: <b>{{ i.desck }}</b></td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-      </div>
-      <!-- /.card-body -->
-      {% if perms.problem.add_term %}
-      <div class="card-footer clearfix">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-addterm">
-                  <i class="fas fa-plus"></i> Добавить срок
-                </button>
-      </div>
-      {% endif %}
-      </div>
-    </div>
-    <div class="modal fade" id="modal-addterm">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Добавление срока для жалобы №{{ np.nomdobr }}</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+      {% for i in terms %}
+      <div class="card {{resdat.i.pk}} card-widget collapsed-card">
+        <div class="card-header ">
+          <div class="user-block">
+            <img class="img-circle" src="{% static 'adminlte/dist/img/term.png' %}" alt="User Image">
+            {% if i.curat %}
+            <span class="username">Ответственный: {{i.curat}}</span>
+            {% elif i.curatuser %}
+            <span class="username">Ответственный: {{ i.curatuser.first_name }} {{ i.curatuser.last_name }}</span>
+            {% elif i.org %}
+            <span class="username">Ответственный: {{ i.org }}</span>
+            {% endif %}
+            <span class="description">Дата создания - {{ i.datecre }} Статус - <b>{{i.get_status_display}}. </b>Срок исполнения - <b>{{i.date}}</b> </span>
           </div>
-          <form role="form" action="{% url 'termadd' np.pk %}" method="post">
-            <div class="modal-body">
-                {% csrf_token %}
-                <div class="row">
-                  <div class="col">
-                    <div id="div_id_date" class="form-group">
-                      <label for="id_date" class="">Срок<span class="asteriskField">*</span></label>
-                      <div class="">
-                        <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date" required>
-                        <small id="hint_id_date"></small>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col">
-                    {{ formadd.curat|as_crispy_field }}
-                  </div>
-                </div>
-
-                {{ formadd.desck|as_crispy_field }}
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-              <button type="submit" class="btn btn-primary">Добавить</button>
-            </div>
-          </form>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-    <!-- /.modal -->
-    {% for i in srok %}
-    {% if not i.anwr %}
-    <div class="modal fade" id="modal-answer-{{ i.pk }}">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Ответ на назначение №{{ i.pk }}</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
+          <!-- /.user-block -->
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
             </button>
+            <a href="{% url 'termdel' i.pk np.pk %}" type="button" class="btn btn-tool" title="Удалить"><i class="fas fa-times"></i>
+            </a>
           </div>
-          <form role="form" action="{% url 'addanswer' i.pk %}" method="post" enctype="multipart/form-data">
-            <div class="modal-body">
-              {% csrf_token %}
-              {{ answeradd.text|as_crispy_field }}
-              {{ answeradd.image|as_crispy_field }}
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-              <button type="submit" class="btn btn-primary">Ответить</button>
-            </div>
-          </form>
+          <!-- /.card-tools -->
         </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-    <!-- /.modal -->
-    {% else %}
-    <div class="modal fade" id="modal-answer-{{ i.pk }}">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Ответ на назначение №{{ i.pk }}</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+        <!-- /.card-header -->
+        <div class="card-body" style="display: none;">
+          <!-- post text -->
+          Назначил: <b>{{ i.user.first_name }} {{ i.user.last_name }}</b>.
+          <p></p>
+          <p><b>Текст назначения: </b> {{ i.desck }}</p>
+          <!-- Social sharing buttons -->
+          {% if not i.answers.all %}
+          <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-resolution-{{ i.pk }}"><i class="fas fa-share"></i> Добавить подрезолюцию</button>
+          <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-answer-{{ i.pk }}"><i class="far fa-thumbs-up"></i> Ответить</button>
+          {% endif %}
+          <span class="float-right text-muted">Резолюций: {{i.resolutions.all|length}}. Ответов: {{i.answers.all|length}}</span>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer card-comments" style="display: none;">
+          {% if i.resolutions %}
+          {% for j in i.resolutions.all %}
+          <div class="card-comment">
+            <!-- User image -->
+            <img class="img-circle img-sm" src="{% static 'adminlte/dist/img/resol.png' %}" alt="User Image">
+            <div class="comment-text">
+              <span class="username">
+                Резолюция
+                <span class="text-muted float-right">{{j.datecre}}</span>
+              </span><!-- /.username -->
+              Автор резолюции: <b>{{ j.user.first_name }} {{ j.user.last_name }}</b>
+              <p></p>
+              Ответственный: <b>{{ j.curatuser.first_name }} {{ j.curatuser.last_name }}</b>
+              <p></p>
+              <p>Текст резолюции: {{j.text}}</p>
+            </div>
+            <!-- /.comment-text -->
           </div>
-          <form role="form" action="{% url 'addanswer' i.pk %}" method="post" enctype="multipart/form-data">
-            <div class="modal-body">
-              {% csrf_token %}
-              {{ answeradd.text|as_crispy_field }}
-              {{ answeradd.image|as_crispy_field }}
+          <!-- /.card-comment -->
+          {% endfor %}
+          {% endif %}
+          {% if i.answers %}
+          {% for j in i.answers.all %}
+          <div class="card-comment">
+            <!-- User image -->
+            <img class="img-circle img-sm" src="{% static 'adminlte/dist/img/answer.png' %}" alt="User Image">
+            <div class="comment-text">
+              <span class="username">
+                Ответ
+                <span class="text-muted float-right">{{j.datecre}}</span>
+              </span><!-- /.username -->
+              Автор ответа: <b>{{ j.user.first_name }} {{ j.user.last_name }}</b>
+              <p></p>
+              Статус ответа: <b>{{j.get_status_display}}</b>
+              <p></p>
+              <p>Текст ответа: {{j.text}}</p>
+              <a type="button" class="btn btn-default btn-sm" href="{% url 'answer_approve' j.pk %}"><i class="far fa-thumbs-up"></i> Утвердить</a>
+              <a type="button" class="btn btn-default btn-sm" href="{% url 'answer_modify' j.pk %}"><i class="fas fa-share"></i>Удалить ответ</a>
             </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-              <button type="submit" class="btn btn-primary">Согласовать</button>
-            </div>
-          </form>
+            <!-- /.comment-text -->
+
+          </div>
+          <!-- /.card-comment -->
+          {% endfor %}
+          {% endif %}
         </div>
-        <!-- /.modal-content -->
+        <!-- /.card-footer -->
+        <div class="card-footer" style="display: none;">
+        </div>
+        <!-- /.card-footer -->
       </div>
-      <!-- /.modal-dialog -->
+      {% endfor %}
     </div>
-    <!-- /.modal -->
-    {% endif %}
-    {% endfor %}
-
-
     <div class="col-md-6">
       <div class="card">
           <div class="card-header ui-sortable-handle">

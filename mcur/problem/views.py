@@ -6,13 +6,13 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.views.generic.base import TemplateView
+from django.views import View
 from django.forms import inlineformset_factory, modelform_factory
 from django.urls import reverse
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.template.context_processors import csrf
-from django.views import View
 from django.core.files.base import ContentFile
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -21,7 +21,7 @@ from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
 from .models import Problem, Curator, Term, Answer, Image, Status
 from .tables import ProblemTable, TermTable
-from .forms import PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm
+from .forms import PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm, ResolutionForm
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
 from django.contrib import messages
@@ -179,37 +179,41 @@ def Answer_approve(request, pk):
     anw.term.anwr = True
     anw.save()
     anw.term.save()
-    return redirect('termview',pk=anw.term.pk)
+    return redirect('termview',pk=anw.term.problem.pk)
 
 def Answer_modify(request, pk):
     term = 'problem.change_answer'
     proverka(request, term)
     anw = Answer.objects.get(pk=pk)
-    anw.status = '2'
     anw.term.status = '0'
     anw.term.anwr = False
-    anw.save()
     anw.term.save()
-    return redirect('termview',pk=anw.term.pk)
+    z = anw.term.problem.nomdobr
+    anw.delete()
+    return redirect('problem',pk=z)
 
 def prob(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if Problem.objects.filter(nomdobr=pk).exists():
+            nowdatetime = datetime.now()
+            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             prob = Problem.objects.get(nomdobr=pk)
-            a = Term.objects.filter(problem=prob)
+            #a = Term.objects.filter(problem=prob)
+            terms = prob.terms.all()
             userr = User.objects.get(username=request.user.username)
             c = False
-            for i in a:
-                if i.curat == userr.userprofile.org:
-                    c = True
+            #for i in a:
+            #    if i.curat == userr.userprofile.org:
+            #        c = True
             if request.user.has_perm('problem.view_problem'):
                 c = True
             if c:
                 termadd = TermForm()
                 answeradd = AnswerForm()
-                return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'srok': a})
+                resform = ResolutionForm()
+                return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
                 # messages.add_message(request, messages.warning, 'Нет прав для просмотра проблемы.')
                 return redirect('index')
@@ -264,6 +268,7 @@ def termadd(request, pk):
                     a = formadd.save()
                     nd = Problem.objects.get(pk=pk)
                     a.problem = nd
+                    a.user = request.user
                     a.save()
                     nd.statussys = '1'
                     nd.save()
@@ -394,31 +399,22 @@ def termview(request, pk):
 def exportxls(request):
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="problems.xls"'
-
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('problems')
-
     # Sheet header, first row
     row_num = 0
-
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
-
     columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес', 'Дата жалобы', 'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе',]
-
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
-
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
-
     rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat__name', 'podcat__name', 'text', 'adres', 'datecre', 'dateotv', 'status', 'statussys')
     for row in rows:
-
         row_num += 1
         for col_num in range(len(row)):
             ws.write(row_num, col_num, row[col_num], font_style)
-
     wb.save(response)
     return response
 
@@ -426,3 +422,23 @@ def custom404(request):
     return render(request, 'problem/404.html')
 def development(request):
     return render(request, 'problem/development.html')
+
+def resolutionadd(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        term = Term.objects.get(pk=pk)
+        if request.user.has_perm('problem.edit_Problem'):
+            if request.method == 'POST':
+                resform = ResolutionForm(request.POST)
+                if resform.is_valid():
+                    a = resform.save()
+                    a.term = term
+                    a.user = request.user
+                    a.save()
+                    return redirect("problem", pk=term.problem.nomdobr)
+            else:
+                formadd = TermForm()
+            return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
+        else:
+            return render(request, 'problem/termadd.html', {'auth': False, 'np': prob, 'prob': prob})

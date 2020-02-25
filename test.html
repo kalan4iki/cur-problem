@@ -1,0 +1,152 @@
+<div class="col-md-6">
+<div class="card">
+<div class="card-header ui-sortable-handle">
+  <h3 class="card-title">Сроки жалобы</h3>
+  <div class="card-tools">
+  </div>
+</div>
+<!-- /.card-header -->
+<div class="card-body">
+  {% if srok %}
+  <table class="table table-bordered">
+    <thead class="thead-light">
+      <tr>
+        <th class="orderable">№</th>
+        <th class="orderable">Срок до</th>
+        <th class="orderable">Куратор</th>
+        <th class="orderable">Статус</th>
+        <th class="orderable">Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in srok %}
+      <tr>
+        <td>{{ i.pk }}</td>
+        <td>{{ i.date }}</td>
+        <td>{{ i.curat }}</td>
+        <td>{{ i.get_status_display }}</td>
+        <td>
+          <a class="btn btn-sm btn-info" href="{% url 'termview' i.pk %}">Карточка назначения</a>
+          {% if not i.anwr %}
+          <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#modal-answer-{{ i.pk }}">Ответить</button>
+          {% endif %}
+          {% if user.is_staff %}
+          <a type="button" class="btn btn-sm btn-danger" href="{% url 'termdel' i.pk np.pk %}">Удалить</a>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5">Описание назначения: <b>{{ i.desck }}</b></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+<!-- /.card-body -->
+{% if perms.problem.add_term %}
+<div class="card-footer clearfix">
+  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-addterm">
+            <i class="fas fa-plus"></i> Добавить срок
+          </button>
+</div>
+{% endif %}
+</div>
+</div>
+<div class="modal fade" id="modal-addterm">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Добавление срока для жалобы №{{ np.nomdobr }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'termadd' np.pk %}" method="post">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col">
+                <div id="div_id_date" class="form-group">
+                  <label for="id_date" class="">Срок<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                {{ formadd.curat|as_crispy_field }}
+              </div>
+            </div>
+
+            {{ formadd.desck|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% for i in srok %}
+{% if not i.anwr %}
+<div class="modal fade" id="modal-answer-{{ i.pk }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Ответ на назначение №{{ i.pk }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'addanswer' i.pk %}" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          {% csrf_token %}
+          {{ answeradd.text|as_crispy_field }}
+          {{ answeradd.image|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Ответить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% else %}
+<div class="modal fade" id="modal-answer-{{ i.pk }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Ответ на назначение №{{ i.pk }}</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'addanswer' i.pk %}" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          {% csrf_token %}
+          {{ answeradd.text|as_crispy_field }}
+          {{ answeradd.image|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Согласовать</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+{% endif %}
+{% endfor %}

@@ -7,7 +7,18 @@ from django.utils.text import capfirst
 from django import forms
 from django.forms.widgets import Select
 import datetime
-from .models import Problem, Term, Answer
+from .models import Problem, Term, Answer, Termhistory
+
+class ResolutionForm(ModelForm):
+    class Meta:
+        model = Termhistory
+        fields = ('curat', 'curatuser', 'text')
+        TA = Textarea
+        TA.template_name="widgets/textarea.html"
+        widgets = {'text': TA}
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.helper = FormHelper()
 
 class AnswerForm(Form):
     text = CharField(label=u'Комментарий')
@@ -20,7 +31,7 @@ class AnswerForm(Form):
 class TermForm(ModelForm):
     class Meta:
         model = Term
-        fields = {'date', 'curat', 'desck'}
+        fields = {'date', 'desck','org', 'curat', 'curatuser'}
         TA = Textarea
         TA.template_name="widgets/textarea.html"
         widgets = {'desck': TA}
