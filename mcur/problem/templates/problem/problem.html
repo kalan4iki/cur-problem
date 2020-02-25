@@ -14,7 +14,7 @@
 
       </div><!-- /.col -->
       <div class="col-sm-6 ">
-        {% if user.is_authenticated %}
+        {% if perms.problem.add_term %}
         <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm">
               <i class="fas fa-download"></i> Добавить назначение
         </a>
@@ -143,7 +143,7 @@
                   <a class="nav-link active" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#resform-tabs-three-curat" role="tab" aria-controls="resform-tabs-three-curat" aria-selected="false">Отдел</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#resform-tabs-three-curatuser" role="tab" aria-controls="resform-tabs-three-curatuser" aria-selected="false">Отдел</a>
+                  <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#resform-tabs-three-curatuser" role="tab" aria-controls="resform-tabs-three-curatuser" aria-selected="false">Сотрудник</a>
                 </li>
               </ul>
             </div>

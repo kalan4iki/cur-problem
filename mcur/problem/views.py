@@ -19,7 +19,7 @@ from rest_framework.decorators import api_view
 from rest_framework import serializers
 from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
-from .models import Problem, Curator, Term, Answer, Image, Status
+from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department
 from .tables import ProblemTable, TermTable
 from .forms import PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm, ResolutionForm
 from .filter import ProblemListView, ProblemFilter
@@ -63,7 +63,7 @@ class ProblemListView(SingleTableMixin, FilterView):
             prob = Problem.objects.filter(visible='1')
             userlk = User.objects.get(username=self.request.user.username)
             if not self.request.user.has_perm('problem.view_problem'):
-                terms = Term.objects.filter(curat=userlk.userprofile.org)
+                terms = Term.objects.filter(Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk))
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
@@ -197,22 +197,31 @@ def prob(request, pk):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if Problem.objects.filter(nomdobr=pk).exists():
+            c = False
+            terms = []
+            prob = Problem.objects.get(nomdobr=pk)
+            if request.user.has_perm('problem.change_problem'):
+                c = True
+                terms = prob.terms.all()
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-            prob = Problem.objects.get(nomdobr=pk)
-            #a = Term.objects.filter(problem=prob)
-            terms = prob.terms.all()
             userr = User.objects.get(username=request.user.username)
-            c = False
-            #for i in a:
-            #    if i.curat == userr.userprofile.org:
-            #        c = True
-            if request.user.has_perm('problem.view_problem'):
-                c = True
-            if c:
+            if not c:
+                temp = prob.terms.filter(Q(org=userr.userprofile.org) | Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+                if len(temp) > 0:
+                    for i in temp:
+                        terms.append(i)
+                resol = Termhistory.objects.filter(Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+                if len(resol) > 0:
+                    for i in resol:
+                        if not i.term in terms:
+                            terms.append(i.term)
+            if c or len(terms) > 0:
                 termadd = TermForm()
                 answeradd = AnswerForm()
-                resform = ResolutionForm()
+                dep = Department.objects.filter(org=userr.userprofile.org)
+                print(dep)
+                resform = ResolutionForm(initial={'curat': dep})#, 'curatuser':  User.objects.filter()})
                 return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
                 # messages.add_message(request, messages.warning, 'Нет прав для просмотра проблемы.')
@@ -299,17 +308,17 @@ def lk(request):
         if request.user.has_perm('problem.view_problem'):
             kolvo['kolall'] = len(Problem.objects.filter(visible='1'))
             kolvo['kolno'] = len(Problem.objects.filter(visible='1', statussys='2'))
-            termas = Term.objects.filter(status='0', date__range=(nowdate, nowdate+timedelta(3)))
-            kolvo['podx'] = len(termas)
-            termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
-            kolvo['prosr'] = len(termas)
+            #termas = Term.objects.filter(status='0', date__range=(nowdate, nowdate+timedelta(3)))
+            #kolvo['podx'] = len(termas)
+            #termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
+            #kolvo['prosr'] = len(termas)
         elif userlk.userprofile.org != None:
             kolvo['kolclose'] = len(Answer.objects.filter(user=request.user))
-            termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(nowdate, nowdate+timedelta(3)))
-            kolvo['podx'] = len(termas)
-            termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(date(nowdatetime.year, 1, 1), nowdate))
-            kolvo['prosr'] = len(termas)
-            kolvo['kolall'] = len(Term.objects.filter(curat=userlk.userprofile.org).distinct())
+            #termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(nowdate, nowdate+timedelta(3)))
+            #kolvo['podx'] = len(termas)
+            #termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(date(nowdatetime.year, 1, 1), nowdate))
+            #kolvo['prosr'] = len(termas)
+            #kolvo['kolall'] = len(Term.objects.filter(curat=userlk.userprofile.org).distinct())
         return render(request, 'problem/lk.html', {'kolvo': kolvo})
 
 def closedproblem(request):
