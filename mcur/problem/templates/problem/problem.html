@@ -14,7 +14,7 @@
 
       </div><!-- /.col -->
       <div class="col-sm-6 ">
-        {% if perms.problem.add_term %}
+        {% if perms.user_moderator %}
         <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm">
               <i class="fas fa-download"></i> Добавить назначение
         </a>
@@ -254,13 +254,48 @@
               Статус ответа: <b>{{j.get_status_display}}</b>
               <p></p>
               <p>Текст ответа: {{j.text}}</p>
+              {% if perms.problem.user_moderator  %}
+              {% if j.status == '0' %}
               <a type="button" class="btn btn-default btn-sm" href="{% url 'answer_approve' j.pk %}"><i class="far fa-thumbs-up"></i> Утвердить</a>
               <a type="button" class="btn btn-default btn-sm" href="{% url 'answer_modify' j.pk %}"><i class="fas fa-share"></i>Удалить ответ</a>
+              {% endif %}
+              {% endif %}
+              {% if j.imgs.all %}
+              <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-photo-{{ j.pk }}"><i class="far fa-image"></i> Фотографии</button>
+              {% endif %}
             </div>
             <!-- /.comment-text -->
 
           </div>
           <!-- /.card-comment -->
+          {% if j.imgs.all %}
+          <div class="modal fade" id="modal-photo-{{ j.pk }}">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">Фотографии ответа №{{ j.pk }}</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    {% for k in j.imgs.all %}
+                    <div class="col">
+                      <img src="{{k.file.url}}" class="img-fluid" style="width: 100%;">
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+          <!-- /.modal -->
+          {% endif %}
           {% endfor %}
           {% endif %}
         </div>

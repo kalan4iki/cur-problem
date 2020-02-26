@@ -240,7 +240,7 @@ class Answer(models.Model):
     #    return reverse() # TODO: Доработать
 
 class Image(models.Model):
-    otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='img', blank=True,
+    otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='imgs', blank=True,
                             verbose_name='Ответ')
     file = models.ImageField(upload_to='photos', null=True, verbose_name = 'Фотография')
 

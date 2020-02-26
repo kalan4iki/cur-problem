@@ -16,7 +16,7 @@
 </div>
 <section class="content">
   <div class="row">
-    {% if perms.problem.view_problem %}
+    {% if perms.problem.user_moderator %}
     <div class="col-12 col-sm-6 col-md-3">
       <div class="small-box bg-info">
         <div class="inner">
@@ -36,7 +36,7 @@
       <div class="small-box bg-success">
         <div class="inner">
           <h3>{{ kolvo.kolclose }}</h3>
-          <p>Закрытых жалоб</p>
+          <p>Ответов</p>
         </div>
         <div class="icon">
           <i class="fas fa-check"></i>

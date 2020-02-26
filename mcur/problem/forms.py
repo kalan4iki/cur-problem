@@ -11,8 +11,8 @@ import datetime
 from .models import Problem, Term, Answer, Termhistory, Department
 
 class ResolutionForm(ModelForm):
-    curat = ModelChoiceField(queryset=Department.objects.all(), label='Отдел')
-    curatuser = ModelChoiceField(queryset=User.objects.all(), label='Сотрудник')
+    curat = ModelChoiceField(queryset=Department.objects.all(), label='Отдел', required=False)
+    curatuser = ModelChoiceField(queryset=User.objects.all(), label='Сотрудник', required=False)
     class Meta:
         model = Termhistory
         fields = ('text',)
@@ -20,14 +20,15 @@ class ResolutionForm(ModelForm):
         TA.template_name="widgets/textarea.html"
         widgets = {'text': TA}
 
-    def __init__(self, curat_qs=None, curatuser_qs=None, **kwargs):
-        super(ResolutionForm, self).__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        curat_qs = kwargs.pop('curat_qs')
+        curatuser_qs =kwargs.pop('curatuser_qs')
+        super(ResolutionForm, self).__init__(*args,**kwargs)
         self.helper = FormHelper()
         if curat_qs:
             self.fields['curat'].queryset = curat_qs
         if curatuser_qs:
             self.fields['curatuser'].queryset = curatuser_qs
-        #self.fields['curatuser'].queryset = kwargs.pop('curatuser_qs')
 
 class AnswerForm(Form):
     text = CharField(label=u'Комментарий')

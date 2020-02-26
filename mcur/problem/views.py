@@ -116,11 +116,11 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
             userlk = User.objects.get(username=self.request.user.username)
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-            if not self.request.user.has_perm('problem.view_problem'):
-                terms = Term.objects.filter(status='0', curat=userlk.userprofile.org, date__range=(nowdate, nowdate + timedelta(3)))
-                prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
-            else:
+            if userlk.has_perm('problem.user_moderator'):
                 terms = Term.objects.filter(status='0', date__range=(nowdate, nowdate + timedelta(3)))
+                prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
+            elif userlk.has_perm('problem.user_executor'):
+                terms = Term.objects.filter(Q(status='0'), Q(date__range=(nowdate, nowdate + timedelta(3))), (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
@@ -147,11 +147,11 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             userlk = User.objects.get(username=self.request.user.username)
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-            if not self.request.user.has_perm('problem.view_problem'):
-                terms = Term.objects.filter(status='0', curat=userlk.userprofile.org, date__range=(date(nowdatetime.year, 1, 1), nowdate))
-                prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
-            else:
+            if userlk.has_perm('problem.user_moderator'):
                 terms = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
+                prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
+            elif userlk.has_perm('problem.user_executor'):
+                terms = Term.objects.filter(Q(status='0'), Q(date__range=(date(nowdatetime.year, 1, 1), nowdate)), (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
@@ -201,7 +201,7 @@ def prob(request, pk):
             c = False
             terms = []
             prob = Problem.objects.get(nomdobr=pk)
-            if request.user.has_perm('problem.change_problem'):
+            if request.user.has_perm('problem.user_moderator'):
                 c = True
                 terms = prob.terms.all()
             nowdatetime = datetime.now()
@@ -220,9 +220,16 @@ def prob(request, pk):
             if c or len(terms) > 0:
                 termadd = TermForm()
                 answeradd = AnswerForm()
-                dep = Department.objects.filter(org=userr.userprofile.org)
-                userorg = User.objects.filter(userprofile__org=userr.userprofile.org)
-                resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)#, 'curatuser':  User.objects.filter()})
+                if userr.has_perm('problem.user_moderator'):
+                    dep = Department.objects.all()
+                    userorg = User.objects.all()
+                elif userr.has_perm('problem.user_dispatcher'):
+                    dep = Department.objects.filter(org=userr.userprofile.org)
+                    userorg = User.objects.filter(userprofile__org=userr.userprofile.org)
+                elif userr.has_perm('problem.user_executor'):
+                    dep = Department.objects.filter(name=userr.userprofile.dep.name)
+                    userorg = User.objects.filter(userprofile__dep__in=dep)
+                resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
                 return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
                 # messages.add_message(request, messages.warning, 'Нет прав для просмотра проблемы.')
@@ -271,7 +278,7 @@ def termadd(request, pk):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         prob = Problem.objects.get(pk=pk)
-        if request.user.has_perm('problem.edit_Problem'):
+        if request.user.has_perm('problem.user_moderator'):
             if request.method == 'POST':
                 formadd = TermForm(request.POST)
                 if formadd.is_valid():
@@ -306,20 +313,23 @@ def lk(request):
         kolvo = {}
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-        if request.user.has_perm('problem.view_problem'):
+        if request.user.has_perm('problem.user_moderator'):
             kolvo['kolall'] = len(Problem.objects.filter(visible='1'))
             kolvo['kolno'] = len(Problem.objects.filter(visible='1', statussys='2'))
             termas = Term.objects.filter(status='0', date__range=(nowdate, nowdate+timedelta(3)))
             kolvo['podx'] = len(termas)
             termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
             kolvo['prosr'] = len(termas)
-        elif userlk.userprofile.org != None:
-            kolvo['kolclose'] = len(Answer.objects.filter(user=request.user))
-            #termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(nowdate, nowdate+timedelta(3)))
-            #kolvo['podx'] = len(termas)
-            #termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(date(nowdatetime.year, 1, 1), nowdate))
-            #kolvo['prosr'] = len(termas)
-            #kolvo['kolall'] = len(Term.objects.filter(curat=userlk.userprofile.org).distinct())
+        elif request.user.has_perm('problem.user_executor'):
+            kolvo['kolall'] = len(Problem.objects.filter(Q(visible='1'),Q(terms__status='0'),
+                    (Q(terms__org=userlk.userprofile.org) | Q(terms__curat=userlk.userprofile.dep) | Q(terms__curatuser=userlk) | Q(terms__resolutions__curat=userlk.userprofile.dep) | Q(terms__resolutions__curatuser=userlk))))
+            kolvo['kolclose'] = len(Problem.objects.filter(visible='1', statussys='2', terms__answers__user=userlk))
+            termas = Term.objects.filter(Q(status='0'), Q(date__range=(nowdate, nowdate+timedelta(3))),
+                    (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
+            kolvo['podx'] = len(termas)
+            termas = Term.objects.filter(Q(status='0'), Q(date__range=(date(nowdatetime.year, 1, 1), nowdate)),
+                    (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
+            kolvo['prosr'] = len(termas)
         return render(request, 'problem/lk.html', {'kolvo': kolvo})
 
 def closedproblem(request):
@@ -381,31 +391,6 @@ def addanswer(request, pk):
         else:
             return redirect('index')
 
-def termview(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        if Term.objects.filter(pk=pk).exists():
-            terr = Term.objects.get(pk=pk)
-            answ = []
-            try:
-                answ = terr.answers.all()
-            except ObjectDoesNotExist:
-                answ = []
-            userr = User.objects.get(username=request.user.username)
-            c = False
-            if terr.curat == userr.userprofile.org:
-                c = True
-            if request.user.has_perm('problem.view_term'):
-                c = True
-            if c:
-                answeradd = AnswerForm()
-                return render(request, 'problem/term.html', {'term': terr, 'answers': answ, 'answeradd': answeradd})
-            else:
-                return redirect('index')
-        else:
-            return redirect('index')
-
 def exportxls(request):
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="problems.xls"'
@@ -420,11 +405,14 @@ def exportxls(request):
         ws.write(row_num, col_num, columns[col_num], font_style)
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
-    rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat__name', 'podcat__name', 'text', 'adres', 'datecre', 'dateotv', 'status', 'statussys')
+    rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat__name', 'podcat__name', 'text', 'adres', 'datecre', 'dateotv', 'status__name', 'statussys')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
+            if col_num == 6 or col_num == 7:
+                ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}', font_style)
+            else:
+                ws.write(row_num, col_num, row[col_num], font_style)
     wb.save(response)
     return response
 
@@ -438,17 +426,16 @@ def resolutionadd(request, pk):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         term = Term.objects.get(pk=pk)
-        if request.user.has_perm('problem.edit_Problem'):
-            if request.method == 'POST':
-                resform = ResolutionForm(request.POST)
-                if resform.is_valid():
-                    a = resform.save()
-                    a.term = term
-                    a.user = request.user
-                    a.save()
-                    return redirect("problem", pk=term.problem.nomdobr)
+        if request.method == 'POST':
+            resform = ResolutionForm(request.POST)
+            if resform.is_valid():
+                a = resform.save()
+                a.term = term
+                a.user = request.user
+                a.save()
+                return redirect("problem", pk=term.problem.nomdobr)
             else:
-                formadd = TermForm()
-            return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
+                redirect("problem", pk=term.problem.nomdobr)
         else:
-            return render(request, 'problem/termadd.html', {'auth': False, 'np': prob, 'prob': prob})
+            formadd = TermForm()
+        return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
