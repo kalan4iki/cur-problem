@@ -171,7 +171,7 @@ def proverka(request, term):
             return redirect('index')
 
 def Answer_approve(request, pk):
-    term = 'problem.change_answer'
+    term = 'problem.user_moderator'
     proverka(request, term)
     anw = Answer.objects.get(pk=pk)
     anw.status = '1'
@@ -183,7 +183,7 @@ def Answer_approve(request, pk):
     return redirect('problem',pk=z)
 
 def Answer_modify(request, pk):
-    term = 'problem.change_answer'
+    term = 'problem.user_moderator'
     proverka(request, term)
     anw = Answer.objects.get(pk=pk)
     anw.term.status = '0'
