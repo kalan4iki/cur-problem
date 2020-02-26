@@ -74,11 +74,9 @@ def parsTable(source):
                 iter += 1
             date = temp2[9].split('.')
             date2 = temp2[11].split('.')
-
             if not Category.objects.filter(name=temp2[5]).exists():
                 cat = Category(name=temp2[5])
                 cat.save()
-            print(Category.objects.get(name=temp2[5]))
             if not Podcategory.objects.filter(name=temp2[6]).exists():
                 podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
                 podcat.save()
@@ -115,7 +113,7 @@ class Command(BaseCommand):
         #Инициализация браузера
         browser = StartBrowser()
         now = datetime.datetime.now()
-        kolvo = loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.10.2019', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
+        kolvo = loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.01.2019', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
         print(kolvo)
         for i in kolvo:
             sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))

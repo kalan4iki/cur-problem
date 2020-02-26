@@ -73,7 +73,7 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
     list_display_links = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
     search_fields = ('nomdobr',)
-    list_filter = ('ciogv__name', 'status__name', 'parsing', 'temat')
+    list_filter = ('ciogv__name', 'status__name', 'parsing', 'temat', 'visible',)
     actions = ('pars', 'novisib', 'visib')
 
     def pars(self, request, queryset):
