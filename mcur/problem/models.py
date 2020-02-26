@@ -73,7 +73,7 @@ class Department(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     org = models.ForeignKey(Curator, on_delete=models.SET_NULL, verbose_name='Организация', null=True)
-    dep = models.ForeignKey(Department, on_delete=models.SET_NULL, verbose_name='Отдел', default=None, null=True)
+    dep = models.ForeignKey(Department, on_delete=models.SET_NULL, verbose_name='Отдел', default=None, null=True, blank=True)
     post = models.CharField(max_length=100, help_text='Должность', verbose_name = 'Должность', default=' ', null=True, blank=True)
 
     def __unicode__(self):

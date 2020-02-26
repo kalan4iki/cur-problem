@@ -2,13 +2,19 @@ from django.contrib import admin
 from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile,
                     Image, Category, Podcategory, Status, Termhistory, Department)
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
+
 # Register your models here.
 
 class ImageInline(admin.StackedInline):
     model = Image
     can_delete = False
     verbose_name_plural = 'Фотографии'
+
+@admin.register(Permission)
+class PermissionAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    list_display_links = ('name',)
 
 @admin.register(Termhistory)
 class TermhistoryAdmin(admin.ModelAdmin):

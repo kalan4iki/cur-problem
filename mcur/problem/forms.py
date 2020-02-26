@@ -3,22 +3,31 @@ from django.forms import (modelform_factory, DecimalField, ModelForm, DateField,
 from django.contrib.auth import authenticate, get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
+from django.contrib.auth.models import User
 from django.utils.text import capfirst
 from django import forms
 from django.forms.widgets import Select
 import datetime
-from .models import Problem, Term, Answer, Termhistory
+from .models import Problem, Term, Answer, Termhistory, Department
 
 class ResolutionForm(ModelForm):
+    curat = ModelChoiceField(queryset=Department.objects.all(), label='Отдел')
+    curatuser = ModelChoiceField(queryset=User.objects.all(), label='Сотрудник')
     class Meta:
         model = Termhistory
-        fields = ('curat', 'curatuser', 'text')
+        fields = ('text',)
         TA = Textarea
         TA.template_name="widgets/textarea.html"
         widgets = {'text': TA}
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.helper = FormHelper()
+
+    def __init__(self, curat_qs=None, curatuser_qs=None, **kwargs):
+        super(ResolutionForm, self).__init__(**kwargs)
+        self.helper = FormHelper()
+        if curat_qs:
+            self.fields['curat'].queryset = curat_qs
+        if curatuser_qs:
+            self.fields['curatuser'].queryset = curatuser_qs
+        #self.fields['curatuser'].queryset = kwargs.pop('curatuser_qs')
 
 class AnswerForm(Form):
     text = CharField(label=u'Комментарий')

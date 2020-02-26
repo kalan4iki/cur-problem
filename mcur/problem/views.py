@@ -179,7 +179,8 @@ def Answer_approve(request, pk):
     anw.term.anwr = True
     anw.save()
     anw.term.save()
-    return redirect('termview',pk=anw.term.problem.pk)
+    z = anw.term.problem.nomdobr
+    return redirect('problem',pk=z)
 
 def Answer_modify(request, pk):
     term = 'problem.change_answer'
@@ -220,8 +221,8 @@ def prob(request, pk):
                 termadd = TermForm()
                 answeradd = AnswerForm()
                 dep = Department.objects.filter(org=userr.userprofile.org)
-                print(dep)
-                resform = ResolutionForm(initial={'curat': dep})#, 'curatuser':  User.objects.filter()})
+                userorg = User.objects.filter(userprofile__org=userr.userprofile.org)
+                resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)#, 'curatuser':  User.objects.filter()})
                 return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
                 # messages.add_message(request, messages.warning, 'Нет прав для просмотра проблемы.')
@@ -308,10 +309,10 @@ def lk(request):
         if request.user.has_perm('problem.view_problem'):
             kolvo['kolall'] = len(Problem.objects.filter(visible='1'))
             kolvo['kolno'] = len(Problem.objects.filter(visible='1', statussys='2'))
-            #termas = Term.objects.filter(status='0', date__range=(nowdate, nowdate+timedelta(3)))
-            #kolvo['podx'] = len(termas)
-            #termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
-            #kolvo['prosr'] = len(termas)
+            termas = Term.objects.filter(status='0', date__range=(nowdate, nowdate+timedelta(3)))
+            kolvo['podx'] = len(termas)
+            termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
+            kolvo['prosr'] = len(termas)
         elif userlk.userprofile.org != None:
             kolvo['kolclose'] = len(Answer.objects.filter(user=request.user))
             #termas = Term.objects.filter(status='0', curat=Curator.objects.get(name=userlk.userprofile.org), date__range=(nowdate, nowdate+timedelta(3)))
