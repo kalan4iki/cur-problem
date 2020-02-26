@@ -1,0 +1,88 @@
+{% extends "layout/basic.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}Жалоба №{{ np.nomdobr }}{% endblock %}
+{% block nav6 %}active{% endblock %}
+{% block nav61 %}active{% endblock %}
+{% block content %}
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Создать пользователя</h1>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<section class="content">
+{% if mescre %}
+<div class="row">
+  <div class="col">
+    <div class="card card-default">
+      <!-- /.card-header -->
+      <div class="card-body">
+        <div class="alert alert-success alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+          <h5><i class="icon fas fa-check"></i> Пользователь создан!</h5>
+          <p>Логин: {{mescre.0}}</p>
+          <p>Пароль: {{mescre.1}}</p>
+        </div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="row">
+  <div class="col">
+    <div class="card card-default">
+      <form role="form" action="{% url 'createuser' %}" method="post">
+      <div class="card-header">
+        <h3 class="card-title">
+          Создание учетной записи
+        </h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <div class="row">
+            {% csrf_token %}
+            <div class="col">
+              {{ formcre.username|as_crispy_field }}
+            </div>
+            <div class="col">
+              {{ formcre.first_name|as_crispy_field }}
+            </div>
+            <div class="col">
+              {{ formcre.last_name|as_crispy_field }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              {{ formcre.email|as_crispy_field }}
+            </div>
+            <div class="col">
+              {{ formcre.org|as_crispy_field }}
+            </div>
+            <div class="col">
+              {{ formcre.dep|as_crispy_field }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              {{ formcre.group|as_crispy_field }}
+            </div>
+        </div>
+      </div>
+      <!-- /.card-body -->
+      <div class="card-footer">
+        <button type="submit" class="btn btn-info">Создать</button>
+      </div>
+      </form>
+    </div>
+  </div>
+  </div>
+
+</section>
+{% endblock %}

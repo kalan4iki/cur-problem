@@ -10,7 +10,7 @@ from django.views import View
 from django.forms import inlineformset_factory, modelform_factory
 from django.urls import reverse
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import auth
 from django.template.context_processors import csrf
 from django.core.files.base import ContentFile
@@ -21,13 +21,17 @@ from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department
 from .tables import ProblemTable, TermTable
-from .forms import PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm, ResolutionForm
+from .forms import (PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm,
+                    ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
 from django.contrib import messages
 import random
 import xlwt
 import mcur.settings as settings
+import random
+
+chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -439,3 +443,31 @@ def resolutionadd(request, pk):
         else:
             formadd = TermForm()
         return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
+
+def createuser(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.user.has_perm('problem.user_supermoderator'):
+            if request.method == 'POST':
+                formcre = CreateUser(request.POST)
+                if formcre.is_valid():
+                    passw = ''
+                    for i in range(8):
+                        passw += random.choice(chars)
+                    termp = User.objects.create_user(formcre.cleaned_data.get("username"), formcre.cleaned_data.get("email"), passw)
+                    termp.first_name = formcre.cleaned_data.get("first_name")
+                    termp.last_name = formcre.cleaned_data.get("last_name")
+                    termp.group = Group.objects.get(name=formcre.cleaned_data.get("group"))
+                    if formcre.cleaned_data.get("org"): termp.userprofile__org = Curator.objects.get(name=formcre.cleaned_data.get("org"))
+                    if formcre.cleaned_data.get("dep"): termp.userprofile__dep = Department.objects.get(name=formcre.cleaned_data.get("dep"))
+                    mescre = [termp.username, passw]
+                    termp.save()
+                    return render(request, 'problem/createuser.html', {'formcre': formcre, 'mescre': mescre})
+                else:
+                    return render(request, 'problem/createuser.html', {'formcre': formcre})
+            else:
+                formcre = CreateUser()
+                return render(request, 'problem/createuser.html', {'formcre': formcre})
+        else:
+            return redirect('index')

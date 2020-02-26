@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, prob, addanswer, ProblemNoListView,
                 zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView,
                 ProblemPodxListView, ProblemProsrListView, exportxls, Answer_approve,
-                Answer_modify, development, resolutionadd)
+                Answer_modify, development, resolutionadd, createuser)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -12,7 +12,7 @@ from mcur import settings
 #path('', index, name = 'index'),
 urlpatterns = [
     url(r'^$', lk, name='lk'),
-
+    url(r'createuser/', createuser, name='createuser'),
     path('api/problem/', api_problem),
     path('api/problem/<int:np>', api_problem_detail),
     path('problem/<int:pk>', prob, name='problem'),

@@ -3,12 +3,25 @@ from django.forms import (modelform_factory, DecimalField, ModelForm, DateField,
 from django.contrib.auth import authenticate, get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.utils.text import capfirst
 from django import forms
 from django.forms.widgets import Select
 import datetime
-from .models import Problem, Term, Answer, Termhistory, Department
+from .models import Problem, Term, Answer, Termhistory, Department, Curator
+
+class CreateUser(ModelForm):
+    group = ModelChoiceField(queryset=Group.objects.all().exclude(name='Супермодератор'), label='Группа')
+    org = ModelChoiceField(queryset=Curator.objects.all(), label='Организация')
+    dep = ModelChoiceField(queryset=Department.objects.all(), label='Отдел', required=False)
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email',)
+
+    def __init__(self, *args, **kwargs):
+        super(CreateUser, self).__init__(*args,**kwargs)
+        self.helper = FormHelper()
+
 
 class ResolutionForm(ModelForm):
     curat = ModelChoiceField(queryset=Department.objects.all(), label='Отдел', required=False)

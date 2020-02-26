@@ -162,8 +162,33 @@
               </p>
             </a>
           </li>
+          {% if perms.problem.user_supermoderator %}
+          <li class="nav-item has-treeview">
+            <a href="" class="nav-link {% block nav6 %} {% endblock %}">
+              <i class="nav-icon fas fa-circle"></i>
+              <p>
+                Инструментарий
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'createuser' %}" class="nav-link {% block nav61 %} {% endblock %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Создать пользователя</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="" class="nav-link {% block nav62 %} {% endblock %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Добавить жалобу</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          {% endif %}
           <li class="nav-item ">
-            <a href="{% url 'logout' %}" class="nav-link {% block nav6 %} {% endblock %}">
+            <a href="{% url 'logout' %}" class="nav-link {% block nav7 %} {% endblock %}">
               <ion-icon class="nav-icon" style="font-size: 24px;" name="log-out"></ion-icon>
               <p>
                 Выйти
