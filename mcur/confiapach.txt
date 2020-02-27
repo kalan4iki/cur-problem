@@ -14,7 +14,7 @@ CREATE DATABASE 'mcur' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_c
   DocumentRoot /var/www/cur-problem/mcur
   Alias /static/ /var/www/cur-problem/mcur/problem/static
   Alias /media/ /home/media
-  <Directory /var/www/cur-problem/mcur/problem/static>
+  <Directory /var/www/cur-problem/mcur/problem/static/>
     Require all granted
   </Directory>
   <Directory /home/media>
@@ -35,12 +35,12 @@ CREATE DATABASE 'mcur' DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_c
   ServerAlias 192.168.10.25
   ServerAdmin vvk@istra-adm.ru
   DocumentRoot /var/www/cur-problem/mcur
-  Alias /static/ /var/www/cur-problem/mcur/problem/static
-  Alias /media/ /home/media
-  <Directory /var/www/cur-problem/mcur/problem/static>
+  Alias /static/ /home/static/
+  Alias /media/ /home/media/
+  <Directory /home/static/>
     Require all granted
   </Directory>
-  <Directory /home/media>
+  <Directory /home/media/>
     Require all granted
   </Directory>
   <Directory /var/www/cur-problem/mcur/mcur>
