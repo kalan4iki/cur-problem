@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+from sys import platform
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -149,14 +149,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'files', 'media') #Windows media
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #Linux media
-MEDIA_URL = '/static/'
-
+if 'linux' in platform.lower():
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #Linux media
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+else:
+    MEDIA_ROOT = 'C:/www/media/'
+    STATIC_ROOT = 'C:/www/static/'
+MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 #    'C:/GitHub/cur-problem/mcur/problem/static',
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'problem/static'),
 ]
 #'/var/www/cur-problem/mcur/problem/static',
 STATICFILES_FINDERS = (
