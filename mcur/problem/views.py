@@ -325,8 +325,19 @@ def lk(request):
             termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
             kolvo['prosr'] = len(termas)
         elif request.user.has_perm('problem.user_executor'):
+            if userlk.userprofile.org != None:
+                userorg = Q(terms__org=userlk.userprofile.org)
+            else:
+                userorg = Q()
+            if userlk.userprofile.dep != None:
+                userdep = Q(terms__curat=userlk.userprofile.dep)
+                userdep1 = Q(terms__resolutions__curat=userlk.userprofile.dep)
+            else:
+                userdep = Q()
+                userdep1 = Q()
             kolvo['kolall'] = len(Problem.objects.filter(Q(visible='1'),Q(terms__status='0'),
-                    (Q(terms__org=userlk.userprofile.org) | Q(terms__curat=userlk.userprofile.dep) | Q(terms__curatuser=userlk) | Q(terms__resolutions__curat=userlk.userprofile.dep) | Q(terms__resolutions__curatuser=userlk))))
+                    (userorg | userdep | Q(terms__curatuser=userlk) | userdep1 | Q(terms__resolutions__curatuser=userlk))))
+            print(kolvo['kolall'])
             kolvo['kolclose'] = len(Problem.objects.filter(visible='1', statussys='2', terms__answers__user=userlk))
             termas = Term.objects.filter(Q(status='0'), Q(date__range=(nowdate, nowdate+timedelta(3))),
                     (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
