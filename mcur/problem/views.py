@@ -459,8 +459,9 @@ def createuser(request):
                     termp.first_name = formcre.cleaned_data.get("first_name")
                     termp.last_name = formcre.cleaned_data.get("last_name")
                     termp.group = Group.objects.get(name=formcre.cleaned_data.get("group"))
+                    print(formcre.cleaned_data)
                     if formcre.cleaned_data.get("org"): termp.userprofile__org = Curator.objects.get(name=formcre.cleaned_data.get("org"))
-                    if formcre.cleaned_data.get("dep"): termp.userprofile__dep = Department.objects.get(name=formcre.cleaned_data.get("dep"))
+                    if formcre.cleaned_data.get("dep"): termp.userprofile__dep = Department.objects.get(name=formcre.cleaned_data.get("dep").name)
                     mescre = [termp.username, passw]
                     termp.save()
                     return render(request, 'problem/createuser.html', {'formcre': formcre, 'mescre': mescre})
