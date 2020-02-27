@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django_tables2 import RequestConfig
@@ -41,7 +42,7 @@ class ProblemSerializer(serializers.ModelSerializer):
 @api_view(['GET'])
 def api_problem(request):
     if request.method == 'GET':
-        prob = Problem.objects.all()
+        prob = Problem.objects.filter(visible='1')
         serializer = ProblemSerializer(prob, many=True)
         return Response(serializer.data)
 
@@ -51,6 +52,21 @@ def api_problem_detail(request, np):
         prob = Problem.objects.get(nomdobr=np)
         serializer = ProblemSerializer(prob)
         return Response(serializer.data)
+
+class AnswerSerializer(serializers.Serializer):
+    kolvo = serializers.IntegerField()
+
+class AnswerObject(object):
+    def __init__(self, kolvo):
+        self.kolvo = kolvo
+
+@csrf_exempt
+def api_answer_detail(request):
+    if request.method == 'GET':
+        answ = Answer.objects.filter(status='0')
+        a = AnswerObject(kolvo=len(answ))
+        serializer = AnswerSerializer(a)#, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
 class ProblemListView(SingleTableMixin, FilterView):
     table_class = ProblemTable

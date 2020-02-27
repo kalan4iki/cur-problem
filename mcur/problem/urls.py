@@ -1,6 +1,7 @@
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import (api_problem, api_problem_detail, prob, addanswer, ProblemNoListView,
+from .views import (api_problem, api_problem_detail, api_answer_detail,
+                prob, addanswer, ProblemNoListView,
                 zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView,
                 ProblemPodxListView, ProblemProsrListView, exportxls, Answer_approve,
                 Answer_modify, development, resolutionadd, createuser)
@@ -15,6 +16,7 @@ urlpatterns = [
     url(r'createuser/', createuser, name='createuser'),
     path('api/problem/', api_problem),
     path('api/problem/<int:np>', api_problem_detail),
+    path('api/answer/', api_answer_detail),
     path('problem/<int:pk>', prob, name='problem'),
     path('add/', add, name='add'),
     path('zap', zaptable),

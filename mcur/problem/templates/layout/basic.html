@@ -14,7 +14,7 @@
   <!-- Ionicons -->
   <script type="module" src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons/ionicons.esm.js"></script>
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-
+  <script src="{% static 'problem/ajax.js' %}"></script>
   <script src="{% static 'adminlte/dist/js/sweetalert2.all.min.js' %}"></script>
   <!-- Tempusdominus Bbootstrap 4 -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
@@ -79,18 +79,18 @@
           </li>
         </ul>
       </li>
+      {% if perms.problem.user_moderator  %}
       <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-bell"></i>
-          <span class="badge badge-success navbar-badge">0</span>
+          <span class="badge badge-success navbar-badge" id='notif'></span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <span class="dropdown-item dropdown-header">0 Уведомлений</span>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
+          <a href="#" class="dropdown-item" id='not1'>
             <i class="fas fa-envelope mr-2"></i> 0 new messages
-            <span class="float-right text-muted text-sm">0 mins</span>
           </a>
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item">
@@ -106,7 +106,7 @@
           <a href="#" class="dropdown-item dropdown-footer">Посмотреть все уведомления</a>
         </div>
       </li>
-
+      {% endif %}
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -212,7 +212,7 @@
     <strong>Copyright &copy; 2020 <a href="{% url 'index' %}">СКИОГ</a>.</strong>
     Все права защищены.
     <div class="float-right d-none d-sm-inline-block">
-      <b>Версия</b> 0.0.1
+      <b>Версия</b> 0.1.1
     </div>
   </footer>
 </div>
