@@ -149,11 +149,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'files', 'media') #Windows media
-MEDIA_ROOT = '/home/media/' #Linux media
-MEDIA_URL = '/problem/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #Linux media
+MEDIA_URL = '/static/'
 
-STATIC_URL = '/problem/static/'
-STATIC_ROOT = '/problem/static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 #    'C:/GitHub/cur-problem/mcur/problem/static',
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
