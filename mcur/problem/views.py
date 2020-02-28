@@ -461,7 +461,7 @@ def exportxls(request):
 
 
 class error_page:
-    def e400(request):
+    def e400(request, exception):
         errors = 'Ошибка 400!'
         num = 400
         head = 'Упс! Ошибка сервера!'
@@ -487,7 +487,7 @@ class error_page:
         status = 'danger'
         content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
         return render(request, 'problem/errorpage.html', {'content': content})
-        
+
 def development(request):
     return render(request, 'problem/development.html')
 

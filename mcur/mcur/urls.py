@@ -21,6 +21,6 @@ urlpatterns = [
     path('', include('problem.urls')),
 ]
 
-handler400 = error_page.e404
+handler400 = error_page.e400
 handler404 = error_page.e404
 handler500 = error_page.e500
