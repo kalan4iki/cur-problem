@@ -1,52 +1,44 @@
-#Django
+# Django
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
-from django.views.generic.base import TemplateView
-from django.views import View
-from django.forms import inlineformset_factory, modelform_factory
-from django.urls import reverse
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.models import User, Group
 from django.contrib import auth
-from django.template.context_processors import csrf
 from django.core.files.base import ContentFile
 from django.contrib import messages
 
-#django_tables2
+# django_tables2
 from django_tables2 import RequestConfig
 from django_tables2.views import SingleTableMixin
-from django_tables2.views import MultiTableMixin
 from django_tables2.paginators import LazyPaginator
 
-#django_filters
+# django_filters
 from django_filters.views import FilterView
 
-#rest_framework
+# rest_framework
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import serializers
 
-#other
+# other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department
-from .tables import ProblemTable, TermTable
-from .forms import (PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm,
-                    ResolutionForm, CreateUser)
+from .tables import ProblemTable
+from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
-import random
 import xlwt
 import mcur.settings as settings
 import random
 
 chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
+
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
         fields = ('__all__')
+
 
 @api_view(['GET'])
 def api_problem(request):
@@ -55,6 +47,7 @@ def api_problem(request):
         serializer = ProblemSerializer(prob, many=True)
         return Response(serializer.data)
 
+
 @api_view(['GET'])
 def api_problem_detail(request, np):
     if request.method == 'GET':
@@ -62,14 +55,17 @@ def api_problem_detail(request, np):
         serializer = ProblemSerializer(prob)
         return Response(serializer.data)
 
+
 class AnswerSerializer(serializers.Serializer):
     kolvosogl = serializers.IntegerField()
     kollno = serializers.IntegerField()
+
 
 class AnswerObject(object):
     def __init__(self, kollno, kolvosogl):
         self.kollno = kollno
         self.kolvosogl = kolvosogl
+
 
 @csrf_exempt
 def api_answer_detail(request):
@@ -80,6 +76,7 @@ def api_answer_detail(request):
         serializer = AnswerSerializer(a)#, many=True)
         return JsonResponse(serializer.data, safe=False)
 
+
 class ProblemListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
@@ -88,14 +85,14 @@ class ProblemListView(SingleTableMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super(ProblemListView, self).get_context_data(**kwargs)
-        #a = self.object_list
         if not self.request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
             prob = Problem.objects.filter(visible='1')
             userlk = User.objects.get(username=self.request.user.username)
-            if not self.request.user.has_perm('problem.view_problem'):
-                terms = Term.objects.filter(Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk))
+            if not self.request.user.has_perm('problem.user_moderator'):
+                q1 = Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                terms = Term.objects.filter(q1)
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
@@ -107,6 +104,7 @@ class ProblemListView(SingleTableMixin, FilterView):
             context['title'] = 'Все жалобы'
         return context
 
+
 class ProblemNoListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
@@ -115,9 +113,8 @@ class ProblemNoListView(SingleTableMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super(ProblemNoListView, self).get_context_data(**kwargs)
-        #a = self.object_list
         if not self.request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
             prob = Problem.objects.filter(visible='1', statussys='2')
             userlk = User.objects.get(username=self.request.user.username)
@@ -133,6 +130,7 @@ class ProblemNoListView(SingleTableMixin, FilterView):
             context['title'] = 'Не распределенные'
         return context
 
+
 class ProblemPodxListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
@@ -141,9 +139,8 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super(ProblemPodxListView, self).get_context_data(**kwargs)
-        #a = self.object_list
         if not self.request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
             userlk = User.objects.get(username=self.request.user.username)
             nowdatetime = datetime.now()
@@ -152,7 +149,12 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 terms = Term.objects.filter(status='0', date__range=(nowdate, nowdate + timedelta(3)))
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             elif userlk.has_perm('problem.user_executor'):
-                terms = Term.objects.filter(Q(status='0'), Q(date__range=(nowdate, nowdate + timedelta(3))), (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
+                q1 = Q(status='0')
+                q2 = Q(date__range=(nowdate, nowdate + timedelta(3)))
+                q31 = Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                q32 = Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)
+                q3 = (q31 | q32)
+                terms = Term.objects.filter(q1, q2, q3)
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
@@ -164,6 +166,7 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
             context['title'] = 'Подходит срок'
         return context
 
+
 class ProblemProsrListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
@@ -172,9 +175,8 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super(ProblemProsrListView, self).get_context_data(**kwargs)
-        #a = self.object_list
         if not self.request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
             userlk = User.objects.get(username=self.request.user.username)
             nowdatetime = datetime.now()
@@ -183,7 +185,12 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
                 terms = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             elif userlk.has_perm('problem.user_executor'):
-                terms = Term.objects.filter(Q(status='0'), Q(date__range=(date(nowdatetime.year, 1, 1), nowdate)), (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
+                q1 = Q(status='0')
+                q2 = Q(date__range=(date(nowdatetime.year, 1, 1), nowdate))
+                q31 = Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                q32 = Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)
+                q3 = (q31 | q32)
+                terms = Term.objects.filter(q1, q2, q3)
                 prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
@@ -195,12 +202,43 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             context['title'] = 'Просроченные'
         return context
 
+
+class error_page:
+    def e400(request, exception):
+        errors = 'Ошибка 400!'
+        num = 400
+        head = 'Упс! Ошибка сервера!'
+        cont = 'Просьба обратиться к администратору системы!'
+        status = 'danger'
+        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
+        return render(request, 'problem/errorpage.html', {'content': content})
+
+    def e404(request, exception):
+        errors = 'Ошибка 404!'
+        num = 404
+        head = 'Упс! Страница не найдена!'
+        cont = 'Данной страницы не существует!'
+        status = 'warning'
+        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
+        return render(request, 'problem/errorpage.html', {'content': content})
+
+    def e500(request):
+        errors = 'Ошибка 500!'
+        num = 500
+        head = 'Упс! Ошибка сервера!'
+        cont = 'Просьба обратиться к администратору системы!'
+        status = 'danger'
+        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
+        return render(request, 'problem/errorpage.html', {'content': content})
+
+
 def proverka(request, term):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if not request.user.has_perm(''):
             return redirect('index')
+
 
 def Answer_approve(request, pk):
     term = 'problem.user_moderator'
@@ -214,6 +252,7 @@ def Answer_approve(request, pk):
     z = anw.term.problem.nomdobr
     return redirect('problem',pk=z)
 
+
 def Answer_modify(request, pk):
     term = 'problem.user_moderator'
     proverka(request, term)
@@ -224,6 +263,7 @@ def Answer_modify(request, pk):
     z = anw.term.problem.nomdobr
     anw.delete()
     return redirect('problem',pk=z)
+
 
 def prob(request, pk):
     if not request.user.is_authenticated:
@@ -264,11 +304,10 @@ def prob(request, pk):
                 resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
                 return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
-                # messages.add_message(request, messages.warning, 'Нет прав для просмотра проблемы.')
                 return redirect('index')
         else:
-            #messages.add_message(request, messages.warning, 'Данной проблемы нет в системе.')
             return redirect('index')
+
 
 def zaptable(request):
     for i in range(0,51):
@@ -278,6 +317,7 @@ def zaptable(request):
         a.save()
     return redirect('index')
 
+
 def login(request):
     username = request.POST['username']
     password = request.POST['password']
@@ -285,6 +325,7 @@ def login(request):
     if user is not None and user.is_active:
         auth.login(request, user)
         return HttpResponseRedirect('index')
+
 
 def add(request):
     if not request.user.is_authenticated:
@@ -304,6 +345,7 @@ def add(request):
                     return redirect("index")
             else:
                 return redirect("problem", pk=Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
+
 
 def termadd(request, pk):
     if not request.user.is_authenticated:
@@ -328,6 +370,7 @@ def termadd(request, pk):
         else:
             return render(request, 'problem/termadd.html', {'auth': False, 'np': prob, 'prob': prob})
 
+
 def delterm(request, pk, pkp):
     b = Term.objects.get(pk=pk)
     nd = b.problem
@@ -336,6 +379,7 @@ def delterm(request, pk, pkp):
         nd.statussys = '2'
         nd.save()
     return redirect("problem", pk=nd.nomdobr)
+
 
 def lk(request):
     if not request.user.is_authenticated:
@@ -363,17 +407,25 @@ def lk(request):
             else:
                 userdep = Q()
                 userdep1 = Q()
-            kolvo['kolall'] = len(Problem.objects.filter(Q(visible='1'),Q(terms__status='0'),
-                    (userorg | userdep | Q(terms__curatuser=userlk) | userdep1 | Q(terms__resolutions__curatuser=userlk))))
+            q1 = Q(visible='1')
+            q2 = Q(terms__status='0')
+            q3 = userorg | userdep | Q(terms__curatuser=userlk) | userdep1 | Q(terms__resolutions__curatuser=userlk)
+            kolvo['kolall'] = len(Problem.objects.filter(q1, q2, q3))
             print(kolvo['kolall'])
             kolvo['kolclose'] = len(Problem.objects.filter(visible='1', statussys='2', terms__answers__user=userlk))
-            termas = Term.objects.filter(Q(status='0'), Q(date__range=(nowdate, nowdate+timedelta(3))),
-                    (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
+            q1 = Q(status='0')
+            q2 = Q(date__range=(nowdate, nowdate+timedelta(3)))
+            q31 = Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep)
+            q32 = Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)
+            q3 = (q31 | q32)
+            termas = Term.objects.filter(q1, q2, q3)
             kolvo['podx'] = len(termas)
-            termas = Term.objects.filter(Q(status='0'), Q(date__range=(date(nowdatetime.year, 1, 1), nowdate)),
-                    (Q(org=userlk.userprofile.org) | Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk) | Q(resolutions__curat=userlk.userprofile.dep) | Q(resolutions__curatuser=userlk)))
+            q1 = Q(status='0')
+            q2 = Q(date__range=(date(nowdatetime.year, 1, 1), nowdate))
+            termas = Term.objects.filter(q1, q2, q3)
             kolvo['prosr'] = len(termas)
         return render(request, 'problem/lk.html', {'kolvo': kolvo})
+
 
 def closedproblem(request):
     if not request.user.is_authenticated:
@@ -396,6 +448,7 @@ def closedproblem(request):
         config.configure(table)
         return render(request, 'problem/allproblem.html', {'table': table, 'name': name, 'kolvo': kolvo})
 
+
 def search(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -408,6 +461,7 @@ def search(request):
             else:
                 return redirect('index')
         return redirect('index')
+
 
 def addanswer(request, pk):
     term = Term.objects.get(pk=pk)
@@ -433,6 +487,7 @@ def addanswer(request, pk):
                 return redirect('index')
         else:
             return redirect('index')
+
 
 def exportxls(request):
     response = HttpResponse(content_type='application/ms-excel')
@@ -460,36 +515,9 @@ def exportxls(request):
     return response
 
 
-class error_page:
-    def e400(request, exception):
-        errors = 'Ошибка 400!'
-        num = 400
-        head = 'Упс! Ошибка сервера!'
-        cont = 'Просьба обратиться к администратору системы!'
-        status = 'danger'
-        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
-        return render(request, 'problem/errorpage.html', {'content': content})
-
-    def e404(request, exception):
-        errors = 'Ошибка 404!'
-        num = 404
-        head = 'Упс! Страница не найдена!'
-        cont = 'Данной страницы не существует!'
-        status = 'warning'
-        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
-        return render(request, 'problem/errorpage.html', {'content': content})
-
-    def e500(request):
-        errors = 'Ошибка 500!'
-        num = 500
-        head = 'Упс! Ошибка сервера!'
-        cont = 'Просьба обратиться к администратору системы!'
-        status = 'danger'
-        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
-        return render(request, 'problem/errorpage.html', {'content': content})
-
 def development(request):
     return render(request, 'problem/development.html')
+
 
 def resolutionadd(request, pk):
     if not request.user.is_authenticated:
@@ -506,9 +534,7 @@ def resolutionadd(request, pk):
                 return redirect("problem", pk=term.problem.nomdobr)
             else:
                 redirect("problem", pk=term.problem.nomdobr)
-        else:
-            formadd = TermForm()
-        return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
+
 
 def createuser(request):
     if not request.user.is_authenticated:

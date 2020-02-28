@@ -1,16 +1,13 @@
-from django.urls import path, include
+from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import (api_problem, api_problem_detail, api_answer_detail,
-                prob, addanswer, ProblemNoListView,
-                zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView,
-                ProblemPodxListView, ProblemProsrListView, exportxls, Answer_approve,
-                Answer_modify, development, resolutionadd, createuser)
+from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer, ProblemNoListView,
+                    zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
+                    ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd, createuser)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
 from mcur import settings
-#Login = LoginView(template_name = 'problem/login.html')
-#path('', index, name = 'index'),
+
 urlpatterns = [
     url(r'^$', lk, name='lk'),
     url(r'createuser/', createuser, name='createuser'),
@@ -21,7 +18,6 @@ urlpatterns = [
     path('add/', add, name='add'),
     path('zap', zaptable),
     path('login/', LoginView.as_view(template_name = 'problem/login.html'), name='login'),
-    #path('login/', CurLogin.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('termadd/<int:pk>', termadd, name='termadd'),
     path('resolution/<int:pk>', resolutionadd, name='resolutionadd'),
@@ -40,7 +36,6 @@ urlpatterns = [
     path('calendary/', development, name='calendary'),
     path('dashboard/', development, name='dashboard'),
 ]
-#    path('allproblem/', allproblem, name='allproblem'),
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

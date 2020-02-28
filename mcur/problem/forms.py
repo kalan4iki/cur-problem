@@ -1,14 +1,10 @@
-from django.forms import (modelform_factory, DecimalField, ModelForm, DateField, Form,
-                        DateInput, TextInput, ModelChoiceField, ImageField, Textarea, CharField)
+from django.forms import (ModelForm, DateField, Form, DateInput, ModelChoiceField, ImageField, Textarea, CharField)
 from django.contrib.auth import authenticate, get_user_model
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
 from django.contrib.auth.models import User, Group
 from django.utils.text import capfirst
 from django import forms
-from django.forms.widgets import Select
-import datetime
-from .models import Problem, Term, Answer, Termhistory, Department, Curator
+from .models import Problem, Term, Termhistory, Department, Curator
 
 class CreateUser(ModelForm):
     group = ModelChoiceField(queryset=Group.objects.all().exclude(name='Супермодератор'), label='Группа')

@@ -1,35 +1,28 @@
 # -*- coding: utf-8 -*-
 #Исполняемый файл работы парсера
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
-from xml.dom.minidom import parseString
 from bs4 import BeautifulSoup
 from sys import platform
 from problem.models import Problem, Category, Podcategory, Status
-import lxml
 import time
 import datetime
-import logging
-import argparse
 import traceback
+
 
 def StartBrowser():
     opts = Options()
-    driver = webdriver.Chrome('C:\chromedriver.exe', options=opts)
-    return driver
-    '''
     if platform == 'linux' or platform == 'linux2':
         opts.add_argument('headless')
         opts.add_argument('--no-sandbox')
         opts.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome(path_driver['linux'],options=opts)
-    elif platform == 'win32':
-        driver = webdriver.Chrome(path_driver['win'], options=opts)
-    '''
+        driver = webdriver.Chrome('/home/driver/', options=opts)
+    else:
+        driver = webdriver.Chrome('C:\chromedriver.exe', options=opts)
+    return driver
+
 
 def loginDobrodel(brow, url, date, vxod):
     browser = brow
@@ -57,6 +50,7 @@ def loginDobrodel(brow, url, date, vxod):
         return pages
     except:
         print(traceback.format_exc())
+
 
 def parsTable(source):
     try:
@@ -103,8 +97,6 @@ def parsTable(source):
     except:
         print(traceback.format_exc())
 
-if __name__ == '__main__':
-    parser()
 
 class Command(BaseCommand):
     help = 'Команда запуска парсера vmeste.mosreg.ru'

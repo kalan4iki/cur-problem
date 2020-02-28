@@ -1,20 +1,23 @@
 from django.contrib import admin
-from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile,
-                    Image, Category, Podcategory, Status, Termhistory, Department)
+from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile, Image, Category, Podcategory, Status,
+                     Termhistory, Department)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission
 
 # Register your models here.
+
 
 class ImageInline(admin.StackedInline):
     model = Image
     can_delete = False
     verbose_name_plural = 'Фотографии'
 
+
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_display_links = ('name',)
+
 
 @admin.register(Termhistory)
 class TermhistoryAdmin(admin.ModelAdmin):
@@ -22,15 +25,18 @@ class TermhistoryAdmin(admin.ModelAdmin):
     list_display_links = ('text',)
     list_filter = ('datecre', 'user',)
 
+
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'org')
     list_display_links = ('name',)
 
+
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ('file',)
     list_display_links = ('file',)
+
 
 @admin.register(Status)
 class StatusAdmin(admin.ModelAdmin):
@@ -38,11 +44,13 @@ class StatusAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('name',)
 
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_display_links = ('name',)
     search_fields = ('name',)
+
 
 @admin.register(Podcategory)
 class PodcategoryAdmin(admin.ModelAdmin):
@@ -51,6 +59,7 @@ class PodcategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('categ__name',)
 
+
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('status', 'datecre', 'datebzm',)
@@ -58,15 +67,6 @@ class AnswerAdmin(admin.ModelAdmin):
     search_fields = ('status', 'datecre', 'datebzm',)
     inlines = (ImageInline,)
 
-    #def nomobr(self, answ):
-    #    if answ.otvs.all().exists():
-    #        if answ.otvs.all()[0].terms.all().exists():
-    #            return answ.otvs.all()[0].terms.all()[0].nomdobr
-    #        else:
-    #            return 'Нет'
-    #    else:
-    #        return 'Нет'
-    #nomobr.short_description = "Номер жалобы"
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
@@ -97,8 +97,6 @@ class ProblemAdmin(admin.ModelAdmin):
         self.message_user(request, 'Действие выполнено')
     visib.short_description = 'Показать на сайте'
 
-#    def get_datecrok(self, obj):
-#        return "\n".join([f'({p.curat} - {p.date.day}.{p.date.month}.{p.date.year})  ' for p in obj.datecrok.all()])
 
 @admin.register(Curator)
 class CuratorAdmin(admin.ModelAdmin):
@@ -106,15 +104,16 @@ class CuratorAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     search_fields = ('name',)
 
+
 @admin.register(Minis)
 class MinisAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_display_links = ('name',)
     search_fields = ('name',)
 
+
 @admin.register(Term)
 class TermAdmin(admin.ModelAdmin):
-    #fiels = ('nomobr', 'date', 'curat', 'desck',)
     list_display = ('nomobr', 'date', 'curat', 'desck',)
     list_display_links = ('date', 'curat', 'desck',)
     search_fields = ('pk',)
@@ -128,9 +127,6 @@ class TermAdmin(admin.ModelAdmin):
 
     nomobr.short_description = "Номер жалобы"
 
-    #nomobr.short_description = 'Номер жалобы'
-    #exclude = ('day', 'month', 'year',)
-    #actions = ('sootv',)
 
 @admin.register(Access)
 class AccessAdmin(admin.ModelAdmin):
@@ -138,10 +134,12 @@ class AccessAdmin(admin.ModelAdmin):
     list_display_links = ('user',)
     search_fields = ('user',)
 
+
 class UserInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = 'Доп. информация'
+
 
 # Определяем новый класс настроек для модели User
 class UserAdmin(UserAdmin):
@@ -150,31 +148,3 @@ class UserAdmin(UserAdmin):
 # Перерегистрируем модель User
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
-'''
-    def procall(self, rec):
-        return f'{round(((int(rec.complete) + int(rec.netreb)) * 100) / int(rec.allz))}'
-    procall.short_description = 'Процент выполненого'
-    def vrproc(self, rec):
-        return f'{rec.vrabote}  ({rec.vraboteproc}%)'
-    vrproc.short_description = 'В работе'
-    def doproc(self, rec):
-        return f'{rec.dost}  ({rec.dostproc}%)'
-    doproc.short_description = 'Доступно'
-    def coproc(self, rec):
-        return f'{rec.complete}  ({rec.completeproc}%)'
-    coproc.short_description = 'Выполнено'
-    def neproc(self, rec):
-        return f'{rec.netreb}  ({rec.netrebproc}%)'
-    neproc.short_description = 'Не ребуются'
-
-    def sootv(self, request, queryset):
-        for rec in queryset:
-            temp = rec.date.split('.')
-            rec.day = temp[0]
-            rec.month = temp[1]
-            rec.year = temp[2]
-            rec.save()
-        self.message_user(request, 'Действие выполнено')
-    sootv.short_description = 'Привести запись в соответсвие'
-'''
