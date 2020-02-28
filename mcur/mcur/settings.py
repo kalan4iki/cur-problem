@@ -26,7 +26,7 @@ SECRET_KEY = 'fqovv=(m$_j)qy)exjeo1#z(1u0r-s1@*(=^)%xgh^od%cf_)3'
 if 'linux' in platform.lower():
     DEBUG = False
 else:
-    DEBUG = True
+    DEBUG = False
 
 ALLOWED_HOSTS = [
 '127.0.0.1',

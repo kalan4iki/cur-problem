@@ -1,10 +1,8 @@
+#Django
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from django_tables2 import RequestConfig
-from django_filters.views import FilterView
-from django_tables2.views import SingleTableMixin
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.views.generic.base import TemplateView
 from django.views import View
@@ -15,18 +13,29 @@ from django.contrib.auth.models import User, Group
 from django.contrib import auth
 from django.template.context_processors import csrf
 from django.core.files.base import ContentFile
+from django.contrib import messages
+
+#django_tables2
+from django_tables2 import RequestConfig
+from django_tables2.views import SingleTableMixin
+from django_tables2.views import MultiTableMixin
+from django_tables2.paginators import LazyPaginator
+
+#django_filters
+from django_filters.views import FilterView
+
+#rest_framework
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import serializers
-from django_tables2.views import MultiTableMixin
-from django_tables2.paginators import LazyPaginator
+
+#other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department
 from .tables import ProblemTable, TermTable
 from .forms import (PrSet, AuthenticationForm, PrAdd, TermForm, AnswerForm,
                     ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
-from django.contrib import messages
 import random
 import xlwt
 import mcur.settings as settings
@@ -450,8 +459,35 @@ def exportxls(request):
     wb.save(response)
     return response
 
-def custom404(request):
-    return render(request, 'problem/404.html')
+
+class error_page:
+    def e400(request):
+        errors = 'Ошибка 400!'
+        num = 400
+        head = 'Упс! Ошибка сервера!'
+        cont = 'Просьба обратиться к администратору системы!'
+        status = 'danger'
+        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
+        return render(request, 'problem/errorpage.html', {'content': content})
+
+    def e404(request, exception):
+        errors = 'Ошибка 404!'
+        num = 404
+        head = 'Упс! Страница не найдена!'
+        cont = 'Данной страницы не существует!'
+        status = 'warning'
+        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
+        return render(request, 'problem/errorpage.html', {'content': content})
+
+    def e500(request):
+        errors = 'Ошибка 500!'
+        num = 500
+        head = 'Упс! Ошибка сервера!'
+        cont = 'Просьба обратиться к администратору системы!'
+        status = 'danger'
+        content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
+        return render(request, 'problem/errorpage.html', {'content': content})
+        
 def development(request):
     return render(request, 'problem/development.html')
 

@@ -3,8 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-# Create your models here.
-# TODO: Модель ответов,
+
 class Category(models.Model):
     name = models.CharField(max_length=255, help_text='Категория проблемы',
                             verbose_name = 'Категория')
@@ -162,7 +161,6 @@ class Problem(models.Model):
     def get_absolute_url(self):
         return reverse("problem", args=(self.nomdobr,))
 
-
 class Term(models.Model):
     stats = {
         ('0','На исполнении'),
@@ -211,10 +209,6 @@ class Termhistory(models.Model):
         verbose_name = 'резолюция'
         verbose_name_plural = 'резолюции'
 
-    #def __str__(self):
-    #    temp = f'{self.curat} - {self.date.day}.{self.date.month}.{self.date.year}'
-    #    return temp
-
 class Answer(models.Model):
     stats = {
         ('0','На согласовании'),
@@ -235,9 +229,6 @@ class Answer(models.Model):
 
     def __str__(self):
         return f'{self.datecre.day}.{self.datecre.month}.{self.datecre.year}'
-
-    #def get_absolute_url(self):
-    #    return reverse() # TODO: Доработать
 
 class Image(models.Model):
     otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='imgs', blank=True,

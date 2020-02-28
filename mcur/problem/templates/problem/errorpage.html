@@ -1,0 +1,28 @@
+{% extends "layout/basic.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% block title %}Ошибка {{content.num}}{% endblock %}
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>{{content.error}}</h1>
+      </div>
+    </div>
+  </div><!-- /.container-fluid -->
+</section>
+<section class="content">
+  <div class="error-page">
+    <h2 class="headline text-{{content.status}}"> {{content.num}}</h2>
+    <div class="error-content">
+      <h3><i class="fas fa-exclamation-triangle text-{{content.status}}"></i> {{content.head}}</h3>
+      <p>{{content.cont}}</p>
+        <a href="{% url 'index' %}">Вернуться на главную страницу.</a>
+    </div>
+    <!-- /.error-content -->
+  </div>
+  <!-- /.error-page -->
+</section>
+{% endblock %}
