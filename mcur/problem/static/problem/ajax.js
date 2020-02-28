@@ -1,4 +1,4 @@
-var domain = 'http://skiog.ru/'
+var domain = 'https://skiog.ru/'
 
 window.onload = function() {
   var not = document.getElementById('notif')
