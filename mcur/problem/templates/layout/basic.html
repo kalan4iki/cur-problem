@@ -87,23 +87,17 @@
           <span class="badge badge-success navbar-badge" id='notif'></span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">0 Уведомлений</span>
+          <span class="dropdown-item dropdown-header" id='spannot'></span>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item" id='not1'>
-            <i class="fas fa-envelope mr-2"></i> 0 new messages
+          <a href="{% url 'noproblem' %}" class="dropdown-item" id='not1'>
+            <i class="fas fa-envelope mr-2"></i>
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 0 friend requests
-            <span class="float-right text-muted text-sm">0 mins</span>
+          <a href="" class="dropdown-item" id='not2'>
+            <i class="fas fa-envelope mr-2"></i>
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 0 new reports
-            <span class="float-right text-muted text-sm">0 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">Посмотреть все уведомления</a>
+          <a href="" class="dropdown-item dropdown-footer"></a>
         </div>
       </li>
       {% endif %}

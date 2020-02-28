@@ -54,17 +54,20 @@ def api_problem_detail(request, np):
         return Response(serializer.data)
 
 class AnswerSerializer(serializers.Serializer):
-    kolvo = serializers.IntegerField()
+    kolvosogl = serializers.IntegerField()
+    kollno = serializers.IntegerField()
 
 class AnswerObject(object):
-    def __init__(self, kolvo):
-        self.kolvo = kolvo
+    def __init__(self, kollno, kolvosogl):
+        self.kollno = kollno
+        self.kolvosogl = kolvosogl
 
 @csrf_exempt
 def api_answer_detail(request):
     if request.method == 'GET':
         answ = Answer.objects.filter(status='0')
-        a = AnswerObject(kolvo=len(answ))
+        prob = len(Problem.objects.filter(visible='1', statussys='2'))
+        a = AnswerObject(kollno=prob, kolvosogl=len(answ))
         serializer = AnswerSerializer(a)#, many=True)
         return JsonResponse(serializer.data, safe=False)
 
