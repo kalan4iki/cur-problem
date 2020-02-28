@@ -109,7 +109,7 @@ class ProblemNoListView(SingleTableMixin, FilterView):
         else:
             prob = Problem.objects.filter(visible='1', statussys='2')
             userlk = User.objects.get(username=self.request.user.username)
-            if not self.request.user.has_perm('problem.view_problem'):
+            if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
             filter = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filter.qs)
