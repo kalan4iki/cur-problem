@@ -131,12 +131,12 @@ class Command(BaseCommand):
         loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
         a = True
         while a:
-            a = ActionHistory.objects.filter(status='0')
-            if len(a) > 0:
-                for i in a:
-                    if a.act.nact == '1':
+            b = ActionHistory.objects.filter(status='0')
+            if len(b) > 0:
+                for i in b:
+                    if i.act.nact == '1':
                         print('0')
-                        if a.arg != None:
+                        if i.arg != None:
                             kolvo = parsingall(browser, '01.01.2019')
                             for i in kolvo:
                                 sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
@@ -144,11 +144,11 @@ class Command(BaseCommand):
                                 time.sleep(5)
                                 source = browser.page_source
                                 parsTable(source)
-                    elif a.act.nact == '2':
+                    elif i.act.nact == '2':
                         print('1')
-                        if a.arg == None:
-                            a = Problem.objects.filter(visible='1')
-                            for i in a:
+                        if i.arg == None:
+                            prob = Problem.objects.filter(visible='1')
+                            for i in prob:
                                 pars(browser, i.nomdobr)
                                 source = browser.page_source
                                 temp = parsTable(source)
@@ -159,7 +159,7 @@ class Command(BaseCommand):
                                     print(traceback.format_exc())
                         else:
                             print('2')
-                            pars(browser, a.arg)
+                            pars(browser, i.arg)
                             source = browser.page_source
                             parsTable(source)
                     i.status = '1'
