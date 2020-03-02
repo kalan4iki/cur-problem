@@ -1,6 +1,6 @@
 from django.db import models
-import uuid
-# Create your models here.
+
+
 class Status(models.Model):
     name = models.CharField(max_length = 70, verbose_name = 'Название')
 
@@ -12,13 +12,14 @@ class Status(models.Model):
     def __str__(self):
         return self.name
 
+
 class Parser(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length = 40, help_text = 'Название парсера',
-                            verbose_name = 'Парсер')
-    datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name = 'Дата создания', blank=True, null=True)
-    status = models.ForeignKey(Status, on_delete=models.PROTECT, help_text='Статус проблемы',
-                            verbose_name = 'Статус')#, default=Status.objects.get(name='Offline'))
+    id = models.AutoField(primary_key=True)
+    session = models.CharField(max_length = 40, verbose_name='Номер сессии', default=None, null=True)
+    name = models.CharField(max_length = 40, help_text='Название парсера', verbose_name='Парсер')
+    datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
+                               null=True)
+    status = models.ForeignKey(Status, on_delete=models.PROTECT, help_text='Статус проблемы', verbose_name='Статус')
 
     class Meta:
         ordering = ['datecre']
@@ -26,7 +27,34 @@ class Parser(models.Model):
         verbose_name_plural = 'парсеры'
 
     def __str__(self):
+        return f'{self.name} №{self.id}'
+
+
+class Action(models.Model):
+    name = models.CharField(max_length = 40, verbose_name='Название действия')
+    nact = models.CharField(max_length = 40, verbose_name='Номер действия')
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'действие'
+        verbose_name_plural = 'действия'
+
+    def __str__(self):
         return self.name
 
-    #def get_absolute_url(self):
-    #    return reverse("problem", args=(self.nomdobr,)) # TODO: Добавить url
+
+class ActionHistory(models.Model):
+    stats = {
+        ('0', 'На выполнении'),
+        ('1', 'Выполнено'),
+    }
+    act = models.ForeignKey(Action, on_delete=models.PROTECT, verbose_name='Действие', related_name='acts')
+    pars = models.ForeignKey(Parser, on_delete=models.PROTECT, verbose_name='Парсер', related_name='parsers')
+    arg = models.CharField(max_length=50, verbose_name='Аргументы', default=None)
+    status = models.CharField(max_length=50, verbose_name='Статус', default='0', choices=stats)
+    lastaction = models.DateTimeField(auto_now=True, verbose_name='Время выполнения', blank=True, null=True)
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'история действия'
+        verbose_name_plural = 'истории действий'

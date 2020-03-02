@@ -7,6 +7,8 @@ from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
 from sys import platform
 from problem.models import Problem, Category, Podcategory, Status
+from parsers.models import Parser, ActionHistory
+from parsers.models import Status as StatusPars
 import time
 import datetime
 import traceback
@@ -18,13 +20,15 @@ def StartBrowser():
         opts.add_argument('headless')
         opts.add_argument('--no-sandbox')
         opts.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome('/home/driver/', options=opts)
+        driver = webdriver.Chrome('/home/chromedriver', options=opts)
     else:
         driver = webdriver.Chrome('C:\chromedriver.exe', options=opts)
+    a = Parser(session=driver.session_id, name='Парсер', status=StatusPars.objects.get(name='Online'))
+    a.save()
     return driver
 
 
-def loginDobrodel(brow, url, date, vxod):
+def loginDobrodel(brow, url, vxod):
     browser = brow
     try:
         browser.get(url)
@@ -33,6 +37,10 @@ def loginDobrodel(brow, url, date, vxod):
         browser.find_element_by_name('j_password').send_keys(vxod['password'])
         browser.find_element_by_xpath('/html/body/div/div[2]/div/form/div/div[5]').click()
         time.sleep(5)
+    except:
+        print(traceback.format_exc())
+
+def parsingall(browser, date):
         browser.find_element_by_id('datefrom').clear()
         browser.find_element_by_id('datefrom').send_keys(date)
         browser.find_element_by_id('deadlineFrom').clear()
@@ -48,8 +56,7 @@ def loginDobrodel(brow, url, date, vxod):
         for i in sele:
             pages.append(i.text)
         return pages
-    except:
-        print(traceback.format_exc())
+
 
 
 def parsTable(source):
@@ -77,11 +84,16 @@ def parsTable(source):
             if not Status.objects.filter(name=temp2[13]).exists():
                 stat = Status(name=temp2[13])
                 stat.save()
+            else:
+                stat = Status.objects.get(name=temp2[13])
             visi = '1'
             if temp2[13] == 'Закрыто' and temp2[13] == 'Решено' and temp2[13] == 'Получен ответ':
                 visi = '0'
             if not Problem.objects.filter(nomdobr=temp2[0]).exists():
-                prob = Problem(nomdobr=temp2[0],temat=Category.objects.get(name=temp2[5]), podcat = Podcategory.objects.get(name=temp2[6]), text=temp2[3],adres=temp2[2],datecre=f'{date[2]}-{date[1]}-{date[0]}',status=Status.objects.get(name=temp2[13]), parsing='1', dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible = visi)
+                prob = Problem(nomdobr=temp2[0], temat=Category.objects.get(name=temp2[5]),
+                               podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
+                               datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
+                               dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
             else:
                 prob = Problem.objects.get(nomdobr=temp2[0])
                 prob.temat = Category.objects.get(name=temp2[5])
@@ -90,28 +102,53 @@ def parsTable(source):
                 prob.adres = temp2[2]
                 prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
                 prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
-                prob.status = Status.objects.get(name=temp2[13])
+                prob.status = stat
                 prob.parsing = '1'
                 prob.visible = visi
             prob.save()
+            return prob
     except:
         print(traceback.format_exc())
+
+
+def pars(browser, nom):
+    browser.find_element_by_id('datefrom').clear()
+    browser.find_element_by_id('deadlineFrom').clear()
+    browser.find_element_by_id('id').clear()
+    browser.find_element_by_id('id').send_keys(nom)
+    browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[1]/form/div[10]/button').click()
+    time.sleep(1)
 
 
 class Command(BaseCommand):
     help = 'Команда запуска парсера vmeste.mosreg.ru'
 
+    def add_arguments(self, parser):
+        parser.add_argument('-mode', dest='mode', nargs='+', type=int)
+
     def handle(self, *args, **options):
-        #Инициализация браузера
-        browser = StartBrowser()
-        now = datetime.datetime.now()
-        kolvo = loginDobrodel(browser, 'http://vmeste.mosreg.ru', '01.01.2019', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
-        print(kolvo)
-        for i in kolvo:
-            sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
-            sele.select_by_value(i)
-            time.sleep(5)
-            source = browser.page_source
-            parsTable(source)
-        time.sleep(5)
+        browser = StartBrowser() #Инициализация браузера
+        if options['mode'][0] == 1:
+            if options['date'][1]:
+                loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
+                kolvo = parsingall(browser, '01.01.2019')
+                for i in kolvo:
+                    sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
+                    sele.select_by_value(i)
+                    time.sleep(5)
+                    source = browser.page_source
+                    parsTable(source)
+        elif options['mode'][0] == 2:
+            loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
+            a = Problem.objects.filter(visible='1')
+            for i in a:
+                pars(browser, i.nomdobr)
+                source = browser.page_source
+                temp = parsTable(source)
+                try:
+                    if i.status.name != temp.status.name:
+                        print(f'Жалоба №{i.nomdobr}: Был статус: {i.status}, теперь {temp.status}')
+                except:
+                    print(traceback.format_exc())
+        time.sleep(2)
         browser.quit()

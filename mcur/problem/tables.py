@@ -11,7 +11,7 @@ class ProblemTable(tables.Table):
         model = Problem
         template_name = "django_tables2/bootstrap4.html"
         # add class="paleblue" to <table> tag
-        attrs = {'class': 'table table-bordered table-striped',
+        attrs = {'class': 'table table-bordered table-striped table-head-fixed text-nowrap',
                 'thead': {
                     'class': 'thead-light'
                 }}
