@@ -123,32 +123,46 @@ def pars(browser, nom):
 class Command(BaseCommand):
     help = 'Команда запуска парсера vmeste.mosreg.ru'
 
-    def add_arguments(self, parser):
-        parser.add_argument('-mode', dest='mode', nargs='+', type=int)
+    #add_arguments(self, parser):
+        #parser.add_argument('-mode', dest='mode', nargs='+', type=int)
 
     def handle(self, *args, **options):
         browser = StartBrowser() #Инициализация браузера
-        if options['mode'][0] == 1:
-            if options['date'][1]:
-                loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
-                kolvo = parsingall(browser, '01.01.2019')
-                for i in kolvo:
-                    sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
-                    sele.select_by_value(i)
-                    time.sleep(5)
-                    source = browser.page_source
-                    parsTable(source)
-        elif options['mode'][0] == 2:
-            loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
-            a = Problem.objects.filter(visible='1')
-            for i in a:
-                pars(browser, i.nomdobr)
-                source = browser.page_source
-                temp = parsTable(source)
-                try:
-                    if i.status.name != temp.status.name:
-                        print(f'Жалоба №{i.nomdobr}: Был статус: {i.status}, теперь {temp.status}')
-                except:
-                    print(traceback.format_exc())
+        loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
+        a = True
+        while a:
+            a = ActionHistory.objects.filter(status='0')
+            if len(a) > 0:
+                for i in a:
+                    if a.act.nact == '1':
+                        print('0')
+                        if a.arg != None:
+                            kolvo = parsingall(browser, '01.01.2019')
+                            for i in kolvo:
+                                sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
+                                sele.select_by_value(i)
+                                time.sleep(5)
+                                source = browser.page_source
+                                parsTable(source)
+                    elif a.act.nact == '2':
+                        print('1')
+                        if a.arg == None:
+                            a = Problem.objects.filter(visible='1')
+                            for i in a:
+                                pars(browser, i.nomdobr)
+                                source = browser.page_source
+                                temp = parsTable(source)
+                                try:
+                                    if i.status.name != temp.status.name:
+                                        print(f'Жалоба №{i.nomdobr}: Был статус: {i.status}, теперь {temp.status}')
+                                except:
+                                    print(traceback.format_exc())
+                        else:
+                            print('2')
+                            pars(browser, a.arg)
+                            source = browser.page_source
+                            parsTable(source)
+                    i.status = '1'
+                    i.save()
         time.sleep(2)
         browser.quit()

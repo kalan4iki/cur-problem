@@ -4,9 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User, Group
-from django.contrib import auth
+from django.core.mail import send_mail
+from django.contrib import auth, messages
 from django.core.files.base import ContentFile
-from django.contrib import messages
 
 # django_tables2
 from django_tables2 import RequestConfig
@@ -75,6 +75,17 @@ def api_answer_detail(request):
         a = AnswerObject(kollno=prob, kolvosogl=len(answ))
         serializer = AnswerSerializer(a)#, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+
+def Mailsend(email, date, nomd):
+    data = f'''
+<p>Вам направлена задача сроком до {date}. На жалобу <a href='https://skiog.ru/problem/{nomd}'>№{nomd}</a></p>
+<p></p>
+<p>______________<p> 
+<p>Администрация информационной системы skiog.ru </p>          
+'''
+    emai = email
+    send_mail('SKIOG', None, 'noreply@skiog.ru', [emai], fail_silently=False, html_message=data)
 
 
 class ProblemListView(SingleTableMixin, FilterView):
@@ -363,6 +374,10 @@ def termadd(request, pk):
                     a.save()
                     nd.statussys = '1'
                     nd.save()
+                    if a.curatuser:
+                        temp = f'{a.date.day}.{a.date.month}.{a.date.year}'
+
+                        Mailsend(a.curatuser.email, temp, a.problem.nomdobr)
                     return redirect("problem", pk=nd.nomdobr)
             else:
                 formadd = TermForm()
@@ -525,11 +540,14 @@ def resolutionadd(request, pk):
     else:
         term = Term.objects.get(pk=pk)
         if request.method == 'POST':
-            resform = ResolutionForm(request.POST)
+            resform = ResolutionForm(request.POST, curat_qs=None, curatuser_qs=None)
             if resform.is_valid():
                 a = resform.save()
                 a.term = term
                 a.user = request.user
+                if a.curatuser:
+                    temp = f'{a.date.day}.{a.date.month}.{a.date.year}'
+                    Mailsend(a.curatuser.email, temp, a.term.problem.nomdobr)
                 a.save()
                 return redirect("problem", pk=term.problem.nomdobr)
             else:

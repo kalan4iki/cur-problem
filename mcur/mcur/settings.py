@@ -22,11 +22,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'fqovv=(m$_j)qy)exjeo1#z(1u0r-s1@*(=^)%xgh^od%cf_)3'
 
+SKIOG_VERSION = '0.2.0'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 if 'linux' in platform.lower():
     DEBUG = False
 else:
-    DEBUG = False
+    DEBUG = True
 
 ALLOWED_HOSTS = [
 '127.0.0.1',
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'grappelli',
     'bootstrap3',
     'bootstrap4',
     'django_tables2',
@@ -82,6 +85,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
+                'problem.centext_processors.basic',
             ],
         },
     },
@@ -169,7 +173,7 @@ STATICFILES_DIRS = [
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -189,3 +193,11 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL =  '/index/'
 
 LOGIN_URL = '/login/'
+
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'noreply@skiog.ru'
+EMAIL_HOST_PASSWORD = '211563'
+DEFAULT_FROM_EMAIL = 'noreply@skiog.ru'
+DEFAULT_TO_EMAIL = 'noreply@skiog.ru'
