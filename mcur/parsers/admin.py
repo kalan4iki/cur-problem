@@ -19,5 +19,5 @@ class ActionAdmin(admin.ModelAdmin):
 
 @admin.register(ActionHistory)
 class ActionHistoryAdmin(admin.ModelAdmin):
-    list_display = ('status', 'lastaction',)
-    list_display_links = ('status', 'lastaction',)
+    list_display = ('act', 'arg', 'status', 'lastaction', )
+    list_display_links = ('act', 'status', 'arg', 'lastaction', )
