@@ -1,0 +1,11 @@
+[Unit]
+Description=Parser
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/home/env/bin/python3 /var/www/cur-problem/mcur/manage.py startparsing
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
