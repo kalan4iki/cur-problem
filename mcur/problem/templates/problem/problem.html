@@ -316,9 +316,11 @@
                 <ion-icon name="person"></ion-icon>
               </a>
               {% endif %}
-              <a type="button" href="" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="На обновление">
+              {% if perms.problem.user_moderator %}
+              <a type="button" href="{% url 'addparsing' np.nomdobr %}" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="На обновление">
                 <ion-icon name="arrow-round-up"></ion-icon>
               </a>
+              {% endif %}
               <a type="button" href="https://dobrodel.mosreg.ru/claims/{{np.nomdobr}}" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="Перейти на добродел" target="_blank">
                 <ion-icon name="arrow-round-forward"></ion-icon>
               </a>

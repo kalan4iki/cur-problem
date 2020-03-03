@@ -23,6 +23,7 @@ from rest_framework import serializers
 
 # other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department
+from parsers.models import ActionHistory, Action
 from .tables import ProblemTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
@@ -462,7 +463,6 @@ def closedproblem(request):
         name = 'Закрытые жалобы'
         userlk = User.objects.get(username=request.user.username)
         otv = Answer.objects.filter(user=userlk)
-        #terms = Term.objects.filter(curat=userlk.userprofile.org)
         prob = []
         for i in otv:
             a = i.otvs.all()
@@ -526,7 +526,8 @@ def exportxls(request):
     row_num = 0
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
-    columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес', 'Дата жалобы', 'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе',]
+    columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес', 'Дата жалобы',
+               'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
     # Sheet body, remaining rows
@@ -609,3 +610,12 @@ def createuser(request):
                 return render(request, 'problem/createuser.html', {'formcre': formcre})
         else:
             return redirect('index')
+
+def addparsing(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.user.has_perm('problem.user_moderator'):
+            hist = ActionHistory(act=Action.objects.get(nact='2'), arg=pk, status='0')
+            hist.save()
+            return redirect("problem", pk=pk)

@@ -4,6 +4,15 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
 
+class Person(User):
+
+    class Meta:
+        proxy = True
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
+
 class Category(models.Model):
     name = models.CharField(max_length=255, help_text='Категория проблемы',
                             verbose_name='Категория')
@@ -186,7 +195,7 @@ class Term(models.Model):
                             verbose_name='Организация', blank=True, null=True)
     curat = models.ForeignKey(Department, on_delete=models.SET_NULL,
                               verbose_name='Отдел', blank=True, null=True)
-    curatuser = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='curatuser',
+    curatuser = models.ForeignKey(Person, on_delete=models.SET_NULL, related_name='curatuser',
                                   verbose_name='Сотрудник', blank=True, null=True)
     desck = models.TextField(help_text='Описание', verbose_name='Описание', blank=True, null=True)
     status = models.CharField(max_length=50, help_text='Статус ответа', verbose_name='Статус', default='0',
@@ -194,7 +203,7 @@ class Term(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True,
                                 verbose_name='Проблема', related_name='terms')
     anwr = models.BooleanField(default=False, verbose_name='Наличие ответа')
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True)
+    user = models.ForeignKey(Person, on_delete=models.SET_NULL, default=None, null=True)
 
     class Meta:
         ordering = ['date']
@@ -215,10 +224,10 @@ class Termhistory(models.Model):
                                null=True)
     curat = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='curaters',
                               verbose_name='Отдел', blank=True, null=True)
-    curatuser = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='curatuserterm',
+    curatuser = models.ForeignKey(Person, on_delete=models.SET_NULL, related_name='curatuserterm',
                                   verbose_name='Сотрудник', blank=True, null=True)
     term = models.ForeignKey(Term, on_delete=models.CASCADE, default=None, null=True, related_name='resolutions')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True)
+    user = models.ForeignKey(Person, on_delete=models.CASCADE, default=None, null=True)
 
     class Meta:
         ordering = ['user']
@@ -239,7 +248,7 @@ class Answer(models.Model):
                                null=True)
     status = models.CharField(max_length=50, help_text='Статус ответа', verbose_name='Статус', default='0',
                               choices=stats)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text='Кто дал ответ',
+    user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто дал ответ',
                              verbose_name='Отвечающий')
     term = models.ForeignKey(Term, on_delete=models.CASCADE, null=True, verbose_name='Назначение',
                              related_name='answers')
