@@ -69,8 +69,14 @@ sudo nano /etc/apache2/sites-available/default-ssl.conf
 sudo a2ensite default-ssl
 sudo a2enmod rewrite
 sudo service apache2 restart
-sudo nano /var/log/apache2/error.log
+sudo nano /var/log/apache2/error.log - ошибка apache2
 ./configure --with-apxs=/usr/local/apache/bin/apxs   --with-python=/usr/local/bin/python3.6
 sudo /home/env/bin/python3 -m pip install
-source /home/env/bin/activate
-python manage.py runserver --insecure
+source /home/env/bin/activate - активация виртуального окружения
+python manage.py runserver --insecure - запуск
+
+[systemd]
+sudo nano /etc/systemd/system/parser.service
+sudo systemctl daemon-reload
+sudo systemctl enable parser.service
+sudo systemctl start parser.service

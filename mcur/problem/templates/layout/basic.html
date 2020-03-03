@@ -150,7 +150,7 @@
           </li>
           <li class="nav-item ">
             <a href="{% url 'dashboard' %}" class="nav-link {% block nav5 %} {% endblock %}">
-              <i class="nav-icon far fa-envelope"></i>
+              <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Статистика
               </p>
@@ -245,5 +245,8 @@
 <script src="{% static 'adminlte/dist/js/pages/dashboard.js' %}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{% static 'adminlte/dist/js/demo.js' %}"></script>
+{% block ends %}
+
+{% endblock %}
 </body>
 </html>

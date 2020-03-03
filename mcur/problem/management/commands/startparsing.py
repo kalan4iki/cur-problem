@@ -40,22 +40,27 @@ def loginDobrodel(brow, url, vxod):
     except:
         print(traceback.format_exc())
 
-def parsingall(browser, date):
+def parsingall(browser, date, dopos):
+    if dopos == '0':
         browser.find_element_by_id('datefrom').clear()
         browser.find_element_by_id('datefrom').send_keys(date)
         browser.find_element_by_id('deadlineFrom').clear()
         browser.find_element_by_id('deadlineFrom').send_keys(date)
-        browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[1]/form/div[10]/button').click()
-        time.sleep(7)
-        a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
-        a.select_by_value('25')
-        time.sleep(5)
-        bs = BeautifulSoup(browser.page_source, 'lxml')
-        sele = bs.find('span', class_='jtable-goto-page').find('select').find_all('option')
-        pages = []
-        for i in sele:
-            pages.append(i.text)
-        return pages
+    elif dopos == '1':
+        browser.find_element_by_id('dateto').clear()
+        browser.find_element_by_id('dateto').send_keys(date)
+        browser.find_element_by_id('deadlineFrom').clear()
+    browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[1]/form/div[10]/button').click()
+    time.sleep(7)
+    a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
+    a.select_by_value('25')
+    time.sleep(5)
+    bs = BeautifulSoup(browser.page_source, 'lxml')
+    sele = bs.find('span', class_='jtable-goto-page').find('select').find_all('option')
+    pages = []
+    for i in sele:
+        pages.append(i.text)
+    return pages
 
 
 
@@ -138,9 +143,8 @@ class Command(BaseCommand):
             if len(b) > 0:
                 for i in b:
                     if i.act.nact == '1':
-                        print('0')
                         if i.arg != None:
-                            kolvo = parsingall(browser, i.arg)
+                            kolvo = parsingall(browser, i.arg, '0')
                             for j in kolvo:
                                 sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
                                 sele.select_by_value(j)
@@ -148,7 +152,6 @@ class Command(BaseCommand):
                                 source = browser.page_source
                                 parsTable(source)
                     elif i.act.nact == '2':
-                        print('1')
                         if i.arg == 'all':
                             prob = Problem.objects.filter(visible='1')
                             for j in prob:
@@ -165,7 +168,6 @@ class Command(BaseCommand):
                                     j.visible = '0'
                                     j.save()
                         else:
-                            print('2')
                             pars(browser, i.arg)
                             source = browser.page_source
                             er = parsTable(source)
@@ -177,6 +179,16 @@ class Command(BaseCommand):
                         i.status = '1'
                         i.save()
                         break
+                    elif i.act.nact == '4':
+                        if i.arg != None:
+                            kolvo = parsingall(browser, i.arg, '1')
+                            for j in kolvo:
+                                sele = Select(browser.find_element_by_xpath(
+                                    '//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
+                                sele.select_by_value(j)
+                                time.sleep(3)
+                                source = browser.page_source
+                                parsTable(source)
                     i.status = '1'
                     i.save()
         time.sleep(2)

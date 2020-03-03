@@ -619,3 +619,23 @@ def addparsing(request, pk):
             hist = ActionHistory(act=Action.objects.get(nact='2'), arg=pk, status='0')
             hist.save()
             return redirect("problem", pk=pk)
+
+def dashboard(request):
+    nowdatetime = datetime.now()
+    nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+    dates = {}
+    dates['min'] = []
+    for i in range(6, 0, -1):
+        dates['min'].append(nowdate-timedelta(i))
+    dates['min'].append(nowdate)
+    dates['plus'] = []
+    for i in range(0,7):
+        dates['plus'].append(nowdate+timedelta(i))
+    kolvo = {}
+    kolvo['terms'] = []
+    kolvo['problems'] = []
+    for i in dates['min']:
+        kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
+    for i in dates['plus']:
+        kolvo['problems'].append(len(Problem.objects.filter(visible='1', dateotv=i)))
+    return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
