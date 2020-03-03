@@ -137,11 +137,11 @@ class Command(BaseCommand):
                     if i.act.nact == '1':
                         print('0')
                         if i.arg != None:
-                            kolvo = parsingall(browser, '01.01.2019')
-                            for i in kolvo:
+                            kolvo = parsingall(browser, i.arg)
+                            for j in kolvo:
                                 sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
-                                sele.select_by_value(i)
-                                time.sleep(5)
+                                sele.select_by_value(j)
+                                time.sleep(2)
                                 source = browser.page_source
                                 parsTable(source)
                     elif i.act.nact == '2':

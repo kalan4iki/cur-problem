@@ -376,8 +376,7 @@ def termadd(request, pk):
                     nd.save()
                     if a.curatuser:
                         temp = f'{a.date.day}.{a.date.month}.{a.date.year}'
-
-                        Mailsend(a.curatuser.email, temp, a.problem.nomdobr)
+                        #Mailsend(a.curatuser.email, temp, a.problem.nomdobr)
                     return redirect("problem", pk=nd.nomdobr)
             else:
                 formadd = TermForm()
@@ -547,7 +546,7 @@ def resolutionadd(request, pk):
                 a.user = request.user
                 if a.curatuser:
                     temp = f'{a.date.day}.{a.date.month}.{a.date.year}'
-                    Mailsend(a.curatuser.email, temp, a.term.problem.nomdobr)
+                    #Mailsend(a.curatuser.email, temp, a.term.problem.nomdobr)
                 a.save()
                 return redirect("problem", pk=term.problem.nomdobr)
             else:
