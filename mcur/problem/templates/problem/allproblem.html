@@ -13,7 +13,7 @@
         <h1 class="m-0 text-dark">{{ name }}. {{ dop }}</h1>
       </div><!-- /.col -->
       <div class="col-sm-6 ">
-        {% if user.is_authenticated %}
+        {% if perms.problem.user_dispatcher %}
         <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right">
               <i class="fas fa-download"></i> Выгрузить
         </a>

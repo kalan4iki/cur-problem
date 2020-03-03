@@ -157,8 +157,11 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             if userlk.has_perm('problem.user_moderator'):
-                terms = Term.objects.filter(status='0', date__range=(nowdate, nowdate + timedelta(3)))
-                prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
+                terms = Term.objects.filter(status='0', date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
+                q1 = (Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(3))) & Q(
+                    status=Status.objects.get(name='В работе')))
+                q2 = Q(visible='1') | Q(statussys='1')
+                prob = Problem.objects.filter(Q(terms__in=terms) | q1, q2)
             elif userlk.has_perm('problem.user_executor'):
                 q1 = Q(status='0')
                 q2 = Q(date__range=(nowdate, nowdate + timedelta(3)))
@@ -194,7 +197,9 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             if userlk.has_perm('problem.user_moderator'):
                 terms = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
-                prob = Problem.objects.filter(terms__in=terms, visible='1', statussys='1')
+                q1 = (Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate)) & Q(status=Status.objects.get(name='В работе')))
+                q2 = Q(visible='1') | Q(statussys='1')
+                prob = Problem.objects.filter(Q(terms__in=terms) | q1, q2)
             elif userlk.has_perm('problem.user_executor'):
                 q1 = Q(status='0')
                 q2 = Q(date__range=(date(nowdatetime.year, 1, 1), nowdate))
@@ -406,10 +411,19 @@ def lk(request):
         if request.user.has_perm('problem.user_moderator'):
             kolvo['kolall'] = len(Problem.objects.filter(visible='1'))
             kolvo['kolno'] = len(Problem.objects.filter(visible='1', statussys='2'))
-            termas = Term.objects.filter(status='0', date__range=(nowdate, nowdate+timedelta(3)))
-            kolvo['podx'] = len(termas)
-            termas = Term.objects.filter(status='0', date__range=(date(nowdatetime.year, 1, 1), nowdate))
-            kolvo['prosr'] = len(termas)
+            q1 = Q(status='0') & Q(date__range=(nowdate + timedelta(1), nowdate+timedelta(3)))
+            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(3))) & Q(
+                status=Status.objects.get(name='В работе'))
+            q22 = Q(visible='1') | Q(statussys='1')
+            termas = Term.objects.filter(q1)
+            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+            kolvo['podx'] = len(termas2)
+            q1 = Q(status='0') & Q(date__range=(date(nowdatetime.year, 1, 1), nowdate))
+            q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate)) & Q(status=Status.objects.get(name='В работе'))
+            q22 = Q(visible='1') | Q(statussys='1')
+            termas = Term.objects.filter(q1)
+            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+            kolvo['prosr'] = len(termas2)
         elif request.user.has_perm('problem.user_executor'):
             if userlk.userprofile.org != None:
                 userorg = Q(terms__org=userlk.userprofile.org)
@@ -517,7 +531,21 @@ def exportxls(request):
         ws.write(row_num, col_num, columns[col_num], font_style)
     # Sheet body, remaining rows
     font_style = xlwt.XFStyle()
-    rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat__name', 'podcat__name', 'text', 'adres', 'datecre', 'dateotv', 'status__name', 'statussys')
+    userlk = User.objects.get(username=request.user.username)
+    if request.user.has_perm('problem.user_moderator'):
+        rows = Problem.objects.filter(Q(visible='1')).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                                                             'text', 'adres', 'datecre',
+                                                                             'dateotv', 'status__name', 'statussys')
+    elif request.user.has_perm('problem.user_dispatcher'):
+        if userlk.userprofile.dep:
+            q1 = Q(terms__org=userlk.userprofile.org) | Q(terms__curat=userlk.userprofile.dep) | Q(terms__curatuser=userlk)
+            q2 = Q(terms__resolutions__curat=userlk.userprofile.dep) | Q(terms__resolutions__curatuser=userlk)
+        else:
+            q1 = Q(terms__org=userlk.userprofile.org) | Q(terms__curatuser=userlk)
+            q2 = Q(terms__resolutions__curatuser=userlk)
+        rows = Problem.objects.filter(Q(visible='1'), (q1 | q2)).values_list('pk', 'nomdobr', 'temat__name',
+                                                                             'podcat__name', 'text', 'adres', 'datecre',
+                                                                             'dateotv', 'status__name', 'statussys')
     for row in rows:
         row_num += 1
         for col_num in range(len(row)):

@@ -162,7 +162,7 @@ class Problem(models.Model):
                                verbose_name='Режим', default='1', choices=vis)
 
     class Meta:
-        ordering = ['nomdobr']
+        ordering = ['dateotv']
         verbose_name = 'жалоба'
         verbose_name_plural = 'жалобы'
 

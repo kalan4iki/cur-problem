@@ -63,50 +63,53 @@ def parsTable(source):
     try:
         bs = BeautifulSoup(source, 'lxml')
         table = bs.find_all('tr', class_ = 'jtable-data-row')
-        for i in table:
-            temp = i.find_all('td')
-            temp2 = []
-            iter = 0
-            for j in temp:
-                if iter == 3:
-                    temp2.append(j.find('a').attrs['data-hint'])
+        if len(table) >0:
+            for i in table:
+                temp = i.find_all('td')
+                temp2 = []
+                iter = 0
+                for j in temp:
+                    if iter == 3:
+                        temp2.append(j.find('a').attrs['data-hint'])
+                    else:
+                        temp2.append(j.text)
+                    iter += 1
+                date = temp2[9].split('.')
+                date2 = temp2[11].split('.')
+                if not Category.objects.filter(name=temp2[5]).exists():
+                    cat = Category(name=temp2[5])
+                    cat.save()
+                if not Podcategory.objects.filter(name=temp2[6]).exists():
+                    podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
+                    podcat.save()
+                if not Status.objects.filter(name=temp2[13]).exists():
+                    stat = Status(name=temp2[13])
+                    stat.save()
                 else:
-                    temp2.append(j.text)
-                iter += 1
-            date = temp2[9].split('.')
-            date2 = temp2[11].split('.')
-            if not Category.objects.filter(name=temp2[5]).exists():
-                cat = Category(name=temp2[5])
-                cat.save()
-            if not Podcategory.objects.filter(name=temp2[6]).exists():
-                podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
-                podcat.save()
-            if not Status.objects.filter(name=temp2[13]).exists():
-                stat = Status(name=temp2[13])
-                stat.save()
-            else:
-                stat = Status.objects.get(name=temp2[13])
-            visi = '1'
-            if temp2[13] == 'Закрыто' and temp2[13] == 'Решено' and temp2[13] == 'Получен ответ':
-                visi = '0'
-            if not Problem.objects.filter(nomdobr=temp2[0]).exists():
-                prob = Problem(nomdobr=temp2[0], temat=Category.objects.get(name=temp2[5]),
-                               podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
-                               datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
-                               dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
-            else:
-                prob = Problem.objects.get(nomdobr=temp2[0])
-                prob.temat = Category.objects.get(name=temp2[5])
-                prob.podcat = Podcategory.objects.get(name=temp2[6])
-                prob.text = temp2[3]
-                prob.adres = temp2[2]
-                prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
-                prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
-                prob.status = stat
-                prob.parsing = '1'
-                prob.visible = visi
-            prob.save()
-            return prob
+                    stat = Status.objects.get(name=temp2[13])
+                visi = '1'
+                if temp2[13] == 'Закрыто' and temp2[13] == 'Решено' and temp2[13] == 'Получен ответ':
+                    visi = '0'
+                if not Problem.objects.filter(nomdobr=temp2[0]).exists():
+                    prob = Problem(nomdobr=temp2[0], temat=Category.objects.get(name=temp2[5]),
+                                   podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
+                                   datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
+                                   dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
+                else:
+                    prob = Problem.objects.get(nomdobr=temp2[0])
+                    prob.temat = Category.objects.get(name=temp2[5])
+                    prob.podcat = Podcategory.objects.get(name=temp2[6])
+                    prob.text = temp2[3]
+                    prob.adres = temp2[2]
+                    prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
+                    prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
+                    prob.status = stat
+                    prob.parsing = '1'
+                    prob.visible = visi
+                prob.save()
+                return prob
+        else:
+            return None
     except:
         print(traceback.format_exc())
 
@@ -146,22 +149,34 @@ class Command(BaseCommand):
                                 parsTable(source)
                     elif i.act.nact == '2':
                         print('1')
-                        if i.arg == None:
+                        if i.arg == 'all':
                             prob = Problem.objects.filter(visible='1')
-                            for i in prob:
-                                pars(browser, i.nomdobr)
+                            for j in prob:
+                                pars(browser, j.nomdobr)
                                 source = browser.page_source
                                 temp = parsTable(source)
-                                try:
-                                    if i.status.name != temp.status.name:
-                                        print(f'Жалоба №{i.nomdobr}: Был статус: {i.status}, теперь {temp.status}')
-                                except:
-                                    print(traceback.format_exc())
+                                if temp != None:
+                                    try:
+                                        if j.status.name != temp.status.name:
+                                            print(f'Жалоба №{i.nomdobr}: Был статус: {i.status}, теперь {temp.status}')
+                                    except:
+                                        print(traceback.format_exc())
+                                else:
+                                    j.visible = '0'
+                                    j.save()
                         else:
                             print('2')
                             pars(browser, i.arg)
                             source = browser.page_source
-                            parsTable(source)
+                            er = parsTable(source)
+                            if er == None:
+                                tempsss = Problem.objects.get(nomdobr=i.arg)
+                                tempsss.visible = '0'
+                                tempsss.save()
+                    elif i.act.nact == '3':
+                        i.status = '1'
+                        i.save()
+                        break
                     i.status = '1'
                     i.save()
         time.sleep(2)
