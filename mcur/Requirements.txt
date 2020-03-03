@@ -10,6 +10,7 @@ django-debug-toolbar
 django-filter
 django-tables2
 django-tinymce
+django-grappelli
 djangorestframework
 lxml
 matplotlib
