@@ -637,5 +637,5 @@ def dashboard(request):
     for i in dates['min']:
         kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
     for i in dates['plus']:
-        kolvo['problems'].append(len(Problem.objects.filter(visible='1', dateotv=i)))
+        kolvo['problems'].append(len(Problem.objects.filter(visible='1', dateotv=i, status=Status.objects.get(name='В работе'))))
     return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
