@@ -51,7 +51,8 @@ def parsingall(browser, date, dopos):
         browser.find_element_by_id('dateto').clear()
         browser.find_element_by_id('dateto').send_keys(date)
         browser.find_element_by_id('deadlineFrom').clear()
-    browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[1]/form/div[10]/button').click()
+    browser.find_element_by_id('id').click()
+    browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(7)
     a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
     a.select_by_value('25')
@@ -70,6 +71,7 @@ def parsTable(source):
         bs = BeautifulSoup(source, 'lxml')
         table = bs.find_all('tr', class_ = 'jtable-data-row')
         if len(table) >0:
+            allprob = ''
             for i in table:
                 temp = i.find_all('td')
                 temp2 = []
@@ -114,8 +116,10 @@ def parsTable(source):
                     prob.visible = visi
                     loging = Loggings(name='1', note=temp2[0])
                     loging.save()
+                allprob += f'{prob.nomdobr},'
                 prob.save()
-                return prob
+            loging = Loggings(name='2', note=allprob)
+            loging.save()
         else:
             return None
     except:
@@ -127,8 +131,9 @@ def pars(browser, nom):
     browser.find_element_by_id('deadlineFrom').clear()
     browser.find_element_by_id('dateto').clear()
     browser.find_element_by_id('id').clear()
+    browser.find_element_by_id('id').click()
     browser.find_element_by_id('id').send_keys(nom)
-    browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[1]/form/div[10]/button').click()
+    browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(1)
 
 

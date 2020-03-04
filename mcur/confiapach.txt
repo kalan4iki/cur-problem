@@ -10,6 +10,8 @@ sudo nano /etc/apache2/sites-available/default-ssl.conf
 
 sudo a2ensite default-ssl
 sudo a2enmod rewrite
+
+Перезагрузка apache2:
 sudo service apache2 restart
 
 Ошибка apache2:
