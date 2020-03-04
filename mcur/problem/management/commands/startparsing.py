@@ -54,16 +54,18 @@ def parsingall(browser, date, dopos):
     browser.find_element_by_id('id').click()
     browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(7)
+    browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/table/thead/tr/th[10]').click()
     a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
     a.select_by_value('25')
     time.sleep(5)
-    bs = BeautifulSoup(browser.page_source, 'lxml')
-    sele = bs.find('span', class_='jtable-goto-page').find('select').find_all('option')
-    pages = []
-    for i in sele:
-        pages.append(i.text)
-    return pages
-
+'''
+bs = BeautifulSoup(browser.page_source, 'lxml')
+sele = bs.find('span', class_='jtable-goto-page').find('select').find_all('option')
+pages = []
+for i in sele:
+    pages.append(i.text)
+return pages
+'''
 
 
 def parsTable(source):
@@ -113,7 +115,6 @@ def parsTable(source):
                     prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
                     prob.status = stat
                     prob.parsing = '1'
-                    prob.visible = visi
                     loging = Loggings(name='1', note=temp2[0])
                     loging.save()
                 allprob += f'{prob.nomdobr},'
@@ -150,13 +151,20 @@ class Command(BaseCommand):
                 for i in b:
                     if i.act.nact == '1':
                         if i.arg != None:
-                            kolvo = parsingall(browser, i.arg, '0')
-                            for j in kolvo:
-                                sele = Select(browser.find_element_by_xpath('//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
-                                sele.select_by_value(j)
-                                time.sleep(2)
+                            parsingall(browser, i.arg, '0')
+                            j = 1
+                            while True:
+                                i.note = f'Страница {j}'
+                                i.save()
                                 source = browser.page_source
                                 parsTable(source)
+                                ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                    break
+                                else:
+                                    ele.click()
+                                j += 1
+                                time.sleep(2)
                     elif i.act.nact == '2':
                         if i.arg == 'all':
                             prob = Problem.objects.filter(visible='1')
@@ -181,15 +189,22 @@ class Command(BaseCommand):
                         break
                     elif i.act.nact == '4':
                         if i.arg != None:
-                            kolvo = parsingall(browser, i.arg, '1')
-                            for j in kolvo:
-                                sele = Select(browser.find_element_by_xpath(
-                                    '//*[@id="Container"]/div/div[4]/div[1]/span[2]/select'))
-                                sele.select_by_value(j)
-                                time.sleep(3)
+                            parsingall(browser, i.arg, '1')
+                            j = 1
+                            while True:
+                                i.note = f'Страница {j}'
+                                i.save()
                                 source = browser.page_source
                                 parsTable(source)
+                                ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                    break
+                                else:
+                                    ele.click()
+                                j += 1
+                                time.sleep(2)
                     i.status = '1'
                     i.save()
         time.sleep(2)
+        browser.close()
         browser.quit()

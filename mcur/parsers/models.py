@@ -68,7 +68,7 @@ class Loggings(models.Model):
         ('2', 'Прочее'),
     }
     name = models.CharField(max_length=50, verbose_name='Статус', default='0', choices=stats)
-    note = models.CharField(max_length=100, verbose_name='Примечание', default=None, blank=True)
+    note = models.CharField(max_length=255, verbose_name='Примечание', default=None, blank=True)
     datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
                                null=True)
 
