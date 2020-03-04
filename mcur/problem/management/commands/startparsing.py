@@ -41,20 +41,22 @@ def loginDobrodel(brow, url, vxod):
         print(traceback.format_exc())
 
 def parsingall(browser, date, dopos):
+    browser.find_element_by_id('datefrom').clear()
+    browser.find_element_by_id('deadlineFrom').clear()
+    browser.find_element_by_id('dateto').clear()
+    browser.find_element_by_id('id').clear()
     if dopos == '0':
-        browser.find_element_by_id('datefrom').clear()
         browser.find_element_by_id('datefrom').send_keys(date)
-        browser.find_element_by_id('deadlineFrom').clear()
         browser.find_element_by_id('deadlineFrom').send_keys(date)
     elif dopos == '1':
-        browser.find_element_by_id('datefrom').clear()
-        browser.find_element_by_id('dateto').clear()
         browser.find_element_by_id('dateto').send_keys(date)
-        browser.find_element_by_id('deadlineFrom').clear()
+    elif dopos == '2':
+        browser.find_element_by_id('datefrom').send_keys(date[0])
+        browser.find_element_by_id('dateto').send_keys(date[1])
     browser.find_element_by_id('id').click()
     browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(7)
-    browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/table/thead/tr/th[10]').click()
+    #browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/table/thead/tr/th[10]').click()
     a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
     a.select_by_value('25')
     time.sleep(5)
@@ -103,8 +105,6 @@ def parsTable(source):
                                    podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
                                    datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
                                    dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
-                    loging = Loggings(name='0', note=temp2[0])
-                    loging.save()
                 else:
                     prob = Problem.objects.get(nomdobr=temp2[0])
                     prob.temat = Category.objects.get(name=temp2[5])
@@ -115,8 +115,6 @@ def parsTable(source):
                     prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
                     prob.status = stat
                     prob.parsing = '1'
-                    loging = Loggings(name='1', note=temp2[0])
-                    loging.save()
                 allprob += f'{prob.nomdobr},'
                 prob.save()
             loging = Loggings(name='2', note=allprob)
@@ -192,11 +190,28 @@ class Command(BaseCommand):
                             parsingall(browser, i.arg, '1')
                             j = 1
                             while True:
+                                ele = browser.find_element_by_class_name('jtable-page-number-next')
                                 i.note = f'Страница {j}'
                                 i.save()
                                 source = browser.page_source
                                 parsTable(source)
+                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                    break
+                                else:
+                                    ele.click()
+                                j += 1
+                                time.sleep(2)
+                    elif i.act.nact == '5':
+                        if i.arg != None:
+                            tempdate = i.arg.split(',')
+                            parsingall(browser, tempdate, '2')
+                            j = 1
+                            while True:
                                 ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                i.note = f'Страница {j}'
+                                i.save()
+                                source = browser.page_source
+                                parsTable(source)
                                 if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
                                     break
                                 else:
