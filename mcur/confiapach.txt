@@ -31,3 +31,4 @@ sudo nano /etc/systemd/system/parser.service
 sudo systemctl daemon-reload
 sudo systemctl enable parser.service
 sudo systemctl start parser.service
+sudo systemctl stop parser.service

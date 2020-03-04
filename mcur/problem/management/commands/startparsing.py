@@ -47,6 +47,7 @@ def parsingall(browser, date, dopos):
         browser.find_element_by_id('deadlineFrom').clear()
         browser.find_element_by_id('deadlineFrom').send_keys(date)
     elif dopos == '1':
+        browser.find_element_by_id('datefrom').clear()
         browser.find_element_by_id('dateto').clear()
         browser.find_element_by_id('dateto').send_keys(date)
         browser.find_element_by_id('deadlineFrom').clear()
