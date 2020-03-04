@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Parser, Status, Action, ActionHistory)
+from .models import (Parser, Status, Action, ActionHistory, Loggings)
 # Register your models here.
 @admin.register(Parser)
 class ParserAdmin(admin.ModelAdmin):
@@ -21,3 +21,9 @@ class ActionAdmin(admin.ModelAdmin):
 class ActionHistoryAdmin(admin.ModelAdmin):
     list_display = ('act', 'arg', 'status', 'lastaction', )
     list_display_links = ('act', 'status', 'arg', 'lastaction', )
+
+@admin.register(Loggings)
+class LoggingsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'note', 'datecre',)
+    list_display_links = ('name', 'note', 'datecre',)
+    list_filter = ('name', 'datecre',)

@@ -54,8 +54,27 @@ class ActionHistory(models.Model):
     arg = models.CharField(max_length=50, verbose_name='Аргументы', default=None, blank=True)
     status = models.CharField(max_length=50, verbose_name='Статус', default='0', choices=stats)
     lastaction = models.DateTimeField(auto_now=True, verbose_name='Время выполнения', blank=True, null=True)
+    note = models.CharField(max_length=100, verbose_name='Примечание', default=None, blank=True)
 
     class Meta:
         ordering = ['pk']
         verbose_name = 'история действия'
         verbose_name_plural = 'истории действий'
+
+class Loggings(models.Model):
+    stats = {
+        ('0', 'Добавлено'),
+        ('1', 'Обновлено'),
+    }
+    name = models.CharField(max_length=50, verbose_name='Статус', default='0', choices=stats)
+    note = models.CharField(max_length=100, verbose_name='Примечание', default=None, blank=True)
+    datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
+                               null=True)
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'лог'
+        verbose_name_plural = 'логи'
+
+    def __str__(self):
+        return f'{self.note} - {self.name}'
