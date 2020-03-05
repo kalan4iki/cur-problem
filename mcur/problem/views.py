@@ -281,9 +281,7 @@ class ProblemMeListView(SingleTableMixin, FilterView):
             if userlk.has_perm('problem.user_moderator'):
                 nowdatetime = datetime.now()
                 nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-                q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-                if userlk.userprofile.dep == None:
-                    q1 = Q(curatuser=userlk)
+                q1 = Q(curatuser=userlk)
                 termas = Termhistory.objects.filter(q1)
                 termas1 = Term.objects.filter(q1 | Q(resolutions__in = termas))
                 prob = Problem.objects.filter(Q(terms__in=termas1))
@@ -513,9 +511,9 @@ def lk(request):
             termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
             kolvo['today'] = len(termas2)
             #Мои
-            q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-            if userlk.userprofile.dep == None:
-                q1 = Q(curatuser=userlk)
+            #q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+            #if userlk.userprofile.dep == None:
+            q1 = Q(curatuser=userlk)
             termas = Term.objects.filter(q1)
             termas2 = Problem.objects.filter(Q(terms__in=termas))
             kolvo['me'] = len(termas2)
