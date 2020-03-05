@@ -53,6 +53,8 @@ def parsingall(browser, date, dopos):
     elif dopos == '2':
         browser.find_element_by_id('datefrom').send_keys(date[0])
         browser.find_element_by_id('dateto').send_keys(date[1])
+    elif dopos == '3':
+        browser.find_element_by_id('deadlineFrom').send_keys(date)
     browser.find_element_by_id('id').click()
     browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(7)
@@ -205,6 +207,22 @@ class Command(BaseCommand):
                         if i.arg != None:
                             tempdate = i.arg.split(',')
                             parsingall(browser, tempdate, '2')
+                            j = 1
+                            while True:
+                                ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                i.note = f'Страница {j}'
+                                i.save()
+                                source = browser.page_source
+                                parsTable(source)
+                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                    break
+                                else:
+                                    ele.click()
+                                j += 1
+                                time.sleep(2)
+                    elif i.act.nact == '6':
+                        if i.arg != None:
+                            parsingall(browser, i.arg, '2')
                             j = 1
                             while True:
                                 ele = browser.find_element_by_class_name('jtable-page-number-next')
