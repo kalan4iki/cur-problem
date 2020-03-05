@@ -22,7 +22,7 @@ from rest_framework.decorators import api_view
 from rest_framework import serializers
 
 # other
-from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department
+from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person
 from parsers.models import ActionHistory, Action
 from .tables import ProblemTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
@@ -388,13 +388,13 @@ def prob(request, pk):
                 answeradd = AnswerForm()
                 if userr.has_perm('problem.user_moderator'):
                     dep = Department.objects.all()
-                    userorg = User.objects.all()
+                    userorg = Person.objects.all()
                 elif userr.has_perm('problem.user_dispatcher'):
                     dep = Department.objects.filter(org=userr.userprofile.org)
-                    userorg = User.objects.filter(userprofile__org=userr.userprofile.org)
+                    userorg = Person.objects.filter(userprofile__org=userr.userprofile.org)
                 elif userr.has_perm('problem.user_executor'):
                     dep = Department.objects.filter(name=userr.userprofile.dep.name)
-                    userorg = User.objects.filter(userprofile__dep__in=dep)
+                    userorg = Person.objects.filter(userprofile__dep__in=dep)
                 resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
                 return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:

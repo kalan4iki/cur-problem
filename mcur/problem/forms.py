@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from django.contrib.auth.models import User, Group
 from django.utils.text import capfirst
 from django import forms
-from .models import Problem, Term, Termhistory, Department, Curator
+from .models import Problem, Term, Termhistory, Department, Curator, Person
 
 class CreateUser(ModelForm):
     group = ModelChoiceField(queryset=Group.objects.all().exclude(name='Супермодератор'), label='Группа')
@@ -21,7 +21,7 @@ class CreateUser(ModelForm):
 
 class ResolutionForm(ModelForm):
     curat = ModelChoiceField(queryset=Department.objects.all(), label='Отдел', required=False)
-    curatuser = ModelChoiceField(queryset=User.objects.all(), label='Сотрудник', required=False)
+    curatuser = ModelChoiceField(queryset=Person.objects.all(), label='Сотрудник', required=False)
     class Meta:
         model = Termhistory
         fields = ('text',)

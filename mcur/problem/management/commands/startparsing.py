@@ -9,8 +9,8 @@ from sys import platform
 from problem.models import Problem, Category, Podcategory, Status
 from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
+from datetime import date, timedelta, datetime
 import time
-import datetime
 import traceback
 
 
@@ -42,8 +42,9 @@ def loginDobrodel(brow, url, vxod):
 
 def parsingall(browser, date, dopos):
     browser.find_element_by_id('datefrom').clear()
-    browser.find_element_by_id('deadlineFrom').clear()
     browser.find_element_by_id('dateto').clear()
+    browser.find_element_by_id('deadlineFrom').clear()
+    browser.find_element_by_id('deadlineTo').clear()
     browser.find_element_by_id('id').clear()
     if dopos == '0':
         browser.find_element_by_id('datefrom').send_keys(date)
@@ -55,6 +56,9 @@ def parsingall(browser, date, dopos):
         browser.find_element_by_id('dateto').send_keys(date[1])
     elif dopos == '3':
         browser.find_element_by_id('deadlineFrom').send_keys(date)
+    elif dopos == '4':
+        browser.find_element_by_id('deadlineFrom').send_keys(date[0])
+        browser.find_element_by_id('deadlineTo').send_keys(date[1])
     browser.find_element_by_id('id').click()
     browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(7)
@@ -117,6 +121,7 @@ def parsTable(source):
                     prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
                     prob.status = stat
                     prob.parsing = '1'
+                    prob.visible = visi
                 allprob += f'{prob.nomdobr},'
                 prob.save()
             loging = Loggings(name='2', note=allprob)
@@ -130,6 +135,7 @@ def parsTable(source):
 def pars(browser, nom):
     browser.find_element_by_id('datefrom').clear()
     browser.find_element_by_id('deadlineFrom').clear()
+    browser.find_element_by_id('deadlineTo').clear()
     browser.find_element_by_id('dateto').clear()
     browser.find_element_by_id('id').clear()
     browser.find_element_by_id('id').click()
@@ -168,10 +174,15 @@ class Command(BaseCommand):
                     elif i.act.nact == '2':
                         if i.arg == 'all':
                             prob = Problem.objects.filter(visible='1')
+                            als = len(prob)
+                            ke = 1
                             for j in prob:
+                                i.note = f'Проблем {ke} их {als}'
                                 pars(browser, j.nomdobr)
                                 source = browser.page_source
                                 temp = parsTable(source)
+                                i.save()
+                                ke += 1
                                 if temp == None:
                                     j.visible = '0'
                                     j.save()
@@ -222,20 +233,55 @@ class Command(BaseCommand):
                                 time.sleep(2)
                     elif i.act.nact == '6':
                         if i.arg != None:
-                            parsingall(browser, i.arg, '3')
-                            j = 1
-                            while True:
-                                ele = browser.find_element_by_class_name('jtable-page-number-next')
-                                i.note = f'Страница {j}'
-                                i.save()
-                                source = browser.page_source
-                                parsTable(source)
-                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
-                                    break
-                                else:
-                                    ele.click()
-                                j += 1
-                                time.sleep(2)
+                            datetemp = i.arg.split(',')
+                            if len(datetemp) == 1:
+                                parsingall(browser, i.arg, '3')
+                                j = 1
+                                while True:
+                                    ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                    i.note = f'Страница {j}'
+                                    i.save()
+                                    source = browser.page_source
+                                    parsTable(source)
+                                    if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                        break
+                                    else:
+                                        ele.click()
+                                    j += 1
+                                    time.sleep(2)
+                            elif len(datetemp) == 2:
+                                parsingall(browser, datetemp, '4')
+                                j = 1
+                                while True:
+                                    ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                    i.note = f'Страница {j}'
+                                    i.save()
+                                    source = browser.page_source
+                                    parsTable(source)
+                                    if ele.get_attribute(
+                                            'class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                        break
+                                    else:
+                                        ele.click()
+                                    j += 1
+                                    time.sleep(2)
+
+                    elif i.act.nact == '7':
+                        nowdatetime = datetime.now()
+                        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+                        prob = Problem.objects.filter(visible='1', dateotv=nowdate)
+                        als = len(prob)
+                        ke = 1
+                        for j in prob:
+                            i.note = f'Проблем {ke} их {als}'
+                            pars(browser, j.nomdobr)
+                            source = browser.page_source
+                            temp = parsTable(source)
+                            i.save()
+                            ke += 1
+                            if temp == None:
+                                j.visible = '0'
+                                j.save()
                     i.status = '1'
                     i.save()
         time.sleep(2)
