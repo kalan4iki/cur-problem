@@ -198,8 +198,10 @@
           <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
             </button>
+              {% if perms.problem.user_moderator %}
             <a href="{% url 'termdel' i.pk np.pk %}" type="button" class="btn btn-tool" title="Удалить"><i class="fas fa-times"></i>
             </a>
+              {% endif %}
           </div>
           <!-- /.card-tools -->
         </div>

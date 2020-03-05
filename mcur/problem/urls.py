@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer, ProblemNoListView, addparsing,
                     zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd,
-                    createuser, dashboard)
+                    createuser, dashboard, ProblemTodayListView, ProblemMeListView)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'noproblem/', ProblemNoListView.as_view(), name='noproblem'),
     url(r'podxproblem/', ProblemPodxListView.as_view(), name='podxproblem'),
     url(r'prosrproblem/', ProblemProsrListView.as_view(), name='prosrproblem'),
+    url(r'todayproblem/', ProblemTodayListView.as_view(), name='todayproblem'),
+    url(r'meproblem/', ProblemMeListView.as_view(), name='meproblem'),
     url(r'^export/xls/$', exportxls, name='exportxls'),
     path('answer/action/aprrove/<int:pk>', Answer_approve, name='answer_approve'),
     path('answer/action/modify/<int:pk>', Answer_modify, name='answer_modify'),
