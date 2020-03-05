@@ -8,9 +8,13 @@ from django_tables2.views import SingleTableMixin
 class ProblemFilter(django_filters.FilterSet):
     temat = ModelMultipleChoiceFilter(queryset=Category.objects.all())
     status = ModelMultipleChoiceFilter(queryset=Status.objects.all())
+
     class Meta:
         model = Problem
         fields = ['temat', 'status', 'statussys']
+
+
+
 
 class ProblemListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
