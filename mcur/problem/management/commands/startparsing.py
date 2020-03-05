@@ -222,7 +222,7 @@ class Command(BaseCommand):
                                 time.sleep(2)
                     elif i.act.nact == '6':
                         if i.arg != None:
-                            parsingall(browser, i.arg, '2')
+                            parsingall(browser, i.arg, '3')
                             j = 1
                             while True:
                                 ele = browser.find_element_by_class_name('jtable-page-number-next')
