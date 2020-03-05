@@ -741,6 +741,11 @@ def dashboard(request):
     for i in dates['min']:
         kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
     for i in dates['plus']:
-        kolvo['problems'].append(len(Problem.objects.filter(Q(visible='1') & Q(dateotv=i) &
-                                                            (Q(status=Status.objects.get(name='В работе')) | Q(status=Status.objects.get(name='Указан срок'))))))
+        q1 = Q(status='0') & Q(date=i)
+        q21 = Q(dateotv=i)
+        q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+            status__in=Status.objects.filter(name='Указан срок')))
+        termas = Term.objects.filter(q1)
+        termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+        kolvo['problems'].append(len(termas2))
     return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
