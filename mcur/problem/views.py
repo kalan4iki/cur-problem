@@ -21,6 +21,15 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import serializers
 
+#reportlab
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph
+from reportlab.lib.units import mm
+
 # other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person
 from parsers.models import ActionHistory, Action
@@ -31,6 +40,7 @@ from datetime import date, timedelta, datetime
 import xlwt
 import mcur.settings as settings
 import random
+import os
 
 chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
@@ -749,3 +759,45 @@ def dashboard(request):
         termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
         kolvo['problems'].append(len(termas2))
     return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
+
+def export_pdf(request, pk):
+    # Create the HttpResponse object with the appropriate PDF headers.
+    prob = Problem.objects.get(nomdobr=pk)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="d-{prob.nomdobr}.pdf"'
+    # Create the PDF object, using the response object as its "file."
+    times = os.path.join(settings.BASE_DIR, 'font', 'times.ttf')
+    style = getSampleStyleSheet()
+    width, height = A4
+    row = 800
+    c = canvas.Canvas(response, pagesize=A4)
+    pdfmetrics.registerFont(TTFont("Times", times))
+    url = 'http://127.0.0.1:8000/problem/'
+    barcode_string = f'<font name="Times" size="16">Жалоба №<a href="{url}{prob.nomdobr}" underline="True">{prob.nomdobr}</a></font>'
+    p = Paragraph(barcode_string, style=style["Normal"])
+    p.wrapOn(c, width, height)
+    p.drawOn(c, 20, row, mm)
+    barcode_string = f'<font name="Times" size="16">Категория: </font> <font name="Times" size="14"> {prob.temat}</font>'
+    p = Paragraph(barcode_string, style=style["Normal"])
+    p.wrapOn(c, width, height)
+    p.drawOn(c, 20, row-25, mm)
+    barcode_string = f'<font name="Times" size="16">Подкатегория: </font> <font name="Times" size="14"> {prob.podcat}</font>'
+    p = Paragraph(barcode_string, style=style["Normal"])
+    p.wrapOn(c, width, height)
+    p.drawOn(c, 20, row-50, mm)
+    barcode_string = f'<font name="Times" size="16">Адрес: </font> <font name="Times" size="14"> {prob.adres}</font>'
+    p = Paragraph(barcode_string, style=style["Normal"])
+    p.wrapOn(c, width, height)
+    p.drawOn(c, 20, row-75, mm)
+    barcode_string = f'<font name="Times" size="16">Дата ответа по доброделу: </font> <font name="Times" size="14"> {prob.dateotv.day}.{prob.dateotv.month}.{prob.dateotv.year}</font>'
+    p = Paragraph(barcode_string, style=style["Normal"])
+    p.wrapOn(c, width, height)
+    p.drawOn(c, 20, row-100, mm)
+    barcode_string = f'<font name="Times" size="16">Текс жалобы: </font> <font name="Times" size="14"> {prob.text}</font>'
+    p = Paragraph(barcode_string, style=style["Normal"])
+    p.wrapOn(c, width, height)
+    p.drawOn(c, 20, row-150, mm)
+    # Close the PDF object cleanly, and we're done.
+    c.showPage()
+    c.save()
+    return response

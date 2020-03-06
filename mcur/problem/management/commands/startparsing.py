@@ -9,9 +9,12 @@ from sys import platform
 from problem.models import Problem, Category, Podcategory, Status
 from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
+from mcur.settings import MEDIA_ROOT
 from datetime import date, timedelta, datetime
 import time
 import traceback
+import wget
+import os
 
 
 def StartBrowser():
@@ -144,18 +147,39 @@ def pars(browser, nom):
     time.sleep(1)
 
 
+# def parsimg(browser):
+#     prob = Problem.objects.get(visible='1')
+#     url = 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='
+#     for k in prob:
+#         browser.get()
+#         source = browser.page_source
+#         bs = BeautifulSoup(source, 'lxml')
+#         image = bs.find_all('ul', class_='imagesContainer bxslider')
+#         if len(image) > 0:
+#             for i in image:
+#                 temp = []
+#                 a = i.find_all('li')
+#                 for j in a:
+#                     dir = os.path.join(settings.MEDIA_ROOT, 'photos')
+#                     temp.append(j.attrs['name'])
+#                     wget.download()
+
+
 class Command(BaseCommand):
     help = 'Команда запуска парсера vmeste.mosreg.ru'
 
     def handle(self, *args, **options):
         browser = StartBrowser() #Инициализация браузера
-        loginDobrodel(browser, 'http://vmeste.mosreg.ru', {'username': 'tsa@istra-adm.ru', 'password': '12345678'})
+        url = 'http://vmeste.mosreg.ru'
+        username = 'tsa@istra-adm.ru'
+        password = '12345678'
+        loginDobrodel(browser, url, {'username': username, 'password': password})
         a = True
         while a:
             b = ActionHistory.objects.filter(status='0')
             if len(b) > 0:
                 for i in b:
-                    if i.act.nact == '1':
+                    if i.act.nact == '1':#Просмотреть все жалобы
                         if i.arg != None:
                             parsingall(browser, i.arg, '0')
                             j = 1
@@ -171,7 +195,7 @@ class Command(BaseCommand):
                                     ele.click()
                                 j += 1
                                 time.sleep(2)
-                    elif i.act.nact == '2':
+                    elif i.act.nact == '2':#Посмотреть не закрытые жалобы
                         if i.arg == 'all':
                             prob = Problem.objects.filter(visible='1')
                             als = len(prob)
@@ -194,11 +218,11 @@ class Command(BaseCommand):
                                 tempsss = Problem.objects.get(nomdobr=i.arg)
                                 tempsss.visible = '0'
                                 tempsss.save()
-                    elif i.act.nact == '3':
+                    elif i.act.nact == '3':#Выключить парсер
                         i.status = '1'
                         i.save()
                         break
-                    elif i.act.nact == '4':
+                    elif i.act.nact == '4':#Посмотреть до определенного момента
                         if i.arg != None:
                             parsingall(browser, i.arg, '1')
                             j = 1
@@ -214,7 +238,7 @@ class Command(BaseCommand):
                                     ele.click()
                                 j += 1
                                 time.sleep(2)
-                    elif i.act.nact == '5':
+                    elif i.act.nact == '5':#Посмотреть временной промежуток
                         if i.arg != None:
                             tempdate = i.arg.split(',')
                             parsingall(browser, tempdate, '2')
@@ -231,7 +255,7 @@ class Command(BaseCommand):
                                     ele.click()
                                 j += 1
                                 time.sleep(2)
-                    elif i.act.nact == '6':
+                    elif i.act.nact == '6':#Посмотреть срок решения от
                         if i.arg != None:
                             datetemp = i.arg.split(',')
                             if len(datetemp) == 1:
@@ -265,8 +289,7 @@ class Command(BaseCommand):
                                         ele.click()
                                     j += 1
                                     time.sleep(2)
-
-                    elif i.act.nact == '7':
+                    elif i.act.nact == '7':#Обновить сегодняшние жалобы
                         nowdatetime = datetime.now()
                         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
                         prob = Problem.objects.filter(visible='1', dateotv=nowdate)
@@ -282,6 +305,14 @@ class Command(BaseCommand):
                             if temp == None:
                                 j.visible = '0'
                                 j.save()
+                    elif i.act.nact == '8':#Обновление браузера
+                        browser.close()
+                        browser.quit()
+                        browser = StartBrowser()  # Инициализация браузера
+                        url = 'http://vmeste.mosreg.ru'
+                        username = 'tsa@istra-adm.ru'
+                        password = '12345678'
+                        loginDobrodel(browser, url, {'username': username, 'password': password})
                     i.status = '1'
                     i.save()
         time.sleep(2)

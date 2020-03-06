@@ -265,6 +265,8 @@ class Answer(models.Model):
 class Image(models.Model):
     otv = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, default=None, related_name='imgs', blank=True,
                             verbose_name='Ответ')
+    prob = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True, default=None, related_name='imgs', blank=True,
+                            verbose_name='Фотография проблемы')
     file = models.ImageField(upload_to='photos', null=True, verbose_name='Фотография')
 
     def __str__(self):
