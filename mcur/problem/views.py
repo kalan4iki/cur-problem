@@ -793,10 +793,14 @@ def export_pdf(request, pk):
     p = Paragraph(barcode_string, style=style["Normal"])
     p.wrapOn(c, width, height)
     p.drawOn(c, 20, row-100, mm)
-    barcode_string = f'<font name="Times" size="16">Текс жалобы: </font> <font name="Times" size="14"> {prob.text}</font>'
+    barcode_string = f'''<font name="Times" size="16">Текс жалобы: 
+</font> <font name="Times" size="14"> 
+<p>{prob.text}</p>
+</font>'''
     p = Paragraph(barcode_string, style=style["Normal"])
-    p.wrapOn(c, width, height)
-    p.drawOn(c, 20, row-150, mm)
+    print(p)
+    p.wrapOn(c, width-10, height)
+    p.drawOn(c, 20, row-250, mm)
     # Close the PDF object cleanly, and we're done.
     c.setTitle(prob.nomdobr)
     c.showPage()
