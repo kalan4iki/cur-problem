@@ -798,6 +798,7 @@ def export_pdf(request, pk):
     p.wrapOn(c, width, height)
     p.drawOn(c, 20, row-150, mm)
     # Close the PDF object cleanly, and we're done.
+    c.setTitle(prob.nomdobr)
     c.showPage()
     c.save()
     return response
