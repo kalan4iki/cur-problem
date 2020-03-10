@@ -119,15 +119,15 @@ class ProblemListView(SingleTableMixin, FilterView):
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
                 terms1 = Term.objects.filter(Q(resolutions__in=terms) | q1)
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
-            filter = ProblemFilter(self.request.GET, queryset=prob)
-            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
-            table = ProblemTable(filter.qs)
+            filterall = ProblemFilter(self.request.GET, queryset=prob)
+            # filterall.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            # filterall.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
+            table = ProblemTable(filterall.qs)
             RequestConfig(self.request, ).configure(table )
-            context['filter'] = filter
+            context['filter'] = filterall
             context['table'] = table
             context['name'] = 'Все жалобы'
-            context['dop'] = f'Всего: {len(filter.qs)}.'
+            context['dop'] = f'Всего: {len(filterall.qs)}.'
             context['title'] = 'Все жалобы'
         return context
 
@@ -147,15 +147,15 @@ class ProblemNoListView(SingleTableMixin, FilterView):
             userlk = User.objects.get(username=self.request.user.username)
             if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
-            filter = ProblemFilter(self.request.GET, queryset=prob)
-            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
-            table = ProblemTable(filter.qs)
+            filterno = ProblemFilter(self.request.GET, queryset=prob)
+            # filterno.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            # filterno.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
+            table = ProblemTable(filterno.qs)
             RequestConfig(self.request, ).configure(table )
-            context['filter'] = filter
+            context['filter'] = filterno
             context['table'] = table
             context['name'] = 'Не распределенные жалобы'
-            context['dop'] = f'Всего: {len(filter.qs)}.'
+            context['dop'] = f'Всего: {len(filterno.qs)}.'
             context['title'] = 'Не распределенные'
         return context
 
@@ -189,15 +189,15 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
-            filter = ProblemFilter(self.request.GET, queryset=prob)
-            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
-            table = ProblemTable(filter.qs)
+            filterpodx = ProblemFilter(self.request.GET, queryset=prob)
+            # filterpodx.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            # filterpodx.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
+            table = ProblemTable(filterpodx.qs)
             RequestConfig(self.request, ).configure(table )
-            context['filter'] = filter
+            context['filter'] = filterpodx
             context['table'] = table
             context['name'] = 'Подходит срок жалоб'
-            context['dop'] = f'Всего: {len(filter.qs)}.'
+            context['dop'] = f'Всего: {len(filterpodx.qs)}.'
             context['title'] = 'Подходит срок'
         return context
 
@@ -231,15 +231,15 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
-            filter = ProblemFilter(self.request.GET, queryset=prob)
-            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
-            table = ProblemTable(filter.qs)
+            filterpros = ProblemFilter(self.request.GET, queryset=prob)
+            # filterpros.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            # filterpros.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
+            table = ProblemTable(filterpros.qs)
             RequestConfig(self.request, ).configure(table )
-            context['filter'] = filter
+            context['filter'] = filterpros
             context['table'] = table
             context['name'] = 'Просроченные жалобы'
-            context['dop'] = f'Всего: {len(filter.qs)}.'
+            context['dop'] = f'Всего: {len(filterpros.qs)}.'
             context['title'] = 'Просроченные'
         return context
 
@@ -273,15 +273,15 @@ class ProblemTodayListView(SingleTableMixin, FilterView):
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
-            filter = ProblemFilter(self.request.GET, queryset=prob)
-            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
-            table = ProblemTable(filter.qs)
+            filtertodo = ProblemFilter(self.request.GET, queryset=prob)
+            # filtertodo.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            # filtertodo.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
+            table = ProblemTable(filtertodo.qs)
             RequestConfig(self.request, ).configure(table )
-            context['filter'] = filter
+            context['filter'] = filtertodo
             context['table'] = table
             context['name'] = 'Жалобы на сегодня'
-            context['dop'] = f'Всего: {len(filter.qs)}.'
+            context['dop'] = f'Всего: {len(filtertodo.qs)}.'
             context['title'] = 'На сегодня'
         return context
 
@@ -305,15 +305,15 @@ class ProblemMeListView(SingleTableMixin, FilterView):
                 termas = Termhistory.objects.filter(q1)
                 termas1 = Term.objects.filter(q1 | Q(resolutions__in = termas))
                 prob = Problem.objects.filter(Q(terms__in=termas1))
-                filter = ProblemFilter(self.request.GET, queryset=prob)
-                filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-                filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
-                table = ProblemTable(filter.qs)
+                filterme = ProblemFilter(self.request.GET, queryset=prob)
+                # filterme.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+                # filterme.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
+                table = ProblemTable(filterme.qs)
                 RequestConfig(self.request, ).configure(table )
-                context['filter'] = filter
+                context['filter'] = filterme
                 context['table'] = table
                 context['name'] = 'Мои жалобы'
-                context['dop'] = f'Всего: {len(filter.qs)}.'
+                context['dop'] = f'Всего: {len(filterme.qs)}.'
                 context['title'] = 'Мои жалобы'
         return context
 
