@@ -8,7 +8,7 @@
 {% block nav62 %}active{% endblock %}
 {% block nav622 %}active{% endblock %}
 {% block content %}
-<div class="content-header">
+<div class="content-header" xmlns="http://www.w3.org/1999/html">
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
@@ -26,7 +26,21 @@
                         <h3 class="card-title">Стасистика</h3>
                     </div>
                      <div class="card-body">
+                        <div class="chart">
+                        <div class="chartjs-size-monitor">
+                            <div class="chartjs-size-monitor-expand">
+                                <div class="">
 
+                                </div>
+                            </div>
+                            <div class="chartjs-size-monitor-shrink">
+                                <div class="">
+
+                                </div>
+                            </div>
+                        </div>
+                            <canvas id="barChart" ></canvas>
+                        </div>
                      </div>
                 </div>
             </div>
@@ -36,7 +50,32 @@
                         <h3 class="card-title">Действия</h3>
                     </div>
                      <div class="card-body">
-
+                         <div class="row">
+                             <div class="col-md-2">
+                                <form method="post" action="{% url 'api_action' %}" id="action1">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-eye-slash"></i> Скрыть жалобы
+                                    </button>
+                                </form>
+                            </div>
+                             <div class="col-md-2">
+                                <form method="post" action="{% url 'api_action' %}" id="action2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-sync"></i> Обновить жалобы
+                                    </button>
+                                </form>
+                            </div>
+                             <div class="col-md-2">
+                                <form method="post" action="{% url 'api_action' %}" id="action3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-sync"></i> Обновить парсер
+                                    </button>
+                                </form>
+                            </div>
+                         </div>
                      </div>
                 </div>
             </div>
@@ -48,11 +87,108 @@
                         <h3 class="card-title">Парсеры</h3>
                     </div>
                      <div class="card-body">
-
+                        <div class="table-responsive p-0"
+                            {% render_table parsers %}
+                        </div>
                      </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block ends %}
+<script>
+$(function () {
+    var areaChartData = {
+      labels  : {{ content.status|safe }},
+      datasets: [
+        {
+          label               : 'Жалобы показанные на сайте',
+          backgroundColor     : 'rgba(60,141,188,0.9)',
+          borderColor         : 'rgba(60,141,188,0.8)',
+          pointRadius          : false,
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : {{ content.kolvo|safe }}
+        }
+      ]
+    };
+
+    var barChartCanvas = $('#barChart').get(0).getContext('2d')
+    var barChartData = jQuery.extend(true, {}, areaChartData)
+    var temp0 = areaChartData.datasets[0]
+    barChartData.datasets[0] = temp0
+
+    var barChartOptions = {
+      responsive              : true,
+      maintainAspectRatio     : false,
+      datasetFill             : false
+    };
+
+    var barChart = new Chart(barChartCanvas, {
+      type: 'bar',
+      data: barChartData,
+      options: barChartOptions
+    })
+  });
+$('#action1').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            url = $form.attr( 'action' ),
+            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '1'}, onAjaxSuccess);
+    });
+
+$('#action2').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            url = $form.attr( 'action' ),
+            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '2'}, onAjaxSuccess);
+    });
+
+$('#action3').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            url = $form.attr( 'action' ),
+            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '3'}, onAjaxSuccess);
+    });
+
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": true,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+
+function onAjaxSuccess(data)
+{
+    if (data['nom'] == 0) {
+        toastr["success"](data['message'])
+    } else {
+        toastr["error"](data['message'])
+    }
+
+}
+
+</script>
 {% endblock %}

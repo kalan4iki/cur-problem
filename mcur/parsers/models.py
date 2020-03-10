@@ -47,6 +47,7 @@ class ActionHistory(models.Model):
     stats = {
         ('0', 'На выполнении'),
         ('1', 'Выполнено'),
+        ('2', 'Ошибка'),
     }
     act = models.ForeignKey(Action, on_delete=models.PROTECT, verbose_name='Действие', related_name='acts')
     pars = models.ForeignKey(Parser, on_delete=models.SET_NULL, verbose_name='Парсер', related_name='parsers',
@@ -79,3 +80,13 @@ class Loggings(models.Model):
 
     def __str__(self):
         return f'{self.note} - {self.name}'
+
+class Messages(models.Model):
+    note = models.TextField(verbose_name='Ошибка', default=None, blank=True)
+    act = models.ForeignKey(ActionHistory, on_delete=models.CASCADE, verbose_name='Действие', default=None)
+    datecre = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания', blank=True, null=True)
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'сообщение'
+        verbose_name_plural = 'сообщения'

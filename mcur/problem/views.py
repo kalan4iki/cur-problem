@@ -32,8 +32,8 @@ from reportlab.lib.units import mm
 
 # other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category
-from parsers.models import ActionHistory, Action
-from .tables import ProblemTable
+from parsers.models import ActionHistory, Action, Parser
+from .tables import ProblemTable, ParsTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
@@ -65,6 +65,45 @@ def api_problem_detail(request, np):
         prob = Problem.objects.get(nomdobr=np)
         serializer = ProblemSerializer(prob)
         return Response(serializer.data)
+
+
+class ActionSerializer(serializers.Serializer):
+    nom = serializers.IntegerField()
+    message = serializers.CharField()
+
+
+class ActionObject(object):
+    def __init__(self, nom, message):
+        self.nom = nom
+        self.message = message
+
+
+@api_view(['POST'])
+def api_action(request):
+    if request.method == 'POST':
+        if request.POST['action'] == '1':
+            status = ['Закрыто', 'Получен ответ', 'Решено']
+            status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
+            allprob = 0
+            prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status[0]) | Q(status__name=status[1]) | Q(status__name=status[2])))
+            allprob += len(prob)
+            for i in prob:
+                i.visible = '0'
+                i.save()
+            prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status2[0]) | Q(status__name=status2[1]) | Q(status__name=status2[2])))
+            allprob += len(prob)
+            for i in prob:
+                i.visible = '2'
+                i.save()
+            mes = f'''Успешно выполнено!
+Количество исправленных жалоб: {allprob}'''
+            nom = 0
+        else:
+            mes = 'Ошибка при выполнении!'
+            nom = 1
+        a = ActionObject(nom=nom, message=mes)
+        serializer = ActionSerializer(a)
+        return JsonResponse(serializer.data, safe=False)
 
 
 class AnswerSerializer(serializers.Serializer):
@@ -747,78 +786,100 @@ def addparsing(request, pk):
             return redirect("problem", pk=pk)
 
 def dashboard(request):
-    nowdatetime = datetime.now()
-    nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-    dates = {}
-    dates['min'] = []
-    for i in range(6, 0, -1):
-        dates['min'].append(nowdate-timedelta(i))
-    dates['min'].append(nowdate)
-    dates['plus'] = []
-    for i in range(0,7):
-        dates['plus'].append(nowdate+timedelta(i))
-    kolvo = {}
-    kolvo['terms'] = []
-    kolvo['problems'] = []
-    for i in dates['min']:
-        kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
-    for i in dates['plus']:
-        q1 = Q(status='0') & Q(date=i)
-        q21 = Q(dateotv=i)
-        q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
-            status__in=Status.objects.filter(name='Указан срок')))
-        termas = Term.objects.filter(q1)
-        termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
-        kolvo['problems'].append(len(termas2))
-    return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        nowdatetime = datetime.now()
+        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+        dates = {}
+        dates['min'] = []
+        for i in range(6, 0, -1):
+            dates['min'].append(nowdate-timedelta(i))
+        dates['min'].append(nowdate)
+        dates['plus'] = []
+        for i in range(0,7):
+            dates['plus'].append(nowdate+timedelta(i))
+        kolvo = {}
+        kolvo['terms'] = []
+        kolvo['problems'] = []
+        for i in dates['min']:
+            kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
+        for i in dates['plus']:
+            q1 = Q(status='0') & Q(date=i)
+            q21 = Q(dateotv=i)
+            q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+                status__in=Status.objects.filter(name='Указан срок')))
+            termas = Term.objects.filter(q1)
+            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+            kolvo['problems'].append(len(termas2))
+        return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
 
 def export_pdf(request, pk):
-    # Create the HttpResponse object with the appropriate PDF headers.
-    prob = Problem.objects.get(nomdobr=pk)
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="d-{prob.nomdobr}.pdf"'
-    # Create the PDF object, using the response object as its "file."
-    times = os.path.join(settings.BASE_DIR, 'font', 'times.ttf')
-    style = getSampleStyleSheet()
-    width, height = A4
-    row = 800
-    c = canvas.Canvas(response, pagesize=A4)
-    pdfmetrics.registerFont(TTFont("Times", times))
-    url = 'http://127.0.0.1:8000/problem/'
-    barcode_string = f'<font name="Times" size="16">Жалоба №<a href="{url}{prob.nomdobr}" underline="True">{prob.nomdobr}</a></font>'
-    p = Paragraph(barcode_string, style=style["Normal"])
-    p.wrapOn(c, width, height)
-    p.drawOn(c, 20, row, mm)
-    barcode_string = f'<font name="Times" size="16">Категория: </font> <font name="Times" size="14"> {prob.temat}</font>'
-    p = Paragraph(barcode_string, style=style["Normal"])
-    p.wrapOn(c, width, height)
-    p.drawOn(c, 20, row-25, mm)
-    barcode_string = f'<font name="Times" size="16">Подкатегория: </font> <font name="Times" size="14"> {prob.podcat}</font>'
-    p = Paragraph(barcode_string, style=style["Normal"])
-    p.wrapOn(c, width, height)
-    p.drawOn(c, 20, row-50, mm)
-    barcode_string = f'<font name="Times" size="16">Адрес: </font> <font name="Times" size="14"> {prob.adres}</font>'
-    p = Paragraph(barcode_string, style=style["Normal"])
-    p.wrapOn(c, width, height)
-    p.drawOn(c, 20, row-75, mm)
-    barcode_string = f'<font name="Times" size="16">Дата ответа по доброделу: </font> <font name="Times" size="14"> {prob.dateotv.day}.{prob.dateotv.month}.{prob.dateotv.year}</font>'
-    p = Paragraph(barcode_string, style=style["Normal"])
-    p.wrapOn(c, width, height)
-    p.drawOn(c, 20, row-100, mm)
-    barcode_string = f'''<font name="Times" size="16">Текс жалобы: 
-</font> <font name="Times" size="14"> 
-<p>{prob.text}</p>
-</font>'''
-    p = Paragraph(barcode_string, style=style["Normal"])
-    print(p)
-    p.wrapOn(c, width-10, height)
-    p.drawOn(c, 20, row-250, mm)
-    # Close the PDF object cleanly, and we're done.
-    c.setTitle(prob.nomdobr)
-    c.showPage()
-    c.save()
-    return response
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        # Create the HttpResponse object with the appropriate PDF headers.
+        prob = Problem.objects.get(nomdobr=pk)
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="d-{prob.nomdobr}.pdf"'
+        # Create the PDF object, using the response object as its "file."
+        times = os.path.join(settings.BASE_DIR, 'font', 'times.ttf')
+        style = getSampleStyleSheet()
+        width, height = A4
+        row = 800
+        c = canvas.Canvas(response, pagesize=A4)
+        pdfmetrics.registerFont(TTFont("Times", times))
+        url = 'http://127.0.0.1:8000/problem/'
+        barcode_string = f'<font name="Times" size="16">Жалоба №<a href="{url}{prob.nomdobr}" underline="True">{prob.nomdobr}</a></font>'
+        p = Paragraph(barcode_string, style=style["Normal"])
+        p.wrapOn(c, width, height)
+        p.drawOn(c, 20, row, mm)
+        barcode_string = f'<font name="Times" size="16">Категория: </font> <font name="Times" size="14"> {prob.temat}</font>'
+        p = Paragraph(barcode_string, style=style["Normal"])
+        p.wrapOn(c, width, height)
+        p.drawOn(c, 20, row-25, mm)
+        barcode_string = f'<font name="Times" size="16">Подкатегория: </font> <font name="Times" size="14"> {prob.podcat}</font>'
+        p = Paragraph(barcode_string, style=style["Normal"])
+        p.wrapOn(c, width, height)
+        p.drawOn(c, 20, row-50, mm)
+        barcode_string = f'<font name="Times" size="16">Адрес: </font> <font name="Times" size="14"> {prob.adres}</font>'
+        p = Paragraph(barcode_string, style=style["Normal"])
+        p.wrapOn(c, width, height)
+        p.drawOn(c, 20, row-75, mm)
+        barcode_string = f'<font name="Times" size="16">Дата ответа по доброделу: </font> <font name="Times" size="14"> {prob.dateotv.day}.{prob.dateotv.month}.{prob.dateotv.year}</font>'
+        p = Paragraph(barcode_string, style=style["Normal"])
+        p.wrapOn(c, width, height)
+        p.drawOn(c, 20, row-100, mm)
+        barcode_string = f'''<font name="Times" size="16">Текс жалобы: 
+    </font> <font name="Times" size="14"> 
+    <p>{prob.text}</p>
+    </font>'''
+        p = Paragraph(barcode_string, style=style["Normal"])
+        print(p)
+        p.wrapOn(c, width-10, height)
+        p.drawOn(c, 20, row-250, mm)
+        # Close the PDF object cleanly, and we're done.
+        c.setTitle(prob.nomdobr)
+        c.showPage()
+        c.save()
+        return response
 
 def statandact(request):
-    temp = ''
-    return render(request, 'problem/statandact.html')
+    print(request.method)
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.user.has_perm('problem.user_supermoderator'):
+            content = {}
+            content['status'] = ['Закрыто', 'Получен ответ', 'Решено', 'На рассмотрении', 'На уточнении', 'Премодерация']
+            content['kolvo'] = []
+            for i in content['status']:
+                content['kolvo'].append(len(Problem.objects.filter(visible='1', status__name=i)))
+            parser = Parser.objects.all()
+            table = ParsTable(parser)
+            RequestConfig(request, ).configure(table)
+            if request.method == 'POST':
+                print('Test')
+            return render(request, 'problem/statandact.html', {'parsers': table, 'content': content})
+        else:
+            return redirect('index')

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Parser, Status, Action, ActionHistory, Loggings)
+from .models import (Parser, Status, Action, ActionHistory, Loggings, Messages)
 # Register your models here.
 @admin.register(Parser)
 class ParserAdmin(admin.ModelAdmin):
@@ -27,3 +27,9 @@ class LoggingsAdmin(admin.ModelAdmin):
     list_display = ('name', 'note', 'datecre',)
     list_display_links = ('name', 'note', 'datecre',)
     list_filter = ('name', 'datecre',)
+
+@admin.register(Messages)
+class MessagesAdmin(admin.ModelAdmin):
+    list_display = ('note', 'datecre',)
+    list_display_links = ('note', 'datecre',)
+    list_filter = ('note', 'datecre',)

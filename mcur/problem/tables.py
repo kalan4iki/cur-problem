@@ -2,6 +2,7 @@ import django_tables2 as tables
 from django_tables2.views import MultiTableMixin
 from django.views.generic.base import TemplateView
 from .models import Problem, Term
+from parsers.models import Parser
 
 class ProblemTable(tables.Table):
     nomdobr = tables.Column(verbose_name='Номер добродел', linkify=True)
@@ -24,3 +25,8 @@ class TermTable(tables.Table):
                 'thead': {
                     'class': 'thead-light'
                 }}
+
+class ParsTable(tables.Table):
+    class Meta:
+        model = Parser
+        template_name = "django_tables2/bootstrap4.html"
