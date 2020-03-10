@@ -159,8 +159,6 @@ class ProblemListView(SingleTableMixin, FilterView):
                 terms1 = Term.objects.filter(Q(resolutions__in=terms) | q1)
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
             filterall = ProblemFilter(self.request.GET, queryset=prob)
-            # filterall.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            # filterall.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filterall.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filterall
@@ -187,8 +185,6 @@ class ProblemNoListView(SingleTableMixin, FilterView):
             if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
             filterno = ProblemFilter(self.request.GET, queryset=prob)
-            # filterno.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            # filterno.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filterno.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filterno
@@ -218,7 +214,7 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
                 q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
                 termas = Term.objects.filter(q1)
-                prob = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+                prob = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             elif userlk.has_perm('problem.user_executor'):
                 q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
                 termas = Termhistory.objects.filter(q1)
@@ -229,8 +225,6 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
             filterpodx = ProblemFilter(self.request.GET, queryset=prob)
-            # filterpodx.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            # filterpodx.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filterpodx.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filterpodx
@@ -260,7 +254,7 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
                 q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
                 q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
                 termas = Term.objects.filter(q1)
-                prob = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+                prob = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             elif userlk.has_perm('problem.user_executor'):
                 q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
                 termas = Termhistory.objects.filter(q1)
@@ -271,8 +265,6 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
             filterpros = ProblemFilter(self.request.GET, queryset=prob)
-            # filterpros.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            # filterpros.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filterpros.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filterpros
@@ -302,7 +294,7 @@ class ProblemTodayListView(SingleTableMixin, FilterView):
                 q21 = Q(dateotv=nowdate)
                 q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
                 termas = Term.objects.filter(q1)
-                prob = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+                prob = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             elif userlk.has_perm('problem.user_executor'):
                 q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
                 termas = Termhistory.objects.filter(q1)
@@ -313,8 +305,6 @@ class ProblemTodayListView(SingleTableMixin, FilterView):
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
             filtertodo = ProblemFilter(self.request.GET, queryset=prob)
-            # filtertodo.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-            # filtertodo.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filtertodo.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filtertodo
@@ -345,8 +335,6 @@ class ProblemMeListView(SingleTableMixin, FilterView):
                 termas1 = Term.objects.filter(q1 | Q(resolutions__in = termas))
                 prob = Problem.objects.filter(Q(terms__in=termas1))
                 filterme = ProblemFilter(self.request.GET, queryset=prob)
-                # filterme.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
-                # filterme.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
                 table = ProblemTable(filterme.qs)
                 RequestConfig(self.request, ).configure(table )
                 context['filter'] = filterme
@@ -555,21 +543,21 @@ def lk(request):
             q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(3)))
             q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
             termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+            termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             kolvo['podx'] = len(termas2)
             #Просроченные
             q1 = Q(status='0') & Q(date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
             q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
             q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
             termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+            termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             kolvo['prosr'] = len(termas2)
             #На сегодня
             q1 = Q(status='0') & Q(date=nowdate)
             q21 = Q(dateotv = nowdate)
             q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
             termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+            termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             kolvo['today'] = len(termas2)
             #Мои
             #q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
@@ -592,7 +580,7 @@ def lk(request):
             if userlk.userprofile.dep == None:
                 q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
             termas2 = Term.objects.filter(q1 | Q(resolutions__in=termas) & Q(status='0'))
-            termas3 = Problem.objects.filter(Q(visible='1') | Q(statussys='1'), Q(terms__in=termas2))
+            termas3 = Problem.objects.filter(Q(visible='1') | Q(statussys='1') & Q(terms__in=termas2))
             kolvo['kolall'] = len(termas3)
             #3 Подходит срок жалоб
             q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)

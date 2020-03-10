@@ -111,7 +111,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="{% url 'index' %}" class="brand-link">
+    <a href="{% url 'index' %}" class="brand-link navbar-navy">
       <img src="{% static 'adminlte/dist/img/logo.png' %}" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light"><b>СКИОГ</b></span>
     </a>
@@ -121,14 +121,14 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-flat" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item">
             <a href="{% url 'lk' %}" class="nav-link {% block nav2 %} {% endblock %}">
               <i class="nav-icon fas fa-envelope"></i>
               <p>
-                Личный кабинет
+                Главная страница
               </p>
             </a>
           </li>

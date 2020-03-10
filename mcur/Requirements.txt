@@ -23,3 +23,4 @@ selenium
 tablib
 urllib3
 xlwt
+reportlab
