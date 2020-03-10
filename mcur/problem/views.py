@@ -31,7 +31,7 @@ from reportlab.platypus import Paragraph
 from reportlab.lib.units import mm
 
 # other
-from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person
+from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category
 from parsers.models import ActionHistory, Action
 from .tables import ProblemTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
@@ -120,6 +120,8 @@ class ProblemListView(SingleTableMixin, FilterView):
                 terms1 = Term.objects.filter(Q(resolutions__in=terms) | q1)
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
             filter = ProblemFilter(self.request.GET, queryset=prob)
+            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filter.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filter
@@ -146,6 +148,8 @@ class ProblemNoListView(SingleTableMixin, FilterView):
             if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
             filter = ProblemFilter(self.request.GET, queryset=prob)
+            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filter.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filter
@@ -186,6 +190,8 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
             filter = ProblemFilter(self.request.GET, queryset=prob)
+            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filter.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filter
@@ -226,6 +232,8 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
             filter = ProblemFilter(self.request.GET, queryset=prob)
+            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filter.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filter
@@ -266,6 +274,8 @@ class ProblemTodayListView(SingleTableMixin, FilterView):
                 q2 = Q(visible='1')
                 prob = Problem.objects.filter(Q(terms__in=termas1) & q2)
             filter = ProblemFilter(self.request.GET, queryset=prob)
+            filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+            filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
             table = ProblemTable(filter.qs)
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filter
@@ -296,6 +306,8 @@ class ProblemMeListView(SingleTableMixin, FilterView):
                 termas1 = Term.objects.filter(q1 | Q(resolutions__in = termas))
                 prob = Problem.objects.filter(Q(terms__in=termas1))
                 filter = ProblemFilter(self.request.GET, queryset=prob)
+                filter.base_filters['temat'].queryset = Category.objects.filter(problems__in=prob).distinct()
+                filter.base_filters['status'].queryset = Status.objects.filter(problems__in=prob).distinct()
                 table = ProblemTable(filter.qs)
                 RequestConfig(self.request, ).configure(table )
                 context['filter'] = filter

@@ -152,7 +152,7 @@ class Problem(models.Model):
     temat = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Тематика проблемы',
                               verbose_name='Тематика', blank=True, null=True, related_name='problems')
     podcat = models.ForeignKey(Podcategory, on_delete=models.PROTECT, help_text='Подкатегория проблемы',
-                               verbose_name='Подкатегория', blank=True, null=True)
+                               verbose_name='Подкатегория', blank=True, null=True, related_name='problems')
     ciogv = models.ForeignKey(Minis, on_delete=models.PROTECT, blank=True,
                               help_text='ЦИОГВ', verbose_name='ЦИОГВ', null=True)
     text = models.TextField(help_text='Текст проблемы', verbose_name='Текст', blank=True, null=True)
@@ -163,7 +163,7 @@ class Problem(models.Model):
     dateotv = models.DateField(help_text='Дата ответа по доброделу', verbose_name='Дата ответа по доброделу',
                                blank=True, null=True)
     status = models.ForeignKey(Status, on_delete=models.PROTECT, help_text='Статус в доброделе',
-                               verbose_name='Статус в доброделе', blank=True, null=True)
+                               verbose_name='Статус в доброделе', blank=True, null=True, related_name='problems')
     statussys = models.CharField(max_length=70, help_text='Статус проблемы',
                                  verbose_name='Статус', default='2', choices=stat)
     parsing = models.CharField(max_length=50, help_text='Статус парсинга',

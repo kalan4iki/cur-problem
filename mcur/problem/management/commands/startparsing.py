@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #Исполняемый файл работы парсера
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
@@ -194,7 +195,7 @@ class Command(BaseCommand):
                                 time.sleep(2)
                     elif i.act.nact == '2':#Посмотреть не закрытые жалобы
                         if i.arg == 'all':
-                            prob = Problem.objects.filter(visible='1')
+                            prob = Problem.objects.filter(Q(visible='1') | Q(visible='2'))
                             als = len(prob)
                             ke = 1
                             for j in prob:

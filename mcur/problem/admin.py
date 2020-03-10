@@ -74,7 +74,7 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display_links = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
     search_fields = ('nomdobr',)
     list_filter = ('visible', 'dateotv', 'status__name', 'parsing', 'temat', 'ciogv__name',)
-    actions = ('pars', 'novisib', 'visib')
+    actions = ('pars', 'novisib', 'termnovisib', 'visib')
 
     def pars(self, request, queryset):
         for prob in queryset:
@@ -96,6 +96,13 @@ class ProblemAdmin(admin.ModelAdmin):
             prob.save()
         self.message_user(request, 'Действие выполнено')
     visib.short_description = 'Показать на сайте'
+
+    def termnovisib(self, request, queryset):
+        for prob in queryset:
+            prob.visible = '2'
+            prob.save()
+        self.message_user(request, 'Действие выполнено')
+    termnovisib.short_description = 'Времмено убрать с сайта'
 
 
 @admin.register(Curator)
