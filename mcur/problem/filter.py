@@ -15,6 +15,8 @@ class ProblemFilter(django_filters.FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        #print(kwargs)
+        #data = kwargs.get('data', None)
         self.filters['temat'].queryset = Category.objects.filter(problems__in=kwargs['queryset']).distinct()
         self.filters['status'].queryset = Status.objects.filter(problems__in=kwargs['queryset']).distinct()
 
