@@ -207,17 +207,17 @@ class Command(BaseCommand):
                                 temp = parsTable(source)
                                 i.save()
                                 ke += 1
-                                if temp == None:
-                                    j.visible = '0'
-                                    j.save()
+                                #if temp == None:
+                                #    j.visible = '0'
+                                #    j.save()
                         else:
                             pars(browser, i.arg)
                             source = browser.page_source
                             er = parsTable(source)
-                            if er == None:
-                                tempsss = Problem.objects.get(nomdobr=i.arg)
-                                tempsss.visible = '0'
-                                tempsss.save()
+                            #if er == None:
+                            #    tempsss = Problem.objects.get(nomdobr=i.arg)
+                            #    tempsss.visible = '0'
+                            #    tempsss.save()
                     elif i.act.nact == '3':#Выключить парсер
                         i.status = '1'
                         i.save()
