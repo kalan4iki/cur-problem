@@ -9,12 +9,9 @@ from sys import platform
 from problem.models import Problem, Category, Podcategory, Status
 from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
-from mcur.settings import MEDIA_ROOT
-from datetime import date, timedelta, datetime
+from datetime import date, datetime
 import time
 import traceback
-import wget
-import os
 
 
 def StartBrowser():
