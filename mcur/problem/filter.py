@@ -13,19 +13,14 @@ class ProblemFilter(django_filters.FilterSet):
     temat = ModelMultipleChoiceFilter(queryset=Category.objects.all())
     status = ModelMultipleChoiceFilter(queryset=Status.objects.all())
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.filters['temat'].queryset = Category.objects.filter(problems__in=kwargs['queryset']).distinct()
+        self.filters['status'].queryset = Status.objects.filter(problems__in=kwargs['queryset']).distinct()
+
     class Meta:
         model = Problem
         fields = ['temat', 'status', 'statussys']
-# def __init__(self, data=None, queryset=None, prefix=None, strict=None):
-#     self.base_filters['temat'] = django_filters.filters.ModelMultipleChoiceFilter(
-#         queryset=Category.objects.filter(problems__in=queryset).distinct(),
-#     )
-#     super().__init__(data, queryset, prefix, strict)
-
-#    def __init__(self, request, *args, **kwargs):
-#        super().__init__(*args, **kwargs)
-#        temp = Category.objects.filter(problems__in=kwargs['queryset']).distinct()
-#        print(temp)
 
 
 
