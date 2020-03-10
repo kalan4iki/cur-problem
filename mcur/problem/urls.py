@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer, ProblemNoListView, addparsing,
                     zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd,
-                    createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf)
+                    createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -40,6 +40,7 @@ urlpatterns = [
     path('dashboard/', dashboard, name='dashboard'),
     path('addparsing/<int:pk>', addparsing, name='addparsing'),
     path('export_pdf/<int:pk>', export_pdf, name= 'export_pdf'),
+    path('statandact/', statandact, name='statandact'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -159,25 +159,71 @@
           {% if perms.problem.user_supermoderator %}
           <li class="nav-item has-treeview">
             <a href="" class="nav-link {% block nav6 %} {% endblock %}">
-              <i class="nav-icon fas fa-circle"></i>
+              <i class="nav-icon fas fa-list"></i>
               <p>
                 Инструментарий
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'createuser' %}" class="nav-link {% block nav61 %} {% endblock %}">
+                <li class="nav-item has-treeview">
+                <a href="" class="nav-link {% block nav61 %} {% endblock %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Создать пользователя</p>
+                  <p>
+                    Пользователи
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link {% block nav62 %} {% endblock %}">
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'createuser' %}" class="nav-link {% block nav611 %} {% endblock %}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Создать пользователя</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'calendary' %}" class="nav-link {% block nav612 %} {% endblock %}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Список пользователей</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'calendary' %}" class="nav-link {% block nav613 %} {% endblock %}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Ещё</p>
+                    </a>
+                  </li>
+                </ul>
+            </li>
+            <li class="nav-item has-treeview">
+                <a href="{% url 'calendary' %}" class="nav-link {% block nav62 %} {% endblock %}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Добавить жалобу</p>
+                  <p>
+                    Жалобы
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
-              </li>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'calendary' %}" class="nav-link {% block nav621 %} {% endblock %}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Список жалоб</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'statandact' %}" class="nav-link {% block nav622 %} {% endblock %}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Статистика и действия</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'calendary' %}" class="nav-link {% block nav623 %} {% endblock %}">
+                      <i class="far fa-dot-circle nav-icon"></i>
+                      <p>Добавить жалобу</p>
+                    </a>
+                  </li>
+                </ul>
+            </li>
             </ul>
           </li>
           {% endif %}

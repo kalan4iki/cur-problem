@@ -806,3 +806,7 @@ def export_pdf(request, pk):
     c.showPage()
     c.save()
     return response
+
+def statandact(request):
+    temp = ''
+    return render(request, 'problem/statandact.html')
