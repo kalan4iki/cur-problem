@@ -11,7 +11,9 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
-
+        <a href="{% url 'noproblem' %}" class="btn btn-app float-sm-left">
+              <i class="fas fa-backward"></i> К нераспределенным
+        </a>
       </div><!-- /.col -->
       <div class="col-sm-6 ">
         <a href="{% url 'export_pdf' np.nomdobr %}" class="btn btn-app float-sm-right">
@@ -423,7 +425,6 @@ $('#del-{{ i.pk }}').click(function () {
         var url = '{% url "termdel" i.pk %}',
             CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
         var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken}, onAjaxSuccess);
-
     });
 {% endif %}
 {% endfor %}

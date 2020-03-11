@@ -191,7 +191,7 @@ $('#refresh').click(function () {
 
 function Refresh(data)
 {
-    areaChartData.datasets[0].data = [data['kolvo']];
+    areaChartData.datasets[0].data = data['kolvo'];
     barChartData.datasets[0] = areaChartData.datasets[0];
     barChart.data.datasets = areaChartData.datasets;
     barChart.update();

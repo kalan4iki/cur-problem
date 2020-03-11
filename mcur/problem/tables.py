@@ -1,7 +1,8 @@
 import django_tables2 as tables
+from django.contrib.auth.models import User
 from django_tables2.views import MultiTableMixin
 from django.views.generic.base import TemplateView
-from .models import Problem, Term
+from .models import Problem, Term, Person
 from parsers.models import Parser
 
 class ProblemTable(tables.Table):
@@ -30,3 +31,9 @@ class ParsTable(tables.Table):
     class Meta:
         model = Parser
         template_name = "django_tables2/bootstrap4.html"
+
+class UserTable(tables.Table):
+    class Meta:
+        model = Person
+        template_name = "django_tables2/bootstrap4.html"
+        exclude = ("password", "is_active", "is_staff", "is_superuser")

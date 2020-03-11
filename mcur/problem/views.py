@@ -33,7 +33,7 @@ from reportlab.lib.units import mm
 # other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category
 from parsers.models import ActionHistory, Action, Parser
-from .tables import ProblemTable, ParsTable
+from .tables import ProblemTable, ParsTable, UserTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
@@ -973,5 +973,16 @@ def statandact(request):
             table = ParsTable(parser)
             RequestConfig(request, ).configure(table)
             return render(request, 'problem/statandact.html', {'parsers': table, 'content': content})
+        else:
+            return redirect('index')
+
+def listuser(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.user.has_perm('problem.user_supermoderator'):
+            users = User.objects.all()
+            table = UserTable(users)
+            return render(request, 'problem/listuser.html', {'table': table})
         else:
             return redirect('index')

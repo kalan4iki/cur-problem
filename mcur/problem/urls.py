@@ -3,7 +3,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer, ProblemNoListView, addparsing,
                     zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd,
-                    createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action)
+                    createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action,
+                    listuser)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -39,6 +40,7 @@ urlpatterns = [
     path('answer/action/modify/<int:pk>', Answer_modify, name='answer_modify'),
     path('calendary/', development, name='calendary'),
     path('dashboard/', dashboard, name='dashboard'),
+    path('listuser/', listuser, name='listuser'),
     path('addparsing/<int:pk>', addparsing, name='addparsing'),
     path('export_pdf/<int:pk>', export_pdf, name= 'export_pdf'),
     path('statandact/', statandact, name='statandact'),
