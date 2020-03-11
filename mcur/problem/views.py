@@ -625,8 +625,8 @@ def lk(request):
             termas = Termhistory.objects.filter(q1)
             if userlk.userprofile.dep == None:
                 q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-            termas2 = Term.objects.filter(q1 | Q(resolutions__in=termas) & Q(status='0'))
-            termas3 = Problem.objects.filter(Q(visible='1') | Q(statussys='1') & Q(terms__in=termas2))
+            termas2 = Term.objects.filter((q1 | Q(resolutions__in=termas)) & Q(status='0'))
+            termas3 = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(terms__in=termas2))
             kolvo['kolall'] = len(termas3)
             #3 Подходит срок жалоб
             q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
@@ -931,7 +931,9 @@ def statandact(request):
             table = ParsTable(parser)
             RequestConfig(request, ).configure(table)
             if request.method == 'POST':
-                print('Test')
+                if request.POST['refresh'] == '1':
+                    temp = ''
+                    return JsonResponse()
             return render(request, 'problem/statandact.html', {'parsers': table, 'content': content})
         else:
             return redirect('index')
