@@ -193,11 +193,10 @@ toastr.options = {
 function onAjaxSuccess(data)
 {
     if (data['nom'] == 0) {
-        toastr["success"](data['message'])
+        toastr["success"](data['message'], data['title'])
     } else {
-        toastr["error"](data['message'])
+        toastr["error"](data['message'], data['title'])
     }
-
 }
 
 </script>

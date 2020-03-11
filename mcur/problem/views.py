@@ -68,12 +68,14 @@ def api_problem_detail(request, np):
 
 
 class ActionSerializer(serializers.Serializer):
+    title = serializers.CharField()
     nom = serializers.IntegerField()
     message = serializers.CharField()
 
 
 class ActionObject(object):
-    def __init__(self, nom, message):
+    def __init__(self, title, nom, message):
+        self.title = title
         self.nom = nom
         self.message = message
 
@@ -82,6 +84,7 @@ class ActionObject(object):
 def api_action(request):
     if request.method == 'POST':
         if request.POST['action'] == '1':
+            title = 'Скрытие жалоб'
             status = ['Закрыто', 'Получен ответ', 'Решено']
             status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
             allprob = 0
@@ -99,9 +102,10 @@ def api_action(request):
 Количество исправленных жалоб: {allprob}'''
             nom = 0
         else:
+            title = 'Ошибка'
             mes = 'Ошибка при выполнении!'
             nom = 1
-        a = ActionObject(nom=nom, message=mes)
+        a = ActionObject(title=title, nom=nom, message=mes)
         serializer = ActionSerializer(a)
         return JsonResponse(serializer.data, safe=False)
 
@@ -495,6 +499,7 @@ def termadd(request, pk):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         prob = Problem.objects.get(pk=pk)
+        title = 'Добавление назначения'
         if request.user.has_perm('problem.user_moderator'):
             if request.method == 'POST':
                 formadd = TermForm(request.POST)
@@ -509,22 +514,63 @@ def termadd(request, pk):
                     if a.curatuser:
                         temp = f'{a.date.day}.{a.date.month}.{a.date.year}'
                         #Mailsend(a.curatuser.email, temp, a.problem.nomdobr)
-                    return redirect("problem", pk=nd.nomdobr)
+                    mes = 'Назначение успешно добавлено.'
+                    nom = 0
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
             else:
-                formadd = TermForm()
-            return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
+                mes = 'Ошибка, форма не прошла валидацию.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+            #return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
         else:
-            return render(request, 'problem/termadd.html', {'auth': False, 'np': prob, 'prob': prob})
+            mes = 'Ошибка, не достаточно прав на создание назначения.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
 
 
-def delterm(request, pk, pkp):
-    b = Term.objects.get(pk=pk)
-    nd = b.problem
-    b.delete()
-    if len(nd.terms.all()) == 0:
-        nd.statussys = '2'
-        nd.save()
-    return redirect("problem", pk=nd.nomdobr)
+def delterm(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        title = 'Удаление назначения'
+        if request.user.has_perm('problem.user_moderator'):
+            if Term.objects.filter(pk=pk).exists():
+                if request.method == 'POST':
+                    b = Term.objects.get(pk=pk)
+                    nd = b.problem
+                    b.delete()
+                    if len(nd.terms.all()) == 0:
+                        nd.statussys = '2'
+                        nd.save()
+                    mes = 'Назначение удалено'
+                    nom = 0
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+                else:
+                    mes = 'Ошибка, не правильный запрос.'
+                    nom = 1
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+            else:
+                mes = 'Ошибка, данного назначения не найдено.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+        else:
+            mes = 'Ошибка, не достаточно прав на удаление назначения.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
 
 
 def lk(request):
@@ -768,10 +814,28 @@ def addparsing(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
+        title = 'Обновление проблемы'
         if request.user.has_perm('problem.user_moderator'):
-            hist = ActionHistory(act=Action.objects.get(nact='2'), arg=pk, status='0')
-            hist.save()
-            return redirect("problem", pk=pk)
+            if request.method == 'POST':
+                hist = ActionHistory(act=Action.objects.get(nact='2'), arg=pk, status='0')
+                hist.save()
+                mes = 'Проблема отправлена на обновление.'
+                nom = 0
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+            else:
+                mes = 'Ошибка, не правильный запрос.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+        else:
+            mes = 'Ошибка, не достаточно прав на обновление проблемы.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
 
 def dashboard(request):
     if not request.user.is_authenticated:

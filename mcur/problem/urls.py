@@ -23,7 +23,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('termadd/<int:pk>', termadd, name='termadd'),
     path('resolution/<int:pk>', resolutionadd, name='resolutionadd'),
-    path('delterm/<int:pk>/<int:pkp>', delterm, name='termdel'),
+    path('delterm/<int:pk>', delterm, name='termdel'),
     path('index/', lk, name='index'),
     path('search/', search, name='search'),
     path('addanswer/<int:pk>', addanswer, name='addanswer'),
