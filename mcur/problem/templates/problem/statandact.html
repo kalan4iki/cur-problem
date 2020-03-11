@@ -12,6 +12,7 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
+          {% csrf_token %}
         <h1>Жалобы и действия</h1>
       </div><!-- /.col -->
     </div><!-- /.row -->
@@ -27,9 +28,9 @@
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
                             </button>
-                            <a type="button" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="Обновить">
+                            <button type="button" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="Обновить" id="refresh">
                                 <i class="fa fa-refresh"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
                      <div class="card-body">
@@ -60,7 +61,6 @@
                          <div class="row">
                              <div class="col-md-2">
                                 <form method="post" action="{% url 'api_action' %}" id="action1">
-                                    {% csrf_token %}
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-eye-slash"></i> Скрыть жалобы
                                     </button>
@@ -68,7 +68,6 @@
                             </div>
                              <div class="col-md-2">
                                 <form method="post" action="{% url 'api_action' %}" id="action2">
-                                    {% csrf_token %}
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-sync"></i> Обновить жалобы
                                     </button>
@@ -76,14 +75,17 @@
                             </div>
                              <div class="col-md-2">
                                 <form method="post" action="{% url 'api_action' %}" id="action3">
-                                    {% csrf_token %}
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-sync"></i> Обновить парсер
                                     </button>
                                 </form>
                             </div>
                              <div class="col-md-2">
-
+                                 <form method="post" action="{% url 'api_action' %}" id="action4">
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-plus"></i> Новые жалобы
+                                    </button>
+                                </form>
                             </div>
                          </div>
                      </div>
@@ -97,8 +99,9 @@
                         <h3 class="card-title">Парсеры</h3>
                     </div>
                      <div class="card-body">
-                        <div class="table-responsive p-0"
+                        <div class="table-responsive p-0">
                             {% render_table parsers %}
+                            </div>
                         </div>
                      </div>
                 </div>
@@ -110,46 +113,44 @@
 
 {% block ends %}
 <script>
-$(function () {
-    var areaChartData = {
-      labels  : {{ content.status|safe }},
-      datasets: [
-        {
-          label               : 'Жалобы показанные на сайте',
-          backgroundColor     : 'rgba(60,141,188,0.9)',
-          borderColor         : 'rgba(60,141,188,0.8)',
-          pointRadius          : false,
-          pointColor          : '#3b8bba',
-          pointStrokeColor    : 'rgba(60,141,188,1)',
-          pointHighlightFill  : '#fff',
-          pointHighlightStroke: 'rgba(60,141,188,1)',
-          data                : {{ content.kolvo|safe }}
-        }
-      ]
-    };
+var areaChartData = {
+  labels  : {{ content.status|safe }},
+  datasets: [
+    {
+      label               : 'Жалобы показанные на сайте',
+      backgroundColor     : 'rgba(60,141,188,0.9)',
+      borderColor         : 'rgba(60,141,188,0.8)',
+      pointRadius          : false,
+      pointColor          : '#3b8bba',
+      pointStrokeColor    : 'rgba(60,141,188,1)',
+      pointHighlightFill  : '#fff',
+      pointHighlightStroke: 'rgba(60,141,188,1)',
+      data                : {{ content.kolvo|safe }}
+    }
+  ]
+};
 
-    var barChartCanvas = $('#barChart').get(0).getContext('2d')
-    var barChartData = jQuery.extend(true, {}, areaChartData)
-    var temp0 = areaChartData.datasets[0]
-    barChartData.datasets[0] = temp0
+var barChartCanvas = $('#barChart').get(0).getContext('2d'),
+    barChartData = jQuery.extend(true, {}, areaChartData),
+    temp0 = areaChartData.datasets[0];
+    barChartData.datasets[0] = temp0;
 
-    var barChartOptions = {
-      responsive              : true,
-      maintainAspectRatio     : false,
-      datasetFill             : false
-    };
+var barChartOptions = {
+  responsive              : true,
+  maintainAspectRatio     : false,
+  datasetFill             : false
+};
 
-    var barChart = new Chart(barChartCanvas, {
-      type: 'bar',
-      data: barChartData,
-      options: barChartOptions
-    })
-  });
+var barChart = new Chart(barChartCanvas, {
+  type: 'bar',
+  data: barChartData,
+  options: barChartOptions
+});
 $('#action1').submit(function (event) {
         event.preventDefault();
         var $form = $( this ),
             url = $form.attr( 'action' ),
-            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
         var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '1'}, onAjaxSuccess);
     });
@@ -158,7 +159,7 @@ $('#action2').submit(function (event) {
         event.preventDefault();
         var $form = $( this ),
             url = $form.attr( 'action' ),
-            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
         var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '2'}, onAjaxSuccess);
     });
@@ -167,10 +168,35 @@ $('#action3').submit(function (event) {
         event.preventDefault();
         var $form = $( this ),
             url = $form.attr( 'action' ),
-            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
         var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '3'}, onAjaxSuccess);
     });
+
+$('#action4').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            url = $form.attr( 'action' ),
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '4'}, onAjaxSuccess);
+    });
+
+$('#refresh').click(function () {
+    var url = "{% url 'statandact' %}",
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, refresh: '1'}, Refresh);
+});
+
+function Refresh(data)
+{
+    areaChartData.datasets[0].data = [data['kolvo']];
+    barChartData.datasets[0] = areaChartData.datasets[0];
+    barChart.data.datasets = areaChartData.datasets;
+    barChart.update();
+    onAjaxSuccess(data)
+}
 
 toastr.options = {
   "closeButton": true,
@@ -188,7 +214,7 @@ toastr.options = {
   "hideEasing": "linear",
   "showMethod": "fadeIn",
   "hideMethod": "fadeOut"
-}
+};
 
 function onAjaxSuccess(data)
 {

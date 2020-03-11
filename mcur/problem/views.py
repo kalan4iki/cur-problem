@@ -83,6 +83,8 @@ class ActionObject(object):
 @api_view(['POST'])
 def api_action(request):
     if request.method == 'POST':
+        #nowdatetime = datetime.now()
+        #nowdate = datetime.date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
         if request.POST['action'] == '1':
             title = 'Скрытие жалоб'
             status = ['Закрыто', 'Получен ответ', 'Решено']
@@ -100,6 +102,34 @@ def api_action(request):
                 i.save()
             mes = f'''Успешно выполнено!
 Количество исправленных жалоб: {allprob}'''
+            nom = 0
+        elif request.POST['action'] == '2':
+            a = ActionHistory()
+            a.act = Action.objects.get(nact='2')
+            a.arg = 'all'
+            a.save()
+            title = 'Добавление задачи'
+            mes = f'''Успешно выполнено!
+            Задание запущено.'''
+            nom = 0
+        elif request.POST['action'] == '3':
+            a = ActionHistory()
+            a.act = Action.objects.get(nact='8')
+            a.save()
+            title = 'Добавление задачи'
+            mes = f'''Успешно выполнено!
+            Задание запущено.'''
+            nom = 0
+        elif request.POST['action'] == '4':
+            #date = nowdate - timedelta(7)
+            #tempdate = ''
+            a = ActionHistory()
+            a.act = Action.objects.get(nact='8')
+
+            a.save()
+            title = 'Добавление задачи'
+            mes = f'''Успешно выполнено!
+            Задание запущено.'''
             nom = 0
         else:
             title = 'Ошибка'
@@ -554,7 +584,7 @@ def delterm(request, pk):
                     serializer = ActionSerializer(a)
                     return JsonResponse(serializer.data, safe=False)
                 else:
-                    mes = 'Ошибка, не правильный запрос.'
+                    mes = 'Ошибка, неправильный запрос.'
                     nom = 1
                     a = ActionObject(title=title, nom=nom, message=mes)
                     serializer = ActionSerializer(a)
@@ -825,7 +855,7 @@ def addparsing(request, pk):
                 serializer = ActionSerializer(a)
                 return JsonResponse(serializer.data, safe=False)
             else:
-                mes = 'Ошибка, не правильный запрос.'
+                mes = 'Ошибка, неправильный запрос.'
                 nom = 1
                 a = ActionObject(title=title, nom=nom, message=mes)
                 serializer = ActionSerializer(a)
@@ -917,7 +947,6 @@ def export_pdf(request, pk):
         return response
 
 def statandact(request):
-    print(request.method)
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
@@ -927,13 +956,22 @@ def statandact(request):
             content['kolvo'] = []
             for i in content['status']:
                 content['kolvo'].append(len(Problem.objects.filter(visible='1', status__name=i)))
+            if request.method == 'POST':
+                title = 'Действия'
+                temp = {}
+                temp['title'] = title
+                if request.POST['refresh'] == '1':
+                    temp['kolvo'] = content['kolvo']
+                    temp['message'] = 'График успешно обновлен.'
+                    temp['nom'] = 0
+                    return JsonResponse(temp)
+                else:
+                    temp['message'] = 'Ошибка, неправильный запрос.'
+                    temp['nom'] = 1
+                    return JsonResponse(temp)
             parser = Parser.objects.all()
             table = ParsTable(parser)
             RequestConfig(request, ).configure(table)
-            if request.method == 'POST':
-                if request.POST['refresh'] == '1':
-                    temp = ''
-                    return JsonResponse()
             return render(request, 'problem/statandact.html', {'parsers': table, 'content': content})
         else:
             return redirect('index')

@@ -52,7 +52,7 @@ class ActionHistory(models.Model):
     act = models.ForeignKey(Action, on_delete=models.PROTECT, verbose_name='Действие', related_name='acts')
     pars = models.ForeignKey(Parser, on_delete=models.SET_NULL, verbose_name='Парсер', related_name='parsers',
                              blank=True, null=True)
-    arg = models.CharField(max_length=50, verbose_name='Аргументы', default=None, blank=True)
+    arg = models.CharField(max_length=50, verbose_name='Аргументы', default=None, null=True, blank=True)
     status = models.CharField(max_length=50, verbose_name='Статус', default='0', choices=stats)
     lastaction = models.DateTimeField(auto_now=True, verbose_name='Время выполнения', blank=True, null=True)
     note = models.CharField(max_length=100, verbose_name='Примечание', default=None, null=True, blank=True)
