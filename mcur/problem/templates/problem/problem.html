@@ -437,6 +437,7 @@ function onAjaxSuccess(data)
             title: data['title'],
             text: data['message'],
             icon: 'success',
+            backdrop: 'url("{% static 'nyan-cat.gif' %}") left bottom no-repeat',
             onClose: reloadModal
         })
 

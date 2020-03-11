@@ -818,7 +818,16 @@ def createuser(request):
         title = 'Создание пользователя'
         if request.user.has_perm('problem.user_supermoderator'):
             if request.method == 'POST':
-                mes = 'Пользователь создан.'
+                print(request.POST)
+                password = ''
+                for i in range(8):
+                    password += random.choice(chars)
+                #user = User.objects.create_user(request.POST['username'], request.POST['email'], password)
+                org = Curator.objects.get(pk=request.POST['org'])
+                print(request.POST['dep'])
+                mes = f'''Пользователь создан.\n
+Логин: {request.POST['username']}\n
+Пароль: {password}'''
                 nom = 0
                 a = ActionObject(title=title, nom=nom, message=mes)
                 serializer = ActionSerializer(a)
