@@ -815,30 +815,26 @@ def createuser(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
+        title = 'Создание пользователя'
         if request.user.has_perm('problem.user_supermoderator'):
             if request.method == 'POST':
-                formcre = CreateUser(request.POST)
-                if formcre.is_valid():
-                    passw = ''
-                    for i in range(8):
-                        passw += random.choice(chars)
-                    termp = User.objects.create_user(formcre.cleaned_data.get("username"), formcre.cleaned_data.get("email"), passw)
-                    termp.first_name = formcre.cleaned_data.get("first_name")
-                    termp.last_name = formcre.cleaned_data.get("last_name")
-                    termp.group = Group.objects.get(name=formcre.cleaned_data.get("group"))
-                    print(formcre.cleaned_data)
-                    if formcre.cleaned_data.get("org"): termp.userprofile__org = Curator.objects.get(name=formcre.cleaned_data.get("org"))
-                    if formcre.cleaned_data.get("dep"): termp.userprofile__dep = Department.objects.get(name=formcre.cleaned_data.get("dep").name)
-                    mescre = [termp.username, passw]
-                    termp.save()
-                    return render(request, 'problem/createuser.html', {'formcre': formcre, 'mescre': mescre})
-                else:
-                    return render(request, 'problem/createuser.html', {'formcre': formcre})
+                mes = 'Пользователь создан.'
+                nom = 0
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
             else:
-                formcre = CreateUser()
-                return render(request, 'problem/createuser.html', {'formcre': formcre})
+                mes = 'Ошибка, неправильный запрос.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
         else:
-            return redirect('index')
+            mes = 'Ошибка, недостаточно прав.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
 
 def addparsing(request, pk):
     if not request.user.is_authenticated:
@@ -983,6 +979,7 @@ def listuser(request):
         if request.user.has_perm('problem.user_supermoderator'):
             users = User.objects.all()
             table = UserTable(users)
-            return render(request, 'problem/listuser.html', {'table': table})
+            formcreate = CreateUser()
+            return render(request, 'problem/listuser.html', {'table': table, 'formcreate': formcreate})
         else:
             return redirect('index')

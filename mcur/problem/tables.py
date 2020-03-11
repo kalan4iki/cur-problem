@@ -34,6 +34,6 @@ class ParsTable(tables.Table):
 
 class UserTable(tables.Table):
     class Meta:
-        model = Person
+        model = User
         template_name = "django_tables2/bootstrap4.html"
         exclude = ("password", "is_active", "is_staff", "is_superuser")

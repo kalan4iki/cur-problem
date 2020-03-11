@@ -16,13 +16,72 @@
         <h1>Список пользователей</h1>
       </div><!-- /.col -->
         <div class="col-sm-6">
-            <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm">
+            <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-adduser">
               <i class="fas fa-plus"></i> Добавить пользователя
             </a>
       </div><!-- /.col -->
     </div><!-- /.row -->
   </div><!-- /.container-fluid -->
 </div>
+<div class="modal fade" id="modal-adduser">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Добавление пользователя</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'createuser' %}" method="post" id="adduser">
+        <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                {{ formcreate.username|as_crispy_field }}
+              </div>
+            </div>
+            {{ formcreate.first_name|as_crispy_field }}
+            {{ formcreate.last_name|as_crispy_field }}
+            {{ formcreate.email|as_crispy_field }}
+            <div class="row">
+                <div class="col">
+                    <div class="card card-primary card-outline card-outline-tabs">
+                      <div class="card-header p-0 border-bottom-0">
+                        <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                          <li class="nav-item">
+                            <a class="nav-link active" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#formadd-tabs-three-org" role="tab" aria-controls="formadd-tabs-three-org" aria-selected="true">Организация</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#formadd-tabs-three-curat" role="tab" aria-controls="formadd-tabs-three-curat" aria-selected="false">Отдел</a>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="card-body">
+                        <div class="tab-content" id="custom-tabs-three-tabContent">
+                          <div class="tab-pane fade active show" id="formadd-tabs-three-org" role="tabpanel" aria-labelledby="formadd-tabs-three-org-tab">
+                            {{ formcreate.org|as_crispy_field }}
+                          </div>
+                          <div class="tab-pane fade" id="formadd-tabs-three-curat" role="tabpanel" aria-labelledby="formadd-tabs-three-curat-tab">
+                            {{ formcreate.dep|as_crispy_field }}
+                          </div>
+                        </div>
+                      </div>
+                      <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+            {{ formcreate.group|as_crispy_field }}
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -45,5 +104,47 @@
 {% endblock %}
 
 {% block ends %}
+<script>
+$('#adduser').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            username = $form.find('input[name="username"]').val(),
+            first_name = $form.find('input[name="first_name"]').val(),
+            last_name = $form.find('input[name="last_name"]').val(),
+            email = $form.find('input[name="email"]').val(),
+            org = $form.find('select[name="org"]').val(),
+            dep = $form.find('select[name="dep"]').val(),
+            group = $form.find('select[name="group"]').val(),
+            url = $form.attr( 'action' ),
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, username: username, first_name: first_name,
+                                    last_name: last_name, email: email, org: org, dep: dep, group: group}, onAjaxSuccess);
+        $('#modal-adduser').modal('hide');
+    });
 
+
+function onAjaxSuccess(data)
+{
+
+    if (data['nom'] == 0) {
+        Swal.fire({
+            title: data['title'],
+            text: data['message'],
+            icon: 'success',
+            onClose: reloadModal
+        })
+
+    } else {
+        Swal.fire(
+            data['title'],
+            data['message'],
+            'error'
+        )
+    }
+}
+
+function reloadModal() {
+    location.reload()
+}
+</script>
 {% endblock %}
