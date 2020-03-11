@@ -31,7 +31,7 @@ from reportlab.platypus import Paragraph
 from reportlab.lib.units import mm
 
 # other
-from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category
+from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category, UserProfile
 from parsers.models import ActionHistory, Action, Parser
 from .tables import ProblemTable, ParsTable, UserTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
@@ -822,9 +822,16 @@ def createuser(request):
                 password = ''
                 for i in range(8):
                     password += random.choice(chars)
-                #user = User.objects.create_user(request.POST['username'], request.POST['email'], password)
+                user = User.objects.create_user(request.POST['username'], request.POST['email'], password)
                 org = Curator.objects.get(pk=request.POST['org'])
-                print(request.POST['dep'])
+                a = UserProfile(user=user, org=org)
+                if request.POST['dep']:
+                    dep = Department.objects.get(pk=request.POST['dep'])
+                    a.dep = dep
+                a.save()
+                group = Group.objects.get(pk=request.POST['group'])
+                user.groups.add(group)
+                user.save()
                 mes = f'''Пользователь создан.\n
 Логин: {request.POST['username']}\n
 Пароль: {password}'''
