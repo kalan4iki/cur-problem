@@ -305,8 +305,8 @@ class Command(BaseCommand):
                                 j.save()
                     elif i.act.nact == '8':#Обновление браузера
                         session = browser.session_id
-                        pars = Parser.objects.get(session=session)
-                        pars.delete()
+                        parsers = Parser.objects.get(session=session)
+                        parsers.delete()
                         browser.close()
                         browser.quit()
                         browser = StartBrowser()  # Инициализация браузера
