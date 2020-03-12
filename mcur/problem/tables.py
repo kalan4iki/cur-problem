@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django_tables2.views import MultiTableMixin
 from django.views.generic.base import TemplateView
 from .models import Problem, Term, Person
-from parsers.models import Parser
+from parsers.models import Parser, ActionHistory
 
 class ProblemTable(tables.Table):
     nomdobr = tables.Column(verbose_name='Номер добродел', linkify=True)
@@ -32,8 +32,14 @@ class ParsTable(tables.Table):
         model = Parser
         template_name = "django_tables2/bootstrap4.html"
 
+class HistTable(tables.Table):
+    class Meta:
+        model = ActionHistory
+        template_name = "django_tables2/bootstrap4.html"
+        exclude = ("pars",)
+
 class UserTable(tables.Table):
     class Meta:
         model = User
         template_name = "django_tables2/bootstrap4.html"
-        exclude = ("password", "is_active", "is_staff", "is_superuser")
+        exclude = ("password", "is_active", "is_staff", "is_superuser",)

@@ -33,7 +33,7 @@ from reportlab.lib.units import mm
 # other
 from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category, UserProfile
 from parsers.models import ActionHistory, Action, Parser
-from .tables import ProblemTable, ParsTable, UserTable
+from .tables import ProblemTable, ParsTable, UserTable, HistTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
@@ -83,8 +83,8 @@ class ActionObject(object):
 @api_view(['POST'])
 def api_action(request):
     if request.method == 'POST':
-        #nowdatetime = datetime.now()
-        #nowdate = datetime.date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+        nowdatetime = datetime.now()
+        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
         if request.POST['action'] == '1':
             title = 'Скрытие жалоб'
             status = ['Закрыто', 'Получен ответ', 'Решено']
@@ -121,11 +121,29 @@ def api_action(request):
             Задание запущено.'''
             nom = 0
         elif request.POST['action'] == '4':
-            #date = nowdate - timedelta(7)
-            #tempdate = ''
+            data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
+            tempdate = nowdate.strftime('%d.%m.%Y')
             a = ActionHistory()
-            a.act = Action.objects.get(nact='8')
-
+            a.act = Action.objects.get(nact='5')
+            a.arg = f'{data},{tempdate}'
+            a.save()
+            title = 'Добавление задачи'
+            mes = f'''Успешно выполнено!
+            Задание запущено.'''
+            nom = 0
+        elif request.POST['action'] == '5':
+            a = ActionHistory()
+            a.act = Action.objects.get(nact='7')
+            a.save()
+            title = 'Добавление задачи'
+            mes = f'''Успешно выполнено!
+            Задание запущено.'''
+            nom = 0
+        elif request.POST['action'] == '6':
+            data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
+            a = ActionHistory()
+            a.act = Action.objects.get(nact='6')
+            a.arg = data
             a.save()
             title = 'Добавление задачи'
             mes = f'''Успешно выполнено!
@@ -996,8 +1014,10 @@ def statandact(request):
                     return JsonResponse(temp)
             parser = Parser.objects.all()
             table = ParsTable(parser)
+            action = ActionHistory.objects.filter(status='0')
+            table1 = HistTable(action)
             RequestConfig(request, ).configure(table)
-            return render(request, 'problem/statandact.html', {'parsers': table, 'content': content})
+            return render(request, 'problem/statandact.html', {'parsers': table, 'action': table1, 'content': content})
         else:
             return redirect('index')
 

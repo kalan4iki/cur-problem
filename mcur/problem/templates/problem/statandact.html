@@ -13,7 +13,7 @@
     <div class="row mb-2">
       <div class="col-sm-6">
           {% csrf_token %}
-        <h1>Жалобы и действия</h1>
+        <h1>Жалобы и действия {{ test }}</h1>
       </div><!-- /.col -->
 
     <div class="col-sm-6">
@@ -91,23 +91,58 @@
                                     </button>
                                 </form>
                             </div>
+                             <div class="col-md-2">
+                                 <form method="post" action="{% url 'api_action' %}" id="action5">
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-sync"></i> Обновить сегодня
+                                    </button>
+                                </form>
+                            </div>
+                             <div class="col-md-2">
+                                 <form method="post" action="{% url 'api_action' %}" id="action6">
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-sync"></i> Просмотреть срок
+                                    </button>
+                                </form>
+                            </div>
                          </div>
                      </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Парсеры</h3>
-                    </div>
-                     <div class="card-body">
-                        <div class="table-responsive p-0">
-                            {% render_table parsers %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Парсеры</h3>
+                        </div>
+                         <div class="card-body">
+                            <div class="table-responsive p-0">
+                                {% render_table parsers %}
                             </div>
                         </div>
                      </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Действия в очереди</h3>
+                            <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="Обновить" id=""> {# TODO доделать обновление действий #}
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                        </div>
+                        </div>
+                         <div class="card-body">
+                            <div class="table-responsive p-0">
+                                {% render_table action %}
+                            </div>
+                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,6 +219,24 @@ $('#action4').submit(function (event) {
             CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
         var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '4'}, onAjaxSuccess);
+    });
+
+$('#action5').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            url = $form.attr( 'action' ),
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '5'}, onAjaxSuccess);
+    });
+
+$('#action6').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            url = $form.attr( 'action' ),
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '6'}, onAjaxSuccess);
     });
 
 $('#refresh').click(function () {
