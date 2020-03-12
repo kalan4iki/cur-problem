@@ -218,6 +218,11 @@ class Term(models.Model):
     def get_absolute_url(self):
         return reverse("termview", args=(self.pk,))
 
+    def on_close(self):
+        if self.status == '0':
+            return False
+        else:
+            return True
 
 class Termhistory(models.Model):
     text = models.TextField(help_text='Текст резолюции', verbose_name='Описание', null=True)

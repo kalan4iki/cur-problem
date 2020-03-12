@@ -201,10 +201,12 @@
           </div>
           <!-- /.user-block -->
           <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Развернуть/свернуть"><i class="fas fa-plus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" id="approve-{{ i.pk }}" title="Утвердить назначение"><i class="fa fa-check"></i>
             </button>
               {% if perms.problem.user_moderator %}
-                    <button type="button" class="btn btn-tool" id="del-{{ i.pk }}"><i class="fas fa-times"></i>
+                    <button type="button" class="btn btn-tool" id="del-{{ i.pk }}" title="Удалить"><i class="fas fa-times"></i>
                     </button>
               {% endif %}
           </div>
@@ -217,7 +219,7 @@
           <p></p>
           <p><b>Текст назначения: </b> {{ i.desck }}</p>
           <!-- Social sharing buttons -->
-          {% if not i.answers.all %}
+          {% if not i.on_close %}
           <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-resolution-{{ i.pk }}"><i class="fas fa-share"></i> Добавить подрезолюцию</button>
           <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-answer-{{ i.pk }}"><i class="far fa-thumbs-up"></i> Ответить</button>
           {% endif %}
@@ -421,6 +423,12 @@ $('#naobn').click(function () {
     });
 {% for i in terms %}
 {% if perms.problem.user_moderator %}
+$('#approve-{{ i.pk }}').click(function () {
+        var url = '{% url 'term_approve' i.pk %}',
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken}, onAjaxSuccess);
+    });
+
 $('#del-{{ i.pk }}').click(function () {
         var url = '{% url "termdel" i.pk %}',
             CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();

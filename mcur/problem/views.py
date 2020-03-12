@@ -413,7 +413,7 @@ def proverka(request, term):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        if not request.user.has_perm(''):
+        if not request.user.has_perm(term):
             return redirect('index')
 
 
@@ -999,3 +999,38 @@ def listuser(request):
             return render(request, 'problem/listuser.html', {'table': table, 'formcreate': formcreate})
         else:
             return redirect('index')
+
+def term_approve(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        title = 'Утверждение назначения'
+        if request.user.has_perm('problem.user_moderator'):
+            if Term.objects.filter(pk=pk).exists():
+                if request.method == 'POST':
+                    term = Term.objects.get(pk=pk)
+                    term.status = '2'
+                    term.save()
+                    mes = 'Назначение утверждено.'
+                    nom = 0
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+                else:
+                    mes = 'Ошибка, неправильный запрос.'
+                    nom = 1
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+            else:
+                mes = 'Ошибка, данного назначения не существует.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+        else:
+            mes = 'Ошибка, недостаточно прав.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
