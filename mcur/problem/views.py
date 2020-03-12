@@ -193,7 +193,7 @@ class ProblemListView(SingleTableMixin, FilterView):
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
             else:
                 #term = Term.objects.filter(Q(status='0') & Q(status='1'))
-                prob = Problem.objects.filter(visible='1', statussys='1')
+                prob = Problem.objects.filter(visible='1')
             filterall = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filterall.qs)
             RequestConfig(self.request, ).configure(table )
