@@ -189,7 +189,7 @@ class ProblemListView(SingleTableMixin, FilterView):
                 terms = Termhistory.objects.filter(q1)
                 if userlk.userprofile.dep == None:
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-                terms1 = Term.objects.filter((Q(resolutions__in=terms) | q1) & Q(status='0') & Q(status='1'))
+                terms1 = Term.objects.filter((Q(resolutions__in=terms) | q1) & (Q(status='0') | Q(status='1')))
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
             else:
                 #term = Term.objects.filter(Q(status='0') & Q(status='1'))
@@ -670,7 +670,8 @@ def lk(request):
             q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate+timedelta(4)))
             termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
             q2 = Q(visible='1') & Q(statussys='1')
-            termas2 = Problem.objects.filter(Q(terms__in=termas1) & q2)
+            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(3)))
+            termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
             kolvo['podx'] = len(termas2)
             #4 Блок жалоб на сегодня
             q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
@@ -680,7 +681,8 @@ def lk(request):
             q2 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
             termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
             q2 = Q(visible='1') & Q(statussys='1')
-            termas2 = Problem.objects.filter(Q(terms__in=termas1) & q2)
+            q21 = Q(dateotv=nowdate)
+            termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
             kolvo['today'] = len(termas2)
             # 5 Просроченные жалобы
             q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
@@ -690,7 +692,8 @@ def lk(request):
             q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(date(2019, 1, 1), nowdate-timedelta(1)))
             termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
             q2 = Q(visible='1') & Q(statussys='1')
-            termas2 = Problem.objects.filter(Q(terms__in=termas1) & q2)
+            q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
+            termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
             kolvo['prosr'] = len(termas2)
         return render(request, 'problem/lk.html', {'kolvo': kolvo})
 

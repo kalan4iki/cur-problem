@@ -190,13 +190,17 @@
         <div class="card-header ">
           <div class="user-block">
             <img class="img-circle" src="{% static 'adminlte/dist/img/term.png' %}" alt="User Image">
-            {% if i.curat %}
-            <span class="username">Ответственный: {{i.curat}}</span>
-            {% elif i.curatuser %}
-            <span class="username">Ответственный: {{ i.curatuser.first_name }} {{ i.curatuser.last_name }}</span>
-            {% elif i.org %}
-            <span class="username">Ответственный: {{ i.org }}</span>
+            <span class="username">Ответственный:
+            {% if i.org %}
+            | {{i.org}} |
             {% endif %}
+            {% if i.curat %}
+            | {{i.curat}} |
+            {% endif %}
+            {% if i.curatuser %}
+            | {{ i.curatuser.first_name }} {{ i.curatuser.last_name }} |
+            {% endif %}
+            </span>
             <span class="description">Дата создания - {{ i.datecre }} Статус - <b>{{i.get_status_display}}. </b>Срок исполнения - <b>{{i.date}}</b> </span>
           </div>
           <!-- /.user-block -->

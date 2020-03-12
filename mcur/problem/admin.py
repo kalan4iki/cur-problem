@@ -124,7 +124,7 @@ class TermAdmin(admin.ModelAdmin):
     list_display = ('nomobr', 'date', 'curat', 'desck',)
     list_display_links = ('date', 'curat', 'desck',)
     search_fields = ('pk',)
-    list_filter = ('org__name', 'curat__name', 'date',)
+    list_filter = ('org__name', 'status', 'curat__name', 'date',)
 
     def nomobr(self, srok):
         if srok.problem == None:
