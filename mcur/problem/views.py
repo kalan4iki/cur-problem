@@ -251,10 +251,13 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 termas = Term.objects.filter(q1)
                 prob = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
             elif userlk.has_perm('problem.user_executor'):
-                q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-                termas = Termhistory.objects.filter(q1)
                 if userlk.userprofile.dep == None:
+                    q1 = Q(curatuser=userlk)
+                    termas = Termhistory.objects.filter(q1)
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
+                else:
+                    q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                    termas = Termhistory.objects.filter(q1)
                 q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
                 q2 = Q(visible='1')
@@ -620,7 +623,7 @@ def lk(request):
             kolvo['kolno'] = len(Problem.objects.filter(visible='1', statussys='2'))
             #Подходит срок
             q1 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(3)))
+            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(4)))
             q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
             termas = Term.objects.filter(q1)
             termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
@@ -663,14 +666,17 @@ def lk(request):
             termas3 = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(terms__in=termas2))
             kolvo['kolall'] = len(termas3)
             #3 Подходит срок жалоб
-            q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-            termas = Termhistory.objects.filter(q1)
             if userlk.userprofile.dep == None:
+                q1 = Q(curatuser=userlk)
+                termas = Termhistory.objects.filter(q1)
                 q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-            q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate+timedelta(4)))
+            else:
+                q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                termas = Termhistory.objects.filter(q1)
+            q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
             termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-            q2 = Q(visible='1') & Q(statussys='1')
-            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(3)))
+            q2 = Q(visible='1')
+            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
             termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
             kolvo['podx'] = len(termas2)
             #4 Блок жалоб на сегодня
