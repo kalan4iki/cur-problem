@@ -217,7 +217,6 @@ def api_report(request):
                     mes = 'Отчет подготовлен!'
                     nom = 0
                     cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
-                    print(cont)
                     return JsonResponse(cont)
                 else:
                     title = 'Ошибка'

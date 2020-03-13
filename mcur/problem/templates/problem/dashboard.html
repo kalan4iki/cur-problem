@@ -265,6 +265,7 @@ function onAjaxSuccess(data)
 
     document.body.appendChild(dummy);
     dummy.click();
+    dummy.remove()
     if (data['nom'] == 0) {
         toastr["success"](data['message'], data['title'])
     } else {
