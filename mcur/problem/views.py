@@ -177,9 +177,10 @@ def api_report(request):
                 if request.POST['report'] == '1':
                     if 'linux' in platform.lower():
                         temp = request.POST['datefrom'].split('-')
-                        datefrom = date(temp[0], temp[1], temp[2])
+                        print(temp)
+                        datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
                         temp = request.POST['datebefore'].split('-')
-                        datebefore = date(temp[0], temp[1], temp[2])
+                        datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
                     else:
                         datefrom = date.fromisoformat(request.POST['datefrom'])
                         datebefore = date.fromisoformat(request.POST['datebefore'])
