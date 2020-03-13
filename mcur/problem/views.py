@@ -37,6 +37,7 @@ from .tables import ProblemTable, ParsTable, UserTable, HistTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
+from sys import platform
 import xlwt
 import mcur.settings as settings
 import random
@@ -171,7 +172,6 @@ def api_report(request):
     if request.user.has_perm('problem.user_moderator'):
         if request.method == 'POST':
             nowdatetime = datetime.now()
-            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             if request.POST['report'] == '1':
                 datefrom = date.fromisoformat(request.POST['datefrom'])
                 datebefore = date.fromisoformat(request.POST['datebefore'])
@@ -191,7 +191,6 @@ def api_report(request):
                 rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
                                                          'text', 'adres', 'datecre',
                                                          'dateotv', 'status__name', 'statussys')
-                print(rows)
                 for row in rows:
                     row_num += 1
                     for col_num in range(len(row)):
@@ -202,8 +201,10 @@ def api_report(request):
                             ws.write(row_num, col_num, row[col_num], font_style)
                 name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
                 wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
-                #url = f'http://127.0.0.1:8000/media/xls/{name}'
-                url = f'https://skiog.ru/media/xls/{name}'
+                if 'linux' in platform.lower():
+                    url = f'https://skiog.ru/media/xls/{name}'
+                else:
+                    url = f'http://127.0.0.1:8000/media/xls/{name}'
                 title = 'Успешно'
                 mes = 'Отчет подготовлен!'
                 nom = 0
