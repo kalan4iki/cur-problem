@@ -175,8 +175,14 @@ def api_report(request):
             try:
                 nowdatetime = datetime.now()
                 if request.POST['report'] == '1':
-                    datefrom = date.fromisoformat(request.POST['datefrom'])
-                    datebefore = date.fromisoformat(request.POST['datebefore'])
+                    if 'linux' in platform.lower():
+                        temp = request.POST['datefrom'].split('-')
+                        datefrom = date(temp[0], temp[1], temp[2])
+                        temp = request.POST['datebefore'].split('-')
+                        datebefore = date(temp[0], temp[1], temp[2])
+                    else:
+                        datefrom = date.fromisoformat(request.POST['datefrom'])
+                        datebefore = date.fromisoformat(request.POST['datebefore'])
                     wb = xlwt.Workbook(encoding='utf-8')
                     ws = wb.add_sheet('problems')
                     # Sheet header, first row
