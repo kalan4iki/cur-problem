@@ -200,6 +200,8 @@ def api_report(request):
                         else:
                             ws.write(row_num, col_num, row[col_num], font_style)
                 name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
+                print(name)
+                print(settings.MEDIA_ROOT)
                 wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
                 if 'linux' in platform.lower():
                     url = f'https://skiog.ru/media/xls/{name}'
@@ -208,7 +210,9 @@ def api_report(request):
                 title = 'Успешно'
                 mes = 'Отчет подготовлен!'
                 nom = 0
-                return JsonResponse({'url': url, 'title': title, 'message': mes, 'nom': nom})
+                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
+                print(cont)
+                return JsonResponse(cont)
             else:
                 title = 'Ошибка'
                 mes = 'Ошибка при выполнении!'

@@ -259,14 +259,12 @@ $('#report1').submit(function (event) {
 
 function onAjaxSuccess(data)
 {
-
-    // А теперь маленький трюк, чтоб скачать
     const dummy = document.createElement('a');
     dummy.href = data['url'];
     dummy.download = 'my-filename.ext';
 
     document.body.appendChild(dummy);
-    dummy.click(); // Готово
+    dummy.click();
     if (data['nom'] == 0) {
         toastr["success"](data['message'], data['title'])
     } else {
