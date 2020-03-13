@@ -82,77 +82,143 @@ class ActionObject(object):
 
 @api_view(['POST'])
 def api_action(request):
-    if request.method == 'POST':
-        nowdatetime = datetime.now()
-        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-        if request.POST['action'] == '1':
-            title = 'Скрытие жалоб'
-            status = ['Закрыто', 'Получен ответ', 'Решено']
-            status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
-            allprob = 0
-            prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status[0]) | Q(status__name=status[1]) | Q(status__name=status[2])))
-            allprob += len(prob)
-            for i in prob:
-                i.visible = '0'
-                i.save()
-            prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status2[0]) | Q(status__name=status2[1]) | Q(status__name=status2[2])))
-            allprob += len(prob)
-            for i in prob:
-                i.visible = '2'
-                i.save()
-            mes = f'''Успешно выполнено!
-Количество исправленных жалоб: {allprob}'''
-            nom = 0
-        elif request.POST['action'] == '2':
-            a = ActionHistory()
-            a.act = Action.objects.get(nact='2')
-            a.arg = 'all'
-            a.save()
-            title = 'Добавление задачи'
-            mes = f'''Успешно выполнено!
-            Задание запущено.'''
-            nom = 0
-        elif request.POST['action'] == '3':
-            a = ActionHistory()
-            a.act = Action.objects.get(nact='8')
-            a.save()
-            title = 'Добавление задачи'
-            mes = f'''Успешно выполнено!
-            Задание запущено.'''
-            nom = 0
-        elif request.POST['action'] == '4':
-            data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
-            tempdate = nowdate.strftime('%d.%m.%Y')
-            a = ActionHistory()
-            a.act = Action.objects.get(nact='5')
-            a.arg = f'{data},{tempdate}'
-            a.save()
-            title = 'Добавление задачи'
-            mes = f'''Успешно выполнено!
-            Задание запущено.'''
-            nom = 0
-        elif request.POST['action'] == '5':
-            a = ActionHistory()
-            a.act = Action.objects.get(nact='7')
-            a.save()
-            title = 'Добавление задачи'
-            mes = f'''Успешно выполнено!
-            Задание запущено.'''
-            nom = 0
-        elif request.POST['action'] == '6':
-            data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
-            a = ActionHistory()
-            a.act = Action.objects.get(nact='6')
-            a.arg = data
-            a.save()
-            title = 'Добавление задачи'
-            mes = f'''Успешно выполнено!
-            Задание запущено.'''
-            nom = 0
-        else:
-            title = 'Ошибка'
-            mes = 'Ошибка при выполнении!'
-            nom = 1
+    if request.user.has_perm('problem.user_supermoderator'):
+        if request.method == 'POST':
+            nowdatetime = datetime.now()
+            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+            if request.POST['action'] == '1':
+                title = 'Скрытие жалоб'
+                status = ['Закрыто', 'Получен ответ', 'Решено']
+                status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
+                allprob = 0
+                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status[0]) | Q(status__name=status[1]) | Q(status__name=status[2])))
+                allprob += len(prob)
+                for i in prob:
+                    i.visible = '0'
+                    i.save()
+                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status2[0]) | Q(status__name=status2[1]) | Q(status__name=status2[2])))
+                allprob += len(prob)
+                for i in prob:
+                    i.visible = '2'
+                    i.save()
+                mes = f'''Успешно выполнено!
+    Количество исправленных жалоб: {allprob}'''
+                nom = 0
+            elif request.POST['action'] == '2':
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='2')
+                a.arg = 'all'
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
+            elif request.POST['action'] == '3':
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='8')
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
+            elif request.POST['action'] == '4':
+                data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
+                tempdate = nowdate.strftime('%d.%m.%Y')
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='5')
+                a.arg = f'{data},{tempdate}'
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
+            elif request.POST['action'] == '5':
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='7')
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
+            elif request.POST['action'] == '6':
+                data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='6')
+                a.arg = data
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
+            else:
+                title = 'Ошибка'
+                mes = 'Ошибка при выполнении!'
+                nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
+    else:
+        title = 'Ошибка'
+        mes = 'Нет прав на выполнение данной операции!'
+        nom = 1
+        a = ActionObject(title=title, nom=nom, message=mes)
+        serializer = ActionSerializer(a)
+        return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['POST'])
+def api_report(request):
+    if request.user.has_perm('problem.user_moderator'):
+        if request.method == 'POST':
+            nowdatetime = datetime.now()
+            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+            if request.POST['report'] == '1':
+                datefrom = date.fromisoformat(request.POST['datefrom'])
+                datebefore = date.fromisoformat(request.POST['datebefore'])
+                wb = xlwt.Workbook(encoding='utf-8')
+                ws = wb.add_sheet('problems')
+                # Sheet header, first row
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+                columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
+                           'Дата жалобы',
+                           'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
+                for col_num in range(len(columns)):
+                    ws.write(row_num, col_num, columns[col_num], font_style)
+                # Sheet body, remaining rows
+                font_style = xlwt.XFStyle()
+                rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                                         'text', 'adres', 'datecre',
+                                                         'dateotv', 'status__name', 'statussys')
+                print(rows)
+                for row in rows:
+                    row_num += 1
+                    for col_num in range(len(row)):
+                        if col_num == 6 or col_num == 7:
+                            ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
+                                     font_style)
+                        else:
+                            ws.write(row_num, col_num, row[col_num], font_style)
+                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
+                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
+                #url = f'http://127.0.0.1:8000/media/xls/{name}'
+                url = f'https://skiog.ru/media/xls/{name}'
+                title = 'Успешно'
+                mes = 'Отчет подготовлен!'
+                nom = 0
+                return JsonResponse({'url': url, 'title': title, 'message': mes, 'nom': nom})
+            else:
+                title = 'Ошибка'
+                mes = 'Ошибка при выполнении!'
+                nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
+    else:
+        title = 'Ошибка'
+        mes = 'Нет прав на выполнение данной операции!'
+        nom = 1
         a = ActionObject(title=title, nom=nom, message=mes)
         serializer = ActionSerializer(a)
         return JsonResponse(serializer.data, safe=False)
@@ -794,7 +860,7 @@ def exportxls(request):
     font_style = xlwt.XFStyle()
     userlk = User.objects.get(username=request.user.username)
     if request.user.has_perm('problem.user_moderator'):
-        rows = Problem.objects.filter(Q(visible='1')).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+        rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
                                                                              'text', 'adres', 'datecre',
                                                                              'dateotv', 'status__name', 'statussys')
     elif request.user.has_perm('problem.user_dispatcher'):
@@ -914,30 +980,33 @@ def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        nowdatetime = datetime.now()
-        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-        dates = {}
-        dates['min'] = []
-        for i in range(6, 0, -1):
-            dates['min'].append(nowdate-timedelta(i))
-        dates['min'].append(nowdate)
-        dates['plus'] = []
-        for i in range(0,7):
-            dates['plus'].append(nowdate+timedelta(i))
-        kolvo = {}
-        kolvo['terms'] = []
-        kolvo['problems'] = []
-        for i in dates['min']:
-            kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
-        for i in dates['plus']:
-            q1 = Q(status='0') & Q(date=i)
-            q21 = Q(dateotv=i)
-            q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
-                status__in=Status.objects.filter(name='Указан срок')))
-            termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
-            kolvo['problems'].append(len(termas2))
-        return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
+        if request.user.has_perm('problem.user_moderator'):
+            nowdatetime = datetime.now()
+            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+            dates = {}
+            dates['min'] = []
+            for i in range(6, 0, -1):
+                dates['min'].append(nowdate-timedelta(i))
+            dates['min'].append(nowdate)
+            dates['plus'] = []
+            for i in range(0,7):
+                dates['plus'].append(nowdate+timedelta(i))
+            kolvo = {}
+            kolvo['terms'] = []
+            kolvo['problems'] = []
+            for i in dates['min']:
+                kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
+            for i in dates['plus']:
+                q1 = Q(status='0') & Q(date=i)
+                q21 = Q(dateotv=i)
+                q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+                    status__in=Status.objects.filter(name='Указан срок')))
+                termas = Term.objects.filter(q1)
+                termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+                kolvo['problems'].append(len(termas2))
+            return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
+        else:
+            redirect('index')
 
 def export_pdf(request, pk):
     if not request.user.is_authenticated:
@@ -1012,9 +1081,11 @@ def statandact(request):
                     temp['message'] = 'Ошибка, неправильный запрос.'
                     temp['nom'] = 1
                     return JsonResponse(temp)
+            now = datetime.now()
+            a = datetime(now.year, now.month, now.day)
             parser = Parser.objects.all()
             table = ParsTable(parser)
-            action = ActionHistory.objects.filter(status='0')
+            action = ActionHistory.objects.filter(Q(status='0') | Q(lastaction__range=(a, now)))
             table1 = HistTable(action)
             RequestConfig(request, ).configure(table)
             return render(request, 'problem/statandact.html', {'parsers': table, 'action': table1, 'content': content})

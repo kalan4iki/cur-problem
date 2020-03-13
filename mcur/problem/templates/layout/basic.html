@@ -151,14 +151,16 @@
               </p>
             </a>
           </li>
+        {% if perms.problem.user_moderator %}
           <li class="nav-item ">
             <a href="{% url 'dashboard' %}" class="nav-link {% block nav5 %} {% endblock %}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                Статистика
+                Статистика и отчетность
               </p>
             </a>
           </li>
+        {% endif %}
           {% if perms.problem.user_supermoderator %}
           <li class="nav-item has-treeview">
             <a href="" class="nav-link {% block nav6 %} {% endblock %}">

@@ -24,7 +24,7 @@
                     <h3 class="card-title">Назначения</h3>
 
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse" id="collapse1"><i class="fas fa-minus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="card card-success">
                   <div class="card-header">
-
+                        <h3 class="card-title">Отчеты</h3>
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
                       </button>
@@ -58,8 +58,17 @@
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="chart">
-                    </div>
+                    <div class="row">
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
+                            </div>
+                             <div class="col-md-2">
+
+                            </div>
+                             <div class="col-md-2">
+
+                            </div>
+                         </div>
                   </div>
                   <!-- /.card-body -->
                 </div>
@@ -96,7 +105,53 @@
             </div>
         </div>
     </div>
-    </section>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-report1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Отчет жалоб за определенный период</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form role="form" action="{% url 'api_report' %}" method="post" id="report1">
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <div id="div_id_date" class="form-group">
+                  <label for="id_date" class="">Дата создания жалобы от<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_from" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+                <div class="col">
+                <div id="div_id_date" class="form-group">
+                  <label for="id_date" class="">Дата создания жалобы до<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_before" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Запросить</button>
+        </div>
+        </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 {% endblock %}
 {% block ends %}
     <script>
@@ -189,6 +244,34 @@ $(function () {
       data: barChartData2,
       options: barChartOptions
     })
-  })
+  });
+
+$('#report1').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            datefrom = $form.find('input[id="id_date_from"]').val(),
+            datebefore = $form.find('input[id="id_date_before"]').val(),
+            url = $form.attr( 'action' ),
+            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, datefrom: datefrom, datebefore: datebefore, report: '1'}, onAjaxSuccess);
+        $('#modal-report1').modal('hide');
+    });
+
+function onAjaxSuccess(data)
+{
+
+    // А теперь маленький трюк, чтоб скачать
+    const dummy = document.createElement('a');
+    dummy.href = data['url'];
+    dummy.download = 'my-filename.ext';
+
+    document.body.appendChild(dummy);
+    dummy.click(); // Готово
+    if (data['nom'] == 0) {
+        toastr["success"](data['message'], data['title'])
+    } else {
+        toastr["error"](data['message'], data['title'])
+    }
+}
     </script>
 {% endblock %}
