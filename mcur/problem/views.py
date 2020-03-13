@@ -177,7 +177,6 @@ def api_report(request):
                 if request.POST['report'] == '1':
                     if 'linux' in platform.lower():
                         temp = request.POST['datefrom'].split('-')
-                        print(temp)
                         datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
                         temp = request.POST['datebefore'].split('-')
                         datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
@@ -209,8 +208,6 @@ def api_report(request):
                             else:
                                 ws.write(row_num, col_num, row[col_num], font_style)
                     name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
-                    print(name)
-                    print(settings.MEDIA_ROOT)
                     wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
                     if 'linux' in platform.lower():
                         url = f'https://skiog.ru/media/xls/{name}'
