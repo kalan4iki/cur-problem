@@ -19,36 +19,22 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
-                <div class="card card-success">
+                <div class="card card-success collapsed-card">
                   <div class="card-header">
                     <h3 class="card-title">Назначения</h3>
 
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse" id="collapse1"><i class="fas fa-minus"></i>
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse" id="collapse1"><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="chart">
-                        <div class="chartjs-size-monitor">
-                            <div class="chartjs-size-monitor-expand">
-                                <div class="">
 
-                                </div>
-                            </div>
-                            <div class="chartjs-size-monitor-shrink">
-                                <div class="">
-
-                                </div>
-                            </div>
-                        </div>
-                      <canvas id="barChart" ></canvas>
-                    </div>
                   </div>
                   <!-- /.card-body -->
                 </div>
-                <div class="card card-success">
+                <div class="card">
                   <div class="card-header">
                         <h3 class="card-title">Отчеты</h3>
                     <div class="card-tools">
@@ -59,11 +45,11 @@
                   </div>
                   <div class="card-body">
                     <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
                             </div>
                              <div class="col-md-2">
-
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report2">Ещё какой нибудь отчет</button>
                             </div>
                              <div class="col-md-2">
 
@@ -74,11 +60,11 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card card-warning">
+                <div class="card card-warning collapsed-card">
                   <div class="card-header">
                     <h3 class="card-title">Жалобы</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -156,25 +142,6 @@
 {% block ends %}
     <script>
 $(function () {
-    var areaChartData = {
-      labels  : ['{{ dates.min.0 }}', '{{ dates.min.1 }}', '{{ dates.min.2 }}', '{{ dates.min.3 }}',
-                '{{ dates.min.4 }}', '{{ dates.min.5 }}', '{{ dates.min.6 }}'],
-      datasets: [
-        {
-          label               : 'Количетсво созданных назначений',
-          backgroundColor     : 'rgba(60,141,188,0.9)',
-          borderColor         : 'rgba(60,141,188,0.8)',
-          pointRadius          : false,
-          pointColor          : '#3b8bba',
-          pointStrokeColor    : 'rgba(60,141,188,1)',
-          pointHighlightFill  : '#fff',
-          pointHighlightStroke: 'rgba(60,141,188,1)',
-          data                : [{{ kolvo.terms.0 }}, {{ kolvo.terms.1 }}, {{ kolvo.terms.2 }}, {{ kolvo.terms.3 }},
-                                {{ kolvo.terms.4 }}, {{ kolvo.terms.5 }}, {{ kolvo.terms.6 }}]
-        }
-      ]
-    }
-
     var areaChartData2 = {
       labels  : ['{{ dates.plus.0 }}', '{{ dates.plus.1 }}', '{{ dates.plus.2 }}', '{{ dates.plus.3 }}',
                 '{{ dates.plus.4 }}', '{{ dates.plus.5 }}', '{{ dates.plus.6 }}'],
@@ -192,7 +159,7 @@ $(function () {
                                 {{ kolvo.problems.4 }}, {{ kolvo.problems.5 }}, {{ kolvo.problems.6 }}]
         }
       ]
-    }
+    };
 
     var areaChartOptions = {
       maintainAspectRatio : false,
@@ -212,11 +179,65 @@ $(function () {
           }
         }]
       }
-    }
+    };
 
     //-------------
     //- BAR CHART -
     //-------------
+
+    var barChartCanvas2 = $('#barChart1').get(0).getContext('2d')
+    var barChartData2 = jQuery.extend(true, {}, areaChartData2)
+    var temp1 = areaChartData2.datasets[0]
+    barChartData2.datasets[0] = temp1
+
+    var barChart2 = new Chart(barChartCanvas2, {
+      type: 'bar',
+      data: barChartData2,
+      options: barChartOptions
+    })
+  });
+
+$('#collapse1').click(function () {
+    var url = '{% url 'dashboard' %}',
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, chart: '1'}, Collapsef1);
+});
+
+function Collapsef1(data)
+{
+    
+    <div class="chart">
+        <div class="chartjs-size-monitor">
+            <div class="chartjs-size-monitor-expand">
+                <div class="">
+
+                </div>
+            </div>
+            <div class="chartjs-size-monitor-shrink">
+                <div class="">
+
+                </div>
+            </div>
+        </div>
+      <canvas id="barChart" ></canvas>
+    </div>
+    var areaChartData = {
+      labels  : data['label'],
+      datasets: [
+        {
+          label               : 'Количетсво созданных назначений',
+          backgroundColor     : 'rgba(60,141,188,0.9)',
+          borderColor         : 'rgba(60,141,188,0.8)',
+          pointRadius          : false,
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : data['data']
+        }
+      ]
+    };
+
     var barChartCanvas = $('#barChart').get(0).getContext('2d')
     var barChartData = jQuery.extend(true, {}, areaChartData)
     var temp0 = areaChartData.datasets[0]
@@ -226,25 +247,15 @@ $(function () {
       responsive              : true,
       maintainAspectRatio     : false,
       datasetFill             : false
-    }
+    };
 
     var barChart = new Chart(barChartCanvas, {
       type: 'bar',
       data: barChartData,
       options: barChartOptions
-    })
+    });
+}
 
-    var barChartCanvas2 = $('#barChart1').get(0).getContext('2d')
-    var barChartData2 = jQuery.extend(true, {}, areaChartData2)
-    var temp1 = areaChartData2.datasets[0]
-    barChartData2.datasets[0] = temp1
-
-    var barChart = new Chart(barChartCanvas2, {
-      type: 'bar',
-      data: barChartData2,
-      options: barChartOptions
-    })
-  });
 
 $('#report1').submit(function (event) {
         event.preventDefault();

@@ -996,18 +996,23 @@ def dashboard(request):
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             dates = {}
-            dates['min'] = []
-            for i in range(6, 0, -1):
-                dates['min'].append(nowdate-timedelta(i))
-            dates['min'].append(nowdate)
+            if request.method == 'POST':
+                if request.POST['chart'] == '1':
+                    tempdate = []
+                    for i in range(6, 0, -1):
+                        tempdate.append(nowdate-timedelta(i))
+                    tempdate.append(nowdate)
+                    print(tempdate)
+                    kolvo = []
+                    for i in tempdate:
+                        kolvo.append(len(Term.objects.filter(datecre=i)))
+                        otv = {'label': tempdate, 'data': kolvo}
+                    return JsonResponse(otv)
             dates['plus'] = []
             for i in range(0,7):
                 dates['plus'].append(nowdate+timedelta(i))
             kolvo = {}
-            kolvo['terms'] = []
             kolvo['problems'] = []
-            for i in dates['min']:
-                kolvo['terms'].append(len(Term.objects.filter(datecre=i)))
             for i in dates['plus']:
                 q1 = Q(status='0') & Q(date=i)
                 q21 = Q(dateotv=i)
