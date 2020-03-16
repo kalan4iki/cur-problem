@@ -172,58 +172,91 @@ def api_action(request):
 def api_report(request):
     if request.user.has_perm('problem.user_moderator'):
         if request.method == 'POST':
-            try:
-                nowdatetime = datetime.now()
-                if request.POST['report'] == '1':
-                    if 'linux' in platform.lower():
-                        temp = request.POST['datefrom'].split('-')
-                        datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
-                        temp = request.POST['datebefore'].split('-')
-                        datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
-                    else:
-                        datefrom = date.fromisoformat(request.POST['datefrom'])
-                        datebefore = date.fromisoformat(request.POST['datebefore'])
-                    wb = xlwt.Workbook(encoding='utf-8')
-                    ws = wb.add_sheet('problems')
-                    # Sheet header, first row
-                    row_num = 0
-                    font_style = xlwt.XFStyle()
-                    font_style.font.bold = True
-                    columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
-                               'Дата жалобы',
-                               'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
-                    for col_num in range(len(columns)):
-                        ws.write(row_num, col_num, columns[col_num], font_style)
-                    # Sheet body, remaining rows
-                    font_style = xlwt.XFStyle()
-                    rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
-                                                             'text', 'adres', 'datecre',
-                                                             'dateotv', 'status__name', 'statussys')
-                    for row in rows:
-                        row_num += 1
-                        for col_num in range(len(row)):
-                            if col_num == 6 or col_num == 7:
-                                ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
-                                         font_style)
-                            else:
-                                ws.write(row_num, col_num, row[col_num], font_style)
-                    name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
-                    wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
-                    if 'linux' in platform.lower():
-                        url = f'https://skiog.ru/media/xls/{name}'
-                    else:
-                        url = f'http://127.0.0.1:8000/media/xls/{name}'
-                    title = 'Успешно'
-                    mes = 'Отчет подготовлен!'
-                    nom = 0
-                    cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
-                    return JsonResponse(cont)
+            nowdatetime = datetime.now()
+            if request.POST['report'] == '1':
+                if 'linux' in platform.lower():
+                    temp = request.POST['datefrom'].split('-')
+                    datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
+                    temp = request.POST['datebefore'].split('-')
+                    datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
                 else:
-                    title = 'Ошибка'
-                    mes = 'Ошибка при выполнении!'
-                    nom = 1
-            except:
-                print(traceback.format_exc())
+                    datefrom = date.fromisoformat(request.POST['datefrom'])
+                    datebefore = date.fromisoformat(request.POST['datebefore'])
+                wb = xlwt.Workbook(encoding='utf-8')
+                ws = wb.add_sheet('problems')
+                # Sheet header, first row
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+                columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
+                           'Дата жалобы',
+                           'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
+                for col_num in range(len(columns)):
+                    ws.write(row_num, col_num, columns[col_num], font_style)
+                # Sheet body, remaining rows
+                font_style = xlwt.XFStyle()
+                rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                                         'text', 'adres', 'datecre',
+                                                         'dateotv', 'status__name', 'statussys')
+                for row in rows:
+                    row_num += 1
+                    for col_num in range(len(row)):
+                        if col_num == 6 or col_num == 7:
+                            ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
+                                     font_style)
+                        else:
+                            ws.write(row_num, col_num, row[col_num], font_style)
+                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
+                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
+                if 'linux' in platform.lower():
+                    url = f'https://skiog.ru/media/xls/{name}'
+                else:
+                    url = f'http://127.0.0.1:8000/media/xls/{name}'
+                title = 'Успешно'
+                mes = 'Отчет подготовлен!'
+                nom = 0
+                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
+                return JsonResponse(cont)
+            if request.POST['report'] == '2':
+                wb = xlwt.Workbook(encoding='utf-8')
+                ws = wb.add_sheet('problems')
+                # Sheet header, first row
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+                columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
+                           'Дата жалобы',
+                           'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
+                for col_num in range(len(columns)):
+                    ws.write(row_num, col_num, columns[col_num], font_style)
+                # Sheet body, remaining rows
+                font_style = xlwt.XFStyle()
+                rows = Problem.objects.filter(visible='1').values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                                         'text', 'adres', 'datecre',
+                                                         'dateotv', 'status__name', 'statussys')
+                for row in rows:
+                    row_num += 1
+                    for col_num in range(len(row)):
+                        if col_num == 6 or col_num == 7:
+                            ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
+                                     font_style)
+                        else:
+                            ws.write(row_num, col_num, row[col_num], font_style)
+                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
+                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
+                if 'linux' in platform.lower():
+                    url = f'https://skiog.ru/media/xls/{name}'
+                else:
+                    url = f'http://127.0.0.1:8000/media/xls/{name}'
+                title = 'Успешно'
+                mes = 'Отчет подготовлен!'
+                nom = 0
+                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
+                return JsonResponse(cont)
+            else:
+                title = 'Ошибка'
+                mes = 'Ошибка при выполнении!'
+                nom = 1
             a = ActionObject(title=title, nom=nom, message=mes)
             serializer = ActionSerializer(a)
             return JsonResponse(serializer.data, safe=False)

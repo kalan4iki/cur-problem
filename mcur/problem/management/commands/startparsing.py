@@ -202,7 +202,6 @@ class Command(BaseCommand):
                                 i.note = f'Проблем {ke} их {als}'
                                 pars(browser, j.nomdobr)
                                 source = browser.page_source
-                                print('1')
                                 temp = parsTable(source)
                                 i.save()
                                 ke += 1

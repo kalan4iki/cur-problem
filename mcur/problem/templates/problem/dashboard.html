@@ -49,7 +49,7 @@
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
                             </div>
                              <div class="col-md-2">
-                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report2">Ещё отчет</button>
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые жалобы</button>
                             </div>
                              <div class="col-md-2">
 
@@ -262,6 +262,12 @@ $('#report1').submit(function (event) {
         var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, datefrom: datefrom, datebefore: datebefore, report: '1'}, onAjaxSuccess);
         $('#modal-report1').modal('hide');
     });
+
+$('#butreport2').click(function () {
+    var url = "{% url 'api_report' %}",
+        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, report: '2'}, onAjaxSuccess);
+});
 
 function onAjaxSuccess(data)
 {
