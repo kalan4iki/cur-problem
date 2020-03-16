@@ -325,7 +325,7 @@ class ProblemListView(SingleTableMixin, FilterView):
                 prob = Problem.objects.filter(visible='1')
             filterall = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filterall.qs)
-            RequestConfig(self.request, ).configure(table )
+            RequestConfig(self.request, ).configure(table)
             context['filter'] = filterall
             context['table'] = table
             context['name'] = 'Все жалобы'

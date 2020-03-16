@@ -10,6 +10,7 @@
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free-last/css/all.css' %}">
+<link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free-last/css/v4-shims.css' %}">
 {#  <script src="https://kit.fontawesome.com/9495c01576.js" crossorigin="anonymous"></script>#}
   <script src="{% static 'problem/ajax.js' %}"></script>
   <script src="{% static 'adminlte/dist/js/sweetalert2.all.min.js' %}"></script>
@@ -230,6 +231,16 @@
               </p>
             </a>
           </li>
+            <li class="nav-header"></li>
+            <li class="nav-item">
+                <a href="{% url 'calendary' %}" class="nav-link {% block nav8 %} {% endblock %}">
+                  <i class="nav-icon fas fa-calendar-alt"></i>
+                  <p>
+                    Служба поддержки
+                    <span class="badge badge-info right">0</span>
+                  </p>
+                </a>
+              </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
