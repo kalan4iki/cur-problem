@@ -997,31 +997,32 @@ def dashboard(request):
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             dates = {}
             if request.method == 'POST':
-                if request.POST['chart'] == '1':
+                if request.POST['chart'] == 'chart1':
                     tempdate = []
                     for i in range(6, 0, -1):
                         tempdate.append(nowdate-timedelta(i))
                     tempdate.append(nowdate)
-                    print(tempdate)
                     kolvo = []
                     for i in tempdate:
                         kolvo.append(len(Term.objects.filter(datecre=i)))
-                        otv = {'label': tempdate, 'data': kolvo}
-                    return JsonResponse(otv)
-            dates['plus'] = []
-            for i in range(0,7):
-                dates['plus'].append(nowdate+timedelta(i))
-            kolvo = {}
-            kolvo['problems'] = []
-            for i in dates['plus']:
-                q1 = Q(status='0') & Q(date=i)
-                q21 = Q(dateotv=i)
-                q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
-                    status__in=Status.objects.filter(name='Указан срок')))
-                termas = Term.objects.filter(q1)
-                termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
-                kolvo['problems'].append(len(termas2))
-            return render(request, 'problem/dashboard.html', {'dates': dates, 'kolvo': kolvo})
+                elif request.POST['chart'] == 'chart2':
+                    tempdate = []
+                    for i in range(0, 7):
+                        tempdate.append(nowdate + timedelta(i))
+                    kolvo = []
+                    for i in tempdate:
+                        q1 = Q(status='0') & Q(date=i)
+                        q21 = Q(dateotv=i)
+                        q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+                            status__in=Status.objects.filter(name='Указан срок')))
+                        termas = Term.objects.filter(q1)
+                        termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+                        kolvo.append(len(termas2))
+                else:
+                    return JsonResponse()
+                otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart']}
+                return JsonResponse(otv)
+            return render(request, 'problem/dashboard.html')
         else:
             redirect('index')
 

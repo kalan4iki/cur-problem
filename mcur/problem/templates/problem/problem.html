@@ -181,7 +181,6 @@
 <!-- /.modal -->
 {% endif %}
 {% endfor %}
-
 <section class="content">
   <div class="row">
     <div class="col-md-6">
@@ -326,16 +325,16 @@
             <div class="card-tools">
               {% if user.is_staff %}
               <a type="button" href="{% url 'admin:index' %}problem/problem/{{np.pk}}/change/" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="В кабинете администратора" target="_blank">
-                <ion-icon name="person"></ion-icon>
+                <i class="fa fa-user" aria-hidden="true"></i>
               </a>
               {% endif %}
               {% if perms.problem.user_moderator %}
               <button type="button" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="На обновление" id="naobn">
-                <ion-icon name="arrow-round-up"></ion-icon>
+                <i class="fa fa-arrow-up"></i>
               </button>
               {% endif %}
               <a type="button" href="https://dobrodel.mosreg.ru/claims/{{np.nomdobr}}" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="Перейти на добродел" target="_blank">
-                <ion-icon name="arrow-round-forward"></ion-icon>
+                <i class="fa fa-arrow-right"></i>
               </a>
             </div>
           </div>
@@ -401,7 +400,6 @@
     </div>
   </div>
 </section>
-
 {% endblock %}
 
 {% block ends %}

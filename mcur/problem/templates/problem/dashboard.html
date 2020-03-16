@@ -24,12 +24,12 @@
                     <h3 class="card-title">Назначения</h3>
 
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse" id="collapse1"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart1"><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
                   </div>
-                  <div class="card-body">
+                  <div class="card-body" id="bodycard1">
 
                   </div>
                   <!-- /.card-body -->
@@ -49,7 +49,7 @@
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
                             </div>
                              <div class="col-md-2">
-                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report2">Ещё какой нибудь отчет</button>
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report2">Ещё отчет</button>
                             </div>
                              <div class="col-md-2">
 
@@ -64,27 +64,12 @@
                   <div class="card-header">
                     <h3 class="card-title">Жалобы</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart2"><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="chart">
-                        <div class="chartjs-size-monitor">
-                            <div class="chartjs-size-monitor-expand">
-                                <div class="">
-
-                                </div>
-                            </div>
-                            <div class="chartjs-size-monitor-shrink">
-                                <div class="">
-
-                                </div>
-                            </div>
-                        </div>
-                      <canvas id="barChart1" ></canvas>
-                    </div>
                   </div>
                   <!-- /.card-body -->
                 </div>
@@ -141,119 +126,127 @@
 {% endblock %}
 {% block ends %}
     <script>
-$(function () {
-    var areaChartData2 = {
-      labels  : ['{{ dates.plus.0 }}', '{{ dates.plus.1 }}', '{{ dates.plus.2 }}', '{{ dates.plus.3 }}',
-                '{{ dates.plus.4 }}', '{{ dates.plus.5 }}', '{{ dates.plus.6 }}'],
-      datasets: [
-        {
-          label               : 'Количество жалоб подходящий срок ответа',
-          backgroundColor     : 'rgba(60,141,188,0.9)',
-          borderColor         : 'rgba(60,141,188,0.8)',
-          pointRadius          : false,
-          pointColor          : '#3b8bba',
-          pointStrokeColor    : 'rgba(60,141,188,1)',
-          pointHighlightFill  : '#fff',
-          pointHighlightStroke: 'rgba(60,141,188,1)',
-          data                : [{{ kolvo.problems.0 }}, {{ kolvo.problems.1 }}, {{ kolvo.problems.2 }}, {{ kolvo.problems.3 }},
-                                {{ kolvo.problems.4 }}, {{ kolvo.problems.5 }}, {{ kolvo.problems.6 }}]
-        }
-      ]
-    };
-
-    var areaChartOptions = {
-      maintainAspectRatio : false,
-      responsive : true,
-      legend: {
-        display: false
-      },
-      scales: {
-        xAxes: [{
-          gridLines : {
-            display : false,
-          }
-        }],
-        yAxes: [{
-          gridLines : {
-            display : false,
-          }
-        }]
-      }
-    };
-
-    //-------------
-    //- BAR CHART -
-    //-------------
-
-    var barChartCanvas2 = $('#barChart1').get(0).getContext('2d')
-    var barChartData2 = jQuery.extend(true, {}, areaChartData2)
-    var temp1 = areaChartData2.datasets[0]
-    barChartData2.datasets[0] = temp1
-
-    var barChart2 = new Chart(barChartCanvas2, {
-      type: 'bar',
-      data: barChartData2,
-      options: barChartOptions
-    })
-  });
-
-$('#collapse1').click(function () {
-    var url = '{% url 'dashboard' %}',
+$('.addchart').click(function (eventObject) {
+    var but1 = $( this);
+    if (but1.attr('data-card-widget') === 'collapse') {
+        var rod1 = but1.closest('.collapsed-card');
+        rod1.append('<div class="overlay dark syncchart' + but1.attr('id') + '">\n' +
+            '  <i class="fas fa-2x fa-sync-alt fa-spin"></i>\n' +
+            '</div>');
+        rod1.removeClass('collapsed-card');
+        appendchart1(rod1.find('.card-body'), but1.attr('id'));
+        but1.find('i').removeClass('fas fa-plus').addClass('fa fa-refresh');
+        var url = '{% url 'dashboard' %}',
             CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, chart: '1'}, Collapsef1);
+        var posting = $.ajax({
+            url: url,
+            type: 'POST',
+            data: {csrfmiddlewaretoken: CSRFtoken, chart: but1.attr('id')},
+            success: Collapsef1
+        });
+        but1.removeAttr('data-card-widget');
+    }
 });
+
+function appendchart1(obj, chart) {
+    obj.append('<div class="chart">\n' +
+    '        <div class="chartjs-size-monitor">\n' +
+    '            <div class="chartjs-size-monitor-expand">\n' +
+    '                <div class="">\n' +
+    '\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '            <div class="chartjs-size-monitor-shrink">\n' +
+    '                <div class="">\n' +
+    '\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '      <canvas id="bar'+ chart +'" ></canvas>\n' +
+    '    </div>');
+}
 
 function Collapsef1(data)
 {
-    
-    <div class="chart">
-        <div class="chartjs-size-monitor">
-            <div class="chartjs-size-monitor-expand">
-                <div class="">
+    if (data['chart'] === 'chart1') {
+        var areaChartData = {
+          labels  : data['label'],
+          datasets: [
+            {
+              label               : 'Количетсво созданных назначений',
+              backgroundColor     : 'rgba(60,141,188,0.9)',
+              borderColor         : 'rgba(60,141,188,0.8)',
+              pointRadius          : false,
+              pointColor          : '#3b8bba',
+              pointStrokeColor    : 'rgba(60,141,188,1)',
+              pointHighlightFill  : '#fff',
+              pointHighlightStroke: 'rgba(60,141,188,1)',
+              data                : data['data']
+            }
+          ]
+        };
 
-                </div>
-            </div>
-            <div class="chartjs-size-monitor-shrink">
-                <div class="">
+        var areaChartOptions = {
+          maintainAspectRatio : false,
+          responsive : true,
+        };
 
-                </div>
-            </div>
-        </div>
-      <canvas id="barChart" ></canvas>
-    </div>
-    var areaChartData = {
-      labels  : data['label'],
-      datasets: [
-        {
-          label               : 'Количетсво созданных назначений',
-          backgroundColor     : 'rgba(60,141,188,0.9)',
-          borderColor         : 'rgba(60,141,188,0.8)',
-          pointRadius          : false,
-          pointColor          : '#3b8bba',
-          pointStrokeColor    : 'rgba(60,141,188,1)',
-          pointHighlightFill  : '#fff',
-          pointHighlightStroke: 'rgba(60,141,188,1)',
-          data                : data['data']
-        }
-      ]
-    };
+        var barChartCanvas = $('#barchart1').get(0).getContext('2d');
+        var barChartData = jQuery.extend(true, {}, areaChartData);
+        var temp0 = areaChartData.datasets[0];
+        barChartData.datasets[0] = temp0;
 
-    var barChartCanvas = $('#barChart').get(0).getContext('2d')
-    var barChartData = jQuery.extend(true, {}, areaChartData)
-    var temp0 = areaChartData.datasets[0]
-    barChartData.datasets[0] = temp0
+        var barChartOptions = {
+          responsive              : true,
+          maintainAspectRatio     : false,
+          datasetFill             : false
+        };
 
-    var barChartOptions = {
-      responsive              : true,
-      maintainAspectRatio     : false,
-      datasetFill             : false
-    };
+        var barChart = new Chart(barChartCanvas, {
+          type: 'bar',
+          data: barChartData,
+          options: areaChartOptions
+        });
+    } else if (data['chart'] === 'chart2') {
+        var areaChartData2 = {
+            labels  : data['label'],
+            datasets: [
+                {
+                  label               : 'Количество жалоб подходящий срок ответа',
+                  backgroundColor     : 'rgba(60,141,188,0.9)',
+                  borderColor         : 'rgba(60,141,188,0.8)',
+                  pointRadius          : false,
+                  pointColor          : '#3b8bba',
+                  pointStrokeColor    : 'rgba(60,141,188,1)',
+                  pointHighlightFill  : '#fff',
+                  pointHighlightStroke: 'rgba(60,141,188,1)',
+                  data                : data['data']
+                }
+            ]
+        };
 
-    var barChart = new Chart(barChartCanvas, {
-      type: 'bar',
-      data: barChartData,
-      options: barChartOptions
-    });
+        var areaChartOptions = {
+          maintainAspectRatio : false,
+          responsive : true,
+        };
+
+        //-------------
+        //- BAR CHART -
+        //-------------
+
+        var barChartCanvas2 = $('#barchart2').get(0).getContext('2d');
+        var barChartData2 = jQuery.extend(true, {}, areaChartData2);
+        var temp1 = areaChartData2.datasets[0];
+        barChartData2.datasets[0] = temp1;
+
+        var barChart2 = new Chart(barChartCanvas2, {
+          type: 'bar',
+          data: barChartData2,
+          options: areaChartOptions
+        })
+    }
+    var te = '.syncchart' + data['chart']
+    $(te).remove()
 }
 
 
