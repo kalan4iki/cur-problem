@@ -206,11 +206,11 @@
           <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Развернуть/свернуть"><i class="fas fa-plus"></i>
             </button>
+              {% if perms.problem.user_moderator %}
             <button type="button" class="btn btn-tool" id="approve-{{ i.pk }}" title="Утвердить назначение"><i class="fa fa-check"></i>
             </button>
-              {% if perms.problem.user_moderator %}
-                    <button type="button" class="btn btn-tool" id="del-{{ i.pk }}" title="Удалить"><i class="fas fa-times"></i>
-                    </button>
+            <button type="button" class="btn btn-tool" id="del-{{ i.pk }}" title="Удалить"><i class="fas fa-times"></i>
+            </button>
               {% endif %}
           </div>
           <!-- /.card-tools -->

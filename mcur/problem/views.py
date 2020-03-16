@@ -358,7 +358,7 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
                 q2 = Q(visible='1')
                 q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-                prob = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
+                prob = Problem.objects.filter(Q(terms__in=termas1) & q21 & q2)
             filterpodx = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filterpodx.qs)
             RequestConfig(self.request, ).configure(table )
@@ -397,8 +397,8 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
                 q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(date(2019, 1, 1), nowdate - timedelta(1)))
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-                q2 = Q(visible='1')
-                q21 = Q(dateotv__range=(date(2019, 1, 1), nowdate - timedelta(1)))
+                q2 = Q(visible='1') & Q(statussys='1')
+                q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
                 prob = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
             filterpros = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filterpros.qs)
@@ -438,9 +438,9 @@ class ProblemTodayListView(SingleTableMixin, FilterView):
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
                 q2 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
                 termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-                q2 = Q(visible='1')
+                q2 = Q(visible='1') & Q(statussys='1')
                 q21 = Q(dateotv=nowdate)
-                prob = Problem.objects.filter((Q(terms__in=termas1)| q21) & q2)
+                prob = Problem.objects.filter((Q(terms__in=termas1) & q21) & q2)
             filtertodo = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filtertodo.qs)
             RequestConfig(self.request, ).configure(table )
@@ -711,93 +711,112 @@ def lk(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         userlk = User.objects.get(username=request.user.username)
-        kolvo = {}
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-        if request.user.has_perm('problem.user_moderator'):
-            kolvo['kolall'] = len(Problem.objects.filter(visible='1'))
-            kolvo['kolno'] = len(Problem.objects.filter(visible='1', statussys='2'))
-            #Подходит срок
-            q1 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate+timedelta(4)))
-            q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
-            termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
-            kolvo['podx'] = len(termas2)
-            #Просроченные
-            q1 = (Q(status='0') | Q(status='1')) & Q(date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
-            q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
-            q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
-            termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
-            kolvo['prosr'] = len(termas2)
-            #На сегодня
-            q1 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
-            q21 = Q(dateotv = nowdate)
-            q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(status__in=Status.objects.filter(name='Указан срок')))
-            termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
-            kolvo['today'] = len(termas2)
-            #Мои
-            #q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-            #if userlk.userprofile.dep == None:
-            q1 = Q(curatuser=userlk)
-            termas = Term.objects.filter(q1)
-            termas2 = Problem.objects.filter(Q(terms__in=termas))
-            kolvo['me'] = len(termas2)
-            kolvo['kolclose'] = len(Problem.objects.filter(visible='1', statussys='2', terms__answers__user=userlk))
-        elif request.user.has_perm('problem.user_executor'):
-            #1 блок ответы
-            q1 = Q(user=userlk)
-            termas = Answer.objects.filter(q1)
-            termas2 = Term.objects.filter(answers__in=termas)
-            termas3 = Problem.objects.filter(visible='1', terms__in=termas2)
-            kolvo['kolclose'] = len(termas3)
-            #2 блок всего не закрытых жалоб
-            q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-            termas = Termhistory.objects.filter(q1)
-            if userlk.userprofile.dep == None:
-                q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-            termas2 = Term.objects.filter((q1 | Q(resolutions__in=termas)) & (Q(status='0') | Q(status='1')))
-            termas3 = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(terms__in=termas2))
-            kolvo['kolall'] = len(termas3)
-            #3 Подходит срок жалоб
-            if userlk.userprofile.dep == None:
-                q1 = Q(curatuser=userlk)
-                termas = Termhistory.objects.filter(q1)
-                q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-            else:
-                q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-                termas = Termhistory.objects.filter(q1)
-            q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-            termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-            q2 = Q(visible='1')
-            q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-            termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
-            kolvo['podx'] = len(termas2)
-            #4 Блок жалоб на сегодня
-            q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-            termas = Termhistory.objects.filter(q1)
-            if userlk.userprofile.dep == None:
-                q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-            q2 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
-            termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-            q2 = Q(visible='1') & Q(statussys='1')
-            q21 = Q(dateotv=nowdate)
-            termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
-            kolvo['today'] = len(termas2)
-            # 5 Просроченные жалобы
-            q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
-            termas = Termhistory.objects.filter(q1)
-            if userlk.userprofile.dep == None:
-                q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-            q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(date(2019, 1, 1), nowdate-timedelta(1)))
-            termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-            q2 = Q(visible='1') & Q(statussys='1')
-            q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
-            termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
-            kolvo['prosr'] = len(termas2)
-        return render(request, 'problem/lk.html', {'kolvo': kolvo})
+        if request.method == 'POST':
+            if request.user.has_perm('problem.user_moderator'):
+                if request.POST['box'] == 'box1':# Ответы
+                    kolvo = len(Problem.objects.filter(visible='1', statussys='2', terms__answers__user=userlk))
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box2':# Не рапсред. жалобы
+                    kolvo = len(Problem.objects.filter(visible='1', statussys='2'))
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box3':# Все жалобы
+                    kolvo = len(Problem.objects.filter(visible='1'))
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box4':# Мои жалобы
+                    q1 = Q(curatuser=userlk)
+                    termas = Term.objects.filter(q1)
+                    termas2 = Problem.objects.filter(Q(terms__in=termas))
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box5':# Подходит срок
+                    q1 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
+                    q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
+                    q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+                        status__in=Status.objects.filter(name='Указан срок')))
+                    termas = Term.objects.filter(q1)
+                    termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box6':# Жалобы на сегодня
+                    q1 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
+                    q21 = Q(dateotv=nowdate)
+                    q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+                        status__in=Status.objects.filter(name='Указан срок')))
+                    termas = Term.objects.filter(q1)
+                    termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box7':# Просроченные
+                    q1 = (Q(status='0') | Q(status='1')) & Q(
+                        date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
+                    q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
+                    q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
+                        status__in=Status.objects.filter(name='Указан срок')))
+                    termas = Term.objects.filter(q1)
+                    termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                else:
+                    return JsonResponse({'mes': 'error'})
+            elif request.user.has_perm('problem.user_executor'):
+                if request.POST['box'] == 'box1':  # Ответы
+                    q1 = Q(user=userlk)
+                    termas = Answer.objects.filter(q1)
+                    termas2 = Term.objects.filter(answers__in=termas)
+                    termas3 = Problem.objects.filter(visible='1', terms__in=termas2)
+                    kolvo = len(termas3)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box3':  # Все жалобы
+                    q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                    termas = Termhistory.objects.filter(q1)
+                    if userlk.userprofile.dep == None:
+                        q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
+                    termas2 = Term.objects.filter((q1 | Q(resolutions__in=termas)) & (Q(status='0') | Q(status='1')))
+                    termas3 = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(terms__in=termas2))
+                    kolvo = len(termas3)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box5':  # Подходит срок
+                    if userlk.userprofile.dep == None:
+                        q1 = Q(curatuser=userlk)
+                        termas = Termhistory.objects.filter(q1)
+                        q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
+                    else:
+                        q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                        termas = Termhistory.objects.filter(q1)
+                    q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
+                    termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
+                    q2 = Q(visible='1')
+                    q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
+                    termas2 = Problem.objects.filter(Q(terms__in=termas1) & q21 & q2)
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box6':  # Жалобы на сегодня
+                    q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                    termas = Termhistory.objects.filter(q1)
+                    if userlk.userprofile.dep == None:
+                        q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
+                    q2 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
+                    termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
+                    q2 = Q(visible='1') & Q(statussys='1')
+                    q21 = Q(dateotv=nowdate)
+                    termas2 = Problem.objects.filter((Q(terms__in=termas1) & q21) & q2)
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box7':  # Просроченные
+                    q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
+                    termas = Termhistory.objects.filter(q1)
+                    if userlk.userprofile.dep == None:
+                        q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
+                    q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(date(2019, 1, 1), nowdate - timedelta(1)))
+                    termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
+                    q2 = Q(visible='1') & Q(statussys='1')
+                    q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
+                    termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+        return render(request, 'problem/lk.html')
 
 
 def closedproblem(request):
