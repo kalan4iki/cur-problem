@@ -205,9 +205,10 @@ class Command(BaseCommand):
                                 temp = parsTable(source)
                                 i.save()
                                 ke += 1
-                                #if temp == None:
-                                #    j.visible = '0'
-                                #    j.save()
+                                if temp == None:
+                                    j.visible = '0'
+                                    j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
+                                    j.save()
                         else:
                             pars(browser, i.arg)
                             source = browser.page_source
@@ -215,6 +216,7 @@ class Command(BaseCommand):
                             if er == None:
                                 tempsss = Problem.objects.get(nomdobr=i.arg)
                                 tempsss.visible = '0'
+                                tempsss.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
                                 tempsss.save()
                     elif i.act.nact == '3':#Выключить парсер
                         i.status = '1'
@@ -302,6 +304,7 @@ class Command(BaseCommand):
                             ke += 1
                             if temp == None:
                                 j.visible = '0'
+                                j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
                                 j.save()
                     elif i.act.nact == '8':#Обновление браузера
                         session = browser.session_id
