@@ -1019,7 +1019,7 @@ def dashboard(request):
                         termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
                         kolvo.append(len(termas2))
                 else:
-                    return JsonResponse()
+                    return JsonResponse({'chart': 'error'})
                 otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart']}
                 return JsonResponse(otv)
             return render(request, 'problem/dashboard.html')

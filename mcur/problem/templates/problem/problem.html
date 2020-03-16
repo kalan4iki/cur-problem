@@ -20,9 +20,9 @@
               <i class="fas fa-print"></i> Печатать
         </a>
         {% if perms.problem.user_moderator %}
-        <a href="" class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm">
+        <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm" {% if np.visible == '0' %}disabled{% endif %}>
               <i class="fas fa-download"></i> Добавить назначение
-        </a>
+        </button>
         {% endif %}
       </div><!-- /.col -->
     </div><!-- /.row -->
@@ -396,6 +396,12 @@
             </div>
           </div>
           <!-- /.card-body -->
+            {% if np.visible == '0' %}
+            <div class="overlay">
+                <i class="fa fa-eye-slash fa-5x" aria-hidden="true"></i>
+                <h3><b>Жалоба скрыта в системе</b></h3>
+            </div>
+            {% endif %}
       </div>
     </div>
   </div>

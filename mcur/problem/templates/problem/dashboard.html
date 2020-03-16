@@ -188,7 +188,7 @@ function Collapsef1(data)
 
         var areaChartOptions = {
           maintainAspectRatio : false,
-          responsive : true,
+          responsive : true
         };
 
         var barChartCanvas = $('#barchart1').get(0).getContext('2d');
@@ -227,7 +227,7 @@ function Collapsef1(data)
 
         var areaChartOptions = {
           maintainAspectRatio : false,
-          responsive : true,
+          responsive : true
         };
 
         //-------------
@@ -244,6 +244,8 @@ function Collapsef1(data)
           data: barChartData2,
           options: areaChartOptions
         })
+    } else if (data['chart'] === 'error') {
+        toastr["error"]('Ошибка выполнения')
     }
     var te = '.syncchart' + data['chart']
     $(te).remove()

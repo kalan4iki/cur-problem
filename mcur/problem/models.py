@@ -170,6 +170,7 @@ class Problem(models.Model):
                                verbose_name='Статус парсинга', default='0', choices=pars)
     visible = models.CharField(max_length=50, help_text='Режим показа на сайте',
                                verbose_name='Режим', default='1', choices=vis)
+    note = models.CharField(max_length=50, verbose_name='Замечание', default=None, null=True, blank=True)
 
     class Meta:
         ordering = ['dateotv']
