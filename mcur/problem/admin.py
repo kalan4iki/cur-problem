@@ -70,10 +70,10 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
+    list_display = ('nomdobr', 'ciogv', 'text', 'adres', 'status', 'note',)
     list_display_links = ('nomdobr', 'ciogv', 'text', 'adres', 'status',)
     search_fields = ('nomdobr',)
-    list_filter = ('visible', 'dateotv', 'status__name', 'parsing', 'temat', 'ciogv__name',)
+    list_filter = ('visible', 'dateotv', 'status__name', 'note', 'temat', 'ciogv__name',)
     actions = ('pars', 'novisib', 'termnovisib', 'visib')
 
     def pars(self, request, queryset):
