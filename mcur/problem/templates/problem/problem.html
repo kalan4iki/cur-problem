@@ -20,8 +20,11 @@
               <i class="fas fa-print"></i> Печатать
         </a>
         {% if perms.problem.user_moderator %}
+        <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-ty" {% if np.visible == '0' %}disabled{% endif %}>
+              <i class="fas fa-download"></i> Назначить ТУ
+        </button>
         <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm" {% if np.visible == '0' %}disabled{% endif %}>
-              <i class="fas fa-download"></i> Добавить назначение
+              <i class="fa fa-plus-square"></i> Добавить назначение
         </button>
         {% endif %}
       </div><!-- /.col -->
@@ -184,6 +187,34 @@
 <section class="content">
   <div class="row">
     <div class="col-md-6">
+        <div class="card">
+          <!-- /.card-header -->
+          <div class="card-body">
+          <div class="row">
+
+              {% if np.ciogv %}
+                <div class="col-md-12">
+                <div class="alert alert-info alert-dismissible">
+                  <h5><i class="icon fas fa-info"></i>Курирующее территориальное управление: <b>{{np.ciogv}}</b></h5>
+                </div>
+                </div>
+              {% else %}
+                <div class="col-md-10">
+                <div class="alert alert-warning alert-dismissible">
+                  <h5><i class="icon fas fa-exclamation-triangle"></i>Нет курирующего территориального управления</h5>
+                </div>
+                </div>
+                <div class="col-md-2">
+                <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-ty" {% if np.visible == '0' %}disabled{% endif %}>
+                      <i class="fas fa-download"></i> Назначить ТУ
+                </button>
+                </div>
+              {% endif %}
+          </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
       {% for i in terms %}
       <div class="card {{resdat.i.pk}} card-widget collapsed-card">
         <div class="card-header ">
@@ -340,8 +371,6 @@
           </div>
           <!-- /.card-header -->
           <div class="card-body">
-
-
             <div class="row">
               <div class="col">
                 <div id="div_id_temat" class="form-group">
@@ -361,16 +390,6 @@
               </div>
           </div>
             <div class="row">
-              <div class="col">
-                <div class="col">
-                  <div id="div_id_ciogv" class="form-group">
-                    <label for="id_ciogv" class="">ЦИОГВ</label>
-                    <div class="">
-                      <input type="text" name="ciogv" value="{{ np.ciogv }}" class="dateinput form-control" id="id_ciogv" disabled="">
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div class="col">
                 <div class="col">
                   <div id="div_id_datecre" class="form-group">
@@ -407,6 +426,50 @@
       </div>
     </div>
   </div>
+<div class="row">
+   <div class="col-md-12">
+       <div class="card card-primary direct-chat direct-chat-primary">
+      <div class="card-header">
+        <h3 class="card-title">Коментарии по жалобе</h3>
+        <div class="card-tools">
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="direct-chat-messages">
+          <div class="direct-chat-msg">
+            <div class="direct-chat-infos clearfix">
+              <span class="direct-chat-name float-left">Alexander Pierce</span>
+              <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
+            </div>
+            <div class="direct-chat-text">
+              Is this template really for free? That's unbelievable!
+            </div>
+          </div>
+          <div class="direct-chat-msg">
+            <div class="direct-chat-infos clearfix">
+              <span class="direct-chat-name float-left">Alexander Pierce</span>
+              <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
+            </div>
+            <div class="direct-chat-text">
+              Working with AdminLTE on a great new app! Wanna join?
+            </div>
+          </div>
+        </div>
+        <!--/.direct-chat-messages-->
+      </div>
+      <div class="card-footer">
+        <form action="#" method="post">
+          <div class="input-group">
+            <input type="text" name="message" placeholder="Сообщение ..." class="form-control">
+            <span class="input-group-append">
+              <button type="button" class="btn btn-primary">Отправить</button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+   </div>
+</div>
 </section>
 {% endblock %}
 

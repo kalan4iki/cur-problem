@@ -582,6 +582,7 @@ def prob(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
+        print(request.GET)
         if Problem.objects.filter(nomdobr=pk).exists():
             c = False
             terms = []

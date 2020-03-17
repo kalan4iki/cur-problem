@@ -120,13 +120,12 @@ class Access(models.Model):
 
 
 class Minis(models.Model):
-    name = models.CharField(max_length=40, help_text='ЦИОГВ',
-                            verbose_name='ЦИОГВ')
+    name = models.CharField(max_length=100, verbose_name='Название')
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'ЦИОГВ'
-        verbose_name_plural = 'ЦИОГВ'
+        verbose_name = 'территориальное уравление'
+        verbose_name_plural = 'территориальные уравления'
 
     def __str__(self):
         return self.name
@@ -153,8 +152,7 @@ class Problem(models.Model):
                               verbose_name='Тематика', blank=True, null=True, related_name='problems')
     podcat = models.ForeignKey(Podcategory, on_delete=models.PROTECT, help_text='Подкатегория проблемы',
                                verbose_name='Подкатегория', blank=True, null=True, related_name='problems')
-    ciogv = models.ForeignKey(Minis, on_delete=models.PROTECT, blank=True,
-                              help_text='ЦИОГВ', verbose_name='ЦИОГВ', null=True)
+    ciogv = models.ForeignKey(Minis, on_delete=models.PROTECT, blank=True, verbose_name='Тер. управление', null=True)
     text = models.TextField(help_text='Текст проблемы', verbose_name='Текст', blank=True, null=True)
     adres = models.CharField(max_length=255, help_text='Адрес проблемы',
                              verbose_name='Адрес', blank=True, null=True)
