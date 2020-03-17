@@ -331,7 +331,7 @@ class Command(BaseCommand):
                         name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.png'
                         url = MEDIA_ROOT+'photos/' + name
                         a = browser.save_screenshot(url)
-                        i.note = MEDIA_URL+'photos/' + name
+                        i.note = 'https://skiog.ru' + MEDIA_URL+'photos/' + name
                         i.save()
                     i.status = '1'
                     i.save()
