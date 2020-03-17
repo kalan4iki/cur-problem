@@ -84,23 +84,17 @@ class ProblemAdmin(admin.ModelAdmin):
     pars.short_description = 'Отправить на уточнение'
 
     def novisib(self, request, queryset):
-        for prob in queryset:
-            prob.visible = '0'
-            prob.save()
+        queryset.update(visible='0')
         self.message_user(request, 'Действие выполнено')
     novisib.short_description = 'Убрать с сайта'
 
     def visib(self, request, queryset):
-        for prob in queryset:
-            prob.visible = '1'
-            prob.save()
+        queryset.update(visible='1')
         self.message_user(request, 'Действие выполнено')
     visib.short_description = 'Показать на сайте'
 
     def termnovisib(self, request, queryset):
-        for prob in queryset:
-            prob.visible = '2'
-            prob.save()
+        queryset.update(visible='2')
         self.message_user(request, 'Действие выполнено')
     termnovisib.short_description = 'Времмено убрать с сайта'
 

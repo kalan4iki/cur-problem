@@ -94,16 +94,12 @@ def api_action(request):
                 status = ['Закрыто', 'Получен ответ', 'Решено']
                 status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
                 allprob = 0
-                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status[0]) | Q(status__name=status[1]) | Q(status__name=status[2])))
+                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name__in=status)))
                 allprob += len(prob)
-                for i in prob:
-                    i.visible = '0'
-                    i.save()
-                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name=status2[0]) | Q(status__name=status2[1]) | Q(status__name=status2[2])))
+                prob.update(visible='0')
+                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name__in=status2)))
                 allprob += len(prob)
-                for i in prob:
-                    i.visible = '2'
-                    i.save()
+                prob.update(visible='2')
                 mes = f'''Успешно выполнено!
     Количество исправленных жалоб: {allprob}'''
                 nom = 0

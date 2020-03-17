@@ -7,13 +7,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
 from sys import platform
-from problem.models import Problem, Category, Podcategory, Status
+from problem.models import Problem, Category, Podcategory, Status, Image
 from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
+from mcur.settings import MEDIA_ROOT, MEDIA_URL
 from datetime import date, datetime
 import time
 import traceback
-
+import codecs
 
 def StartBrowser():
     opts = Options()
@@ -325,6 +326,13 @@ class Command(BaseCommand):
                         username = 'tsa@istra-adm.ru'
                         password = '12345678'
                         loginDobrodel(browser, url, {'username': username, 'password': password})
+                    elif i.act.nact == '9':#Получить скриншот
+                        nowdatetime = datetime.now()
+                        name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.png'
+                        url = MEDIA_ROOT+'photos/' + name
+                        a = browser.save_screenshot(url)
+                        i.note = MEDIA_URL+'photos/' + name
+                        i.save()
                     i.status = '1'
                     i.save()
         time.sleep(2)

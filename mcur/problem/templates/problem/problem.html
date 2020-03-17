@@ -458,7 +458,7 @@
       </div>
     </div>
   </div>
-{% if perms.problem.user_supermodertor %}
+{% if user.is_superuser %}
 <div class="row">
    <div class="col-md-12">
        <div class="card direct-chat direct-chat-primary">
