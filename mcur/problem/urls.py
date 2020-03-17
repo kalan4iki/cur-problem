@@ -4,7 +4,7 @@ from .views import (api_problem, api_problem_detail, api_answer_detail, prob, ad
                     zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd,
                     createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action,
-                    listuser, term_approve, api_report)
+                    listuser, term_approve, api_report, addty)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -46,6 +46,7 @@ urlpatterns = [
     path('export_pdf/<int:pk>', export_pdf, name= 'export_pdf'),
     path('statandact/', statandact, name='statandact'),
     path('term_approve/<int:pk>', term_approve, name='term_approve'),
+    path('addty/', addty, name='addty'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

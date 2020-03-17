@@ -19,8 +19,17 @@ class ActionAdmin(admin.ModelAdmin):
 
 @admin.register(ActionHistory)
 class ActionHistoryAdmin(admin.ModelAdmin):
-    list_display = ('act', 'arg', 'status', 'lastaction', )
+    list_display = ('act', 'arg', 'status', 'lastaction', 'note')
     list_display_links = ('act', 'status', 'arg', 'lastaction', )
+    actions = ('action',)
+
+    def action(self, request, queryset):
+        for prob in queryset:
+            prob.status = '0'
+            prob.save()
+        self.message_user(request, 'Действие выполнено')
+    action.short_description = 'Отправить на выполнение'
+
 
 @admin.register(Loggings)
 class LoggingsAdmin(admin.ModelAdmin):

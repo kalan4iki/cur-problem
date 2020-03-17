@@ -80,8 +80,8 @@ return pages
 def parsTable(source):
     try:
         bs = BeautifulSoup(source, 'lxml')
-        table = bs.find_all('tr', class_ = 'jtable-data-row')
-        if len(table) >0:
+        table = bs.find_all('tr', class_='jtable-data-row')
+        if len(table) > 0:
             allprob = ''
             for i in table:
                 temp = i.find_all('td')
@@ -128,7 +128,7 @@ def parsTable(source):
             loging = Loggings(name='2', note=allprob)
             loging.save()
         else:
-            return None
+            return 'non'
     except:
         print(traceback.format_exc())
 
@@ -205,19 +205,27 @@ class Command(BaseCommand):
                                 temp = parsTable(source)
                                 i.save()
                                 ke += 1
-                                # if temp == None:
-                                #     j.visible = '0'
-                                #     j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
-                                #     j.save()
+                                if temp == 'non':
+                                    j.visible = '0'
+                                    j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
+                                    j.save()
+                                else:
+                                    j.note = ''
+                                    j.save()
                         else:
                             pars(browser, i.arg)
                             source = browser.page_source
                             er = parsTable(source)
-                            if er == None:
+                            if er == 'non':
                                 tempsss = Problem.objects.get(nomdobr=i.arg)
                                 tempsss.visible = '0'
                                 tempsss.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru. Индивидуальное обновление.'
+                                i.note = 'Жалоба скрыта.'
+                                i.save()
                                 tempsss.save()
+                            else:
+                                i.note = 'Жалоба обновлена.'
+                                i.save()
                     elif i.act.nact == '3':#Выключить парсер
                         i.status = '1'
                         i.save()
@@ -302,10 +310,10 @@ class Command(BaseCommand):
                             temp = parsTable(source)
                             i.save()
                             ke += 1
-                            # if temp == None:
-                            #     j.visible = '0'
-                            #     j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
-                            #     j.save()
+                            if temp == 'non':
+                                j.visible = '0'
+                                j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
+                                j.save()
                     elif i.act.nact == '8':#Обновление браузера
                         session = browser.session_id
                         parsers = Parser.objects.get(session=session)

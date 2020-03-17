@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from django.contrib.auth.models import User, Group
 from django.utils.text import capfirst
 from django import forms
-from .models import Problem, Term, Termhistory, Department, Curator, Person
+from .models import Problem, Term, Termhistory, Department, Curator, Person, Minis
 
 class CreateUser(ModelForm):
     group = ModelChoiceField(queryset=Group.objects.all().exclude(name='Супермодератор'), label='Группа')
@@ -58,6 +58,12 @@ class TermForm(ModelForm):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.helper = FormHelper()
+
+class TyForm(forms.Form):
+    name = ModelChoiceField(queryset=Minis.objects.all(), label='Территариальное управление', required=True)
+    # class Meta:
+    #     model = Minis
+    #     fields = {'name'}
 
 class PrAdd(ModelForm):
     class Meta:

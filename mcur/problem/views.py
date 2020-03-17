@@ -31,10 +31,11 @@ from reportlab.platypus import Paragraph
 from reportlab.lib.units import mm
 
 # other
-from .models import Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category, UserProfile
+from .models import (Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category,
+                     UserProfile, Minis)
 from parsers.models import ActionHistory, Action, Parser
 from .tables import ProblemTable, ParsTable, UserTable, HistTable
-from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser)
+from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser, TyForm)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
 from sys import platform
@@ -593,6 +594,7 @@ def prob(request, pk):
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             userr = User.objects.get(username=request.user.username)
+            tyform = TyForm()
             if not c:
                 temp = prob.terms.filter(Q(org=userr.userprofile.org) | Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
                 if len(temp) > 0:
@@ -616,7 +618,7 @@ def prob(request, pk):
                     dep = Department.objects.filter(name=userr.userprofile.dep.name)
                     userorg = Person.objects.filter(userprofile__dep__in=dep)
                 resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
-                return render(request, 'problem/problem.html', {'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
+                return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
                 return redirect('index')
         else:
@@ -1199,6 +1201,41 @@ def term_approve(request, pk):
                     return JsonResponse(serializer.data, safe=False)
             else:
                 mes = 'Ошибка, данного назначения не существует.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+        else:
+            mes = 'Ошибка, недостаточно прав.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
+
+def addty(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        title = 'Добавление ТУ'
+        if request.user.has_perm('problem.user_moderator'):
+            if request.method == 'POST':
+                if Problem.objects.filter(nomdobr=request.POST['prob']).exists():
+                    proble = Problem.objects.get(nomdobr=request.POST['prob'])
+                    proble.ciogv = Minis.objects.get(pk=request.POST['name'])
+                    proble.save()
+                    mes = 'Успешно, территориальное управление добавлено.'
+                    nom = 0
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+                else:
+                    mes = 'Ошибка, данной жалобы не существует.'
+                    nom = 1
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+            else:
+                mes = 'Ошибка, неправильный запрос.'
                 nom = 1
                 a = ActionObject(title=title, nom=nom, message=mes)
                 serializer = ActionSerializer(a)

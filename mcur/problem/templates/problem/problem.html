@@ -20,7 +20,7 @@
               <i class="fas fa-print"></i> Печатать
         </a>
         {% if perms.problem.user_moderator %}
-        <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-ty" {% if np.visible == '0' %}disabled{% endif %}>
+        <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-ty" {% if np.visible == '0' and not np.ciogv %}disabled{% endif %}>
               <i class="fas fa-download"></i> Назначить ТУ
         </button>
         <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-addterm" {% if np.visible == '0' %}disabled{% endif %}>
@@ -90,6 +90,35 @@
             </div>
             </div>
             {{ formadd.desck|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal-ty">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Назначение территориального управления</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'addty' %}" method="post" id="tyform">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    {{ tyform.name|as_crispy_field }}
+                </div>
+            </div>
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -190,27 +219,28 @@
         <div class="card">
           <!-- /.card-header -->
           <div class="card-body">
-          <div class="row">
-
+            <div class="row">
               {% if np.ciogv %}
                 <div class="col-md-12">
-                <div class="alert alert-info alert-dismissible">
-                  <h5><i class="icon fas fa-info"></i>Курирующее территориальное управление: <b>{{np.ciogv}}</b></h5>
-                </div>
+                    <div class="alert alert-info alert-dismissible">
+                      <h5><i class="icon fas fa-info"></i>Курирующее территориальное управление: <b>{{np.ciogv}}</b></h5>
+                    </div>
                 </div>
               {% else %}
                 <div class="col-md-10">
-                <div class="alert alert-warning alert-dismissible">
-                  <h5><i class="icon fas fa-exclamation-triangle"></i>Нет курирующего территориального управления</h5>
-                </div>
+                    <div class="alert alert-warning alert-dismissible">
+                      <h5><i class="icon fas fa-exclamation-triangle"></i>Нет курирующего территориального управления</h5>
+                    </div>
                 </div>
                 <div class="col-md-2">
-                <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-ty" {% if np.visible == '0' %}disabled{% endif %}>
-                      <i class="fas fa-download"></i> Назначить ТУ
-                </button>
+                    {% if perms.problem.user_moderator %}
+                    <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-ty" {% if np.visible == '0' %}disabled{% endif %}>
+                          <i class="fas fa-download"></i> Назначить ТУ
+                    </button>
+                    {% endif %}
                 </div>
               {% endif %}
-          </div>
+            </div>
           </div>
           <!-- /.card-body -->
         </div>
@@ -426,6 +456,7 @@
       </div>
     </div>
   </div>
+{% if perms.problem.user_supermodertor %}
 <div class="row">
    <div class="col-md-12">
        <div class="card card-primary direct-chat direct-chat-primary">
@@ -438,20 +469,22 @@
         <div class="direct-chat-messages">
           <div class="direct-chat-msg">
             <div class="direct-chat-infos clearfix">
-              <span class="direct-chat-name float-left">Alexander Pierce</span>
+              <span class="direct-chat-name float-left">{{ user.first_name }} {{ user.last_name }}</span>
               <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
             </div>
+            <img class="direct-chat-img" src="{% static 'adminlte/dist/img/logo.png' %}" alt="">
             <div class="direct-chat-text">
-              Is this template really for free? That's unbelievable!
+              Тестовое сообщение!
             </div>
           </div>
           <div class="direct-chat-msg">
             <div class="direct-chat-infos clearfix">
-              <span class="direct-chat-name float-left">Alexander Pierce</span>
+              <span class="direct-chat-name float-left">{{ user.first_name }} {{ user.last_name }}</span>
               <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
             </div>
+            <img class="direct-chat-img" src="{% static 'adminlte/dist/img/logo.png' %}" alt="">
             <div class="direct-chat-text">
-              Working with AdminLTE on a great new app! Wanna join?
+              Тестовое сообщение!
             </div>
           </div>
         </div>
@@ -470,24 +503,35 @@
     </div>
    </div>
 </div>
+{% endif %}
 </section>
 {% endblock %}
 
 {% block ends %}
 <script>
 $('#termform').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            date = $form.find('input[name="date"]').val(),
-            sele1 = $form.find('select[name="org"]').val(),
-            sele2 = $form.find('select[name="curat"]').val(),
-            sele3 = $form.find('select[name="curatuser"]').val(),
-            text = $form.find('textarea[name="desck"]').val(),
-            url = $form.attr( 'action' ),
-            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text}, onAjaxSuccess);
-        $('#modal-addterm').modal('hide');
-    });
+    event.preventDefault();
+    var $form = $( this ),
+        date = $form.find('input[name="date"]').val(),
+        sele1 = $form.find('select[name="org"]').val(),
+        sele2 = $form.find('select[name="curat"]').val(),
+        sele3 = $form.find('select[name="curatuser"]').val(),
+        text = $form.find('textarea[name="desck"]').val(),
+        url = $form.attr( 'action' ),
+        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text}, onAjaxSuccess);
+    $('#modal-addterm').modal('hide');
+});
+
+$('#tyform').submit(function (event) {
+    event.preventDefault();
+    var $form = $( this ),
+        name = $form.find('select[name="name"]').val(),
+        url = $form.attr( 'action' ),
+        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, name: name, prob: {{ np.nomdobr }}}, onAjaxSuccess);
+    $('#modal-ty').modal('hide');
+});
 
 $('#naobn').click(function () {
         var url = '{% url 'addparsing' np.nomdobr %}',
