@@ -79,3 +79,4 @@
     2. Диспетчер - problem.user_dispatcher
     3. Модератор - problem.user_moderator
     4. Супермодератор - problem.user_supermoderator
+    5. Тер. управление - problem.user_ty

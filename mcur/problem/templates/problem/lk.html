@@ -18,6 +18,7 @@
 </div>
 <section class="content">
 {% csrf_token %}
+{% if not perms.problem.user_ty or user.is_superuser %}
   <div class="row">
     {% if perms.problem.user_moderator %}
     <div class="col-12 col-sm-6 col-md-3">
@@ -140,14 +141,28 @@
         </a>
       </div>
     </div>
+</div>
+{% else %}
+  <div class="small-box bg-info" id="box3">
+    <div class="inner">
+      <h3>{{ kolvo.kolall }}</h3>
+      <p>Всего не закрытых жалоб</p>
     </div>
-
+    <div class="icon">
+      <i class="fas fa-info"></i>
+    </div>
+    <a href="{% url 'allproblem' %}" class="small-box-footer">
+      Подробнее <i class="fas fa-arrow-circle-right"></i>
+    </a>
+  </div>
+{% endif %}
 
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">Личная информация:</h3>
         </div>
         <div class="card-body">
+        {% if not perms.problem.user_ty or user.is_superuser %}
           <div class="form-group row">
             <label for="inputEmail3" class="col-sm-2 col-form-label"><i class="fas fa-briefcase"></i> Организация: </label>
             <div class="col-sm-10">
@@ -160,6 +175,14 @@
               <input type="text" class="form-control" value="{{ user.userprofile.post}}" disabled>
             </div>
           </div>
+        {% else %}
+        <div class="form-group row">
+            <label for="inputEmail3" class="col-sm-2 col-form-label"><i class="fas fa-briefcase"></i> Территориальное управление: </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" value="{{ user.userprofile.ty}}" disabled>
+            </div>
+        </div>
+        {% endif %}
         </div>
       </div>
 </section>

@@ -283,9 +283,11 @@
           <p></p>
           <p><b>Текст назначения: </b> {{ i.desck }}</p>
           <!-- Social sharing buttons -->
-          {% if not i.on_close %}
-          <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-resolution-{{ i.pk }}"><i class="fas fa-share"></i> Добавить подрезолюцию</button>
-          <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-answer-{{ i.pk }}"><i class="far fa-thumbs-up"></i> Ответить</button>
+          {% if not i.on_close%}
+            {% if not perms.problem.user_ty or user.is_superuser %}
+                <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-resolution-{{ i.pk }}"><i class="fas fa-share"></i> Добавить подрезолюцию</button>
+                <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-answer-{{ i.pk }}"><i class="far fa-thumbs-up"></i> Ответить</button>
+            {% endif %}
           {% endif %}
           <span class="float-right text-muted">Резолюций: {{i.resolutions.all|length}}. Ответов: {{i.answers.all|length}}</span>
         </div>
@@ -459,7 +461,7 @@
 {% if perms.problem.user_supermodertor %}
 <div class="row">
    <div class="col-md-12">
-       <div class="card card-primary direct-chat direct-chat-primary">
+       <div class="card direct-chat direct-chat-primary">
       <div class="card-header">
         <h3 class="card-title">Коментарии по жалобе</h3>
         <div class="card-tools">

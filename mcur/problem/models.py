@@ -83,10 +83,24 @@ class Department(models.Model):
         return f'{self.org.name}, {self.name}'
 
 
+class Minis(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Название')
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'территориальное уравление'
+        verbose_name_plural = 'территориальные уравления'
+
+    def __str__(self):
+        return self.name
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     org = models.ForeignKey(Curator, on_delete=models.SET_NULL, verbose_name='Организация', null=True)
     dep = models.ForeignKey(Department, on_delete=models.SET_NULL, verbose_name='Отдел', default=None, null=True,
+                            blank=True)
+    ty = models.ForeignKey(Minis, on_delete=models.SET_NULL, verbose_name='Тер. управление', default=None, null=True,
                             blank=True)
     post = models.CharField(max_length=100, help_text='Должность', verbose_name='Должность', default=' ', null=True,
                             blank=True)
@@ -117,18 +131,6 @@ class Access(models.Model):
 
     def __str__(self):
         return self.user
-
-
-class Minis(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Название')
-
-    class Meta:
-        ordering = ['name']
-        verbose_name = 'территориальное уравление'
-        verbose_name_plural = 'территориальные уравления'
-
-    def __str__(self):
-        return self.name
 
 
 class Problem(models.Model):

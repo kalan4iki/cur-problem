@@ -314,13 +314,15 @@ class ProblemListView(SingleTableMixin, FilterView):
             return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
             userlk = User.objects.get(username=self.request.user.username)
-            if not userlk.has_perm('problem.user_moderator'):
+            if not userlk.has_perm('problem.user_moderator') and not userlk.has_perm('problem.user_ty'):
                 q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
                 terms = Termhistory.objects.filter(q1)
                 if userlk.userprofile.dep == None:
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
                 terms1 = Term.objects.filter((Q(resolutions__in=terms) | q1) & (Q(status='0') | Q(status='1')))
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
+            elif userlk.has_perm('problem.user_ty'):
+                prob = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(ciogv=userlk.userprofile.ty))
             else:
                 #term = Term.objects.filter(Q(status='0') & Q(status='1'))
                 prob = Problem.objects.filter(visible='1')
@@ -351,7 +353,7 @@ class ProblemNoListView(SingleTableMixin, FilterView):
                 return redirect('index')
             filterno = ProblemFilter(self.request.GET, queryset=prob)
             table = ProblemTable(filterno.qs)
-            RequestConfig(self.request, ).configure(table )
+            RequestConfig(self.request, ).configure(table)
             context['filter'] = filterno
             context['table'] = table
             context['name'] = 'Не распределенные жалобы'
@@ -583,7 +585,6 @@ def prob(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        print(request.GET)
         if Problem.objects.filter(nomdobr=pk).exists():
             c = False
             terms = []
@@ -595,16 +596,23 @@ def prob(request, pk):
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             userr = User.objects.get(username=request.user.username)
             tyform = TyForm()
-            if not c:
-                temp = prob.terms.filter(Q(org=userr.userprofile.org) | Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+            if userr.userprofile.ty == prob.ciogv and userr.userprofile.ty != None:
+                c = True
+                temp = prob.terms.all()
                 if len(temp) > 0:
                     for i in temp:
                         terms.append(i)
-                resol = Termhistory.objects.filter(Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
-                if len(resol) > 0:
-                    for i in resol:
-                        if not i.term in terms:
-                            terms.append(i.term)
+            else:
+                if not c:
+                    temp = prob.terms.filter(Q(org=userr.userprofile.org) | Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+                    if len(temp) > 0:
+                        for i in temp:
+                            terms.append(i)
+                    resol = Termhistory.objects.filter(Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+                    if len(resol) > 0:
+                        for i in resol:
+                            if not i.term in terms:
+                                terms.append(i.term)
             if c or len(terms) > 0:
                 termadd = TermForm()
                 answeradd = AnswerForm()
@@ -617,6 +625,9 @@ def prob(request, pk):
                 elif userr.has_perm('problem.user_executor'):
                     dep = Department.objects.filter(name=userr.userprofile.dep.name)
                     userorg = Person.objects.filter(userprofile__dep__in=dep)
+                elif userr.has_perm('problem.user_ty'):
+                    dep = None
+                    userorg = None
                 resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
                 return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
             else:
@@ -852,6 +863,15 @@ def lk(request):
                     termas2 = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
                     kolvo = len(termas2)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                else:
+                    return JsonResponse({'mes': 'error'})
+            elif request.user.has_perm('problem.user_ty'):
+                if request.POST['box'] == 'box3':  # Все жалобы
+                    termas3 = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(ciogv=userlk.userprofile.ty))
+                    kolvo = len(termas3)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                else:
+                    return JsonResponse({'mes': 'error'})
         return render(request, 'problem/lk.html')
 
 
