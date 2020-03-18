@@ -34,6 +34,40 @@
                   </div>
                   <!-- /.card-body -->
                 </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-warning collapsed-card">
+                  <div class="card-header">
+                    <h3 class="card-title">Жалобы</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart2"><i class="fas fa-plus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card card-warning collapsed-card">
+                  <div class="card-header">
+                    <h3 class="card-title">Статистика организаций</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart3"><i class="fas fa-plus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+            </div>
+            <div class="col-md-6">
                 <div class="card">
                   <div class="card-header">
                         <h3 class="card-title">Отчеты</h3>
@@ -55,21 +89,6 @@
 
                             </div>
                          </div>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card card-warning collapsed-card">
-                  <div class="card-header">
-                    <h3 class="card-title">Жалобы</h3>
-                    <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart2"><i class="fas fa-plus"></i>
-                      </button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                    </div>
-                  </div>
-                  <div class="card-body">
                   </div>
                   <!-- /.card-body -->
                 </div>
@@ -147,6 +166,10 @@ $('.addchart').click(function (eventObject) {
         but1.removeAttr('data-card-widget');
     }
 });
+
+var randomColorGenerator = function () {
+    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+};
 
 function appendchart1(obj, chart) {
     obj.append('<div class="chart">\n' +
@@ -230,10 +253,6 @@ function Collapsef1(data)
           responsive : true
         };
 
-        //-------------
-        //- BAR CHART -
-        //-------------
-
         var barChartCanvas2 = $('#barchart2').get(0).getContext('2d');
         var barChartData2 = jQuery.extend(true, {}, areaChartData2);
         var temp1 = areaChartData2.datasets[0];
@@ -244,6 +263,31 @@ function Collapsef1(data)
           data: barChartData2,
           options: areaChartOptions
         })
+    } else if (data['chart'] === 'chart3') {
+
+        var donutData        = {
+      labels: data['label'],
+      datasets: [
+            {
+              data: data['data'],
+              backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+            }
+          ]
+        }
+
+        var pieChartCanvas = $('#barchart3').get(0).getContext('2d')
+        var pieData        = donutData;
+        var pieOptions     = {
+          maintainAspectRatio : false,
+          responsive : true,
+        };
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        var pieChart = new Chart(pieChartCanvas, {
+          type: 'pie',
+          data: pieData,
+          options: pieOptions
+        });
     } else if (data['chart'] === 'error') {
         toastr["error"]('Ошибка выполнения')
     }

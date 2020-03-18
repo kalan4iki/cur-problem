@@ -1097,6 +1097,13 @@ def dashboard(request):
                         termas = Term.objects.filter(q1)
                         termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
                         kolvo.append(len(termas2))
+                elif request.POST['chart'] == 'chart3':
+                    temporg = Curator.objects.all().exclude(name='Территориальное управление')
+                    tempdate = []
+                    kolvo = []
+                    for i in temporg:
+                        tempdate.append(i.name)
+                        kolvo.append(len(Term.objects.filter(Q(org=i) & Q(problem__visible='1'))))
                 else:
                     return JsonResponse({'chart': 'error'})
                 otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart']}
