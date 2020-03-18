@@ -64,42 +64,42 @@
                      <div class="card-body">
                          <div class="row">
                              <div class="col-md-2">
-                                <form method="post" action="{% url 'api_action' %}" id="action1">
+                                <form class='formaction' method="post" action="{% url 'api_action' %}" id="action1">
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-eye-slash"></i> Скрыть жалобы
                                     </button>
                                 </form>
                             </div>
                              <div class="col-md-2">
-                                <form method="post" action="{% url 'api_action' %}" id="action2">
+                                <form class='formaction' method="post" action="{% url 'api_action' %}" id="action2">
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-sync"></i> Обновить жалобы
                                     </button>
                                 </form>
                             </div>
                              <div class="col-md-2">
-                                <form method="post" action="{% url 'api_action' %}" id="action3">
+                                <form class='formaction' method="post" action="{% url 'api_action' %}" id="action3">
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-sync"></i> Обновить парсер
                                     </button>
                                 </form>
                             </div>
                              <div class="col-md-2">
-                                 <form method="post" action="{% url 'api_action' %}" id="action4">
+                                 <form class='formaction' method="post" action="{% url 'api_action' %}" id="action4">
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-plus"></i> Новые жалобы
                                     </button>
                                 </form>
                             </div>
                              <div class="col-md-2">
-                                 <form method="post" action="{% url 'api_action' %}" id="action5">
+                                 <form class='formaction' method="post" action="{% url 'api_action' %}" id="action5">
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-sync"></i> Обновить сегодня
                                     </button>
                                 </form>
                             </div>
                              <div class="col-md-2">
-                                 <form method="post" action="{% url 'api_action' %}" id="action6">
+                                 <form class='formaction' method="post" action="{% url 'api_action' %}" id="action6">
                                     <button type="submit" class="btn btn-app" >
                                         <i class="fas fa-sync"></i> Просмотреть срок
                                     </button>
@@ -108,7 +108,11 @@
                          </div>
                          <div class="row">
                             <div class="col-md-2">
-
+                                <form class='formaction' method="post" action="{% url 'api_action' %}" id="action7">
+                                    <button type="submit" class="btn btn-app" >
+                                        <i class="fas fa-sync"></i> Скриншот парсера
+                                    </button>
+                                </form>
                             </div>
                              <div class="col-md-2">
 
@@ -196,59 +200,15 @@ var barChart = new Chart(barChartCanvas, {
   data: barChartData,
   options: barChartOptions
 });
-$('#action1').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            url = $form.attr( 'action' ),
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '1'}, onAjaxSuccess);
-    });
-
-$('#action2').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            url = $form.attr( 'action' ),
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '2'}, onAjaxSuccess);
-    });
-
-$('#action3').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            url = $form.attr( 'action' ),
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '3'}, onAjaxSuccess);
-    });
-
-$('#action4').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            url = $form.attr( 'action' ),
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '4'}, onAjaxSuccess);
-    });
-
-$('#action5').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            url = $form.attr( 'action' ),
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '5'}, onAjaxSuccess);
-    });
-
-$('#action6').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            url = $form.attr( 'action' ),
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: '6'}, onAjaxSuccess);
-    });
+$('.formaction').submit(function (event) {
+    event.preventDefault();
+    var $form = $( this ),
+        url = $form.attr( 'action' ),
+        CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+        act = $form.attr('id');
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, action: act}, onAjaxSuccess);
+});
 
 $('#refresh').click(function () {
     var url = "{% url 'statandact' %}",
@@ -286,12 +246,11 @@ toastr.options = {
 
 function onAjaxSuccess(data)
 {
-    if (data['nom'] == 0) {
+    if (data['nom'] === 0) {
         toastr["success"](data['message'], data['title'])
     } else {
         toastr["error"](data['message'], data['title'])
     }
 }
-
 </script>
 {% endblock %}

@@ -89,7 +89,7 @@ def api_action(request):
         if request.method == 'POST':
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-            if request.POST['action'] == '1':
+            if request.POST['action'] == 'action1':
                 title = 'Скрытие жалоб'
                 status = ['Закрыто', 'Получен ответ', 'Решено']
                 status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
@@ -103,7 +103,7 @@ def api_action(request):
                 mes = f'''Успешно выполнено!
     Количество исправленных жалоб: {allprob}'''
                 nom = 0
-            elif request.POST['action'] == '2':
+            elif request.POST['action'] == 'action2':
                 a = ActionHistory()
                 a.act = Action.objects.get(nact='2')
                 a.arg = 'all'
@@ -112,7 +112,7 @@ def api_action(request):
                 mes = f'''Успешно выполнено!
                 Задание запущено.'''
                 nom = 0
-            elif request.POST['action'] == '3':
+            elif request.POST['action'] == 'action3':
                 a = ActionHistory()
                 a.act = Action.objects.get(nact='8')
                 a.save()
@@ -120,7 +120,7 @@ def api_action(request):
                 mes = f'''Успешно выполнено!
                 Задание запущено.'''
                 nom = 0
-            elif request.POST['action'] == '4':
+            elif request.POST['action'] == 'action4':
                 data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
                 tempdate = nowdate.strftime('%d.%m.%Y')
                 a = ActionHistory()
@@ -131,7 +131,7 @@ def api_action(request):
                 mes = f'''Успешно выполнено!
                 Задание запущено.'''
                 nom = 0
-            elif request.POST['action'] == '5':
+            elif request.POST['action'] == 'action5':
                 a = ActionHistory()
                 a.act = Action.objects.get(nact='7')
                 a.save()
@@ -139,11 +139,19 @@ def api_action(request):
                 mes = f'''Успешно выполнено!
                 Задание запущено.'''
                 nom = 0
-            elif request.POST['action'] == '6':
+            elif request.POST['action'] == 'action6':
                 data = (nowdate - timedelta(3)).strftime('%d.%m.%Y')
                 a = ActionHistory()
                 a.act = Action.objects.get(nact='6')
                 a.arg = data
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
+            elif request.POST['action'] == 'action7':
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='9')
                 a.save()
                 title = 'Добавление задачи'
                 mes = f'''Успешно выполнено!

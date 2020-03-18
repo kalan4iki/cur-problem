@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'fqovv=(m$_j)qy)exjeo1#z(1u0r-s1@*(=^)%xgh^od%cf_)3'
 
-SKIOG_VERSION = '0.2.3'
+SKIOG_VERSION = '0.3.0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if 'linux' in platform.lower():
