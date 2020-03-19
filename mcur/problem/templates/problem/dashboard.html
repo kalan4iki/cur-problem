@@ -68,6 +68,23 @@
                 </div>
             </div>
             <div class="col-md-6">
+                 <div class="card card-warning collapsed-card">
+                  <div class="card-header">
+                    <h3 class="card-title">Статистика ТУ</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart4"><i class="fas fa-plus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
                 <div class="card">
                   <div class="card-header">
                         <h3 class="card-title">Отчеты</h3>
@@ -92,6 +109,9 @@
                   </div>
                   <!-- /.card-body -->
                 </div>
+            </div>
+            <div class="col-md-6">
+
             </div>
         </div>
     </div>
@@ -273,7 +293,7 @@ function Collapsef1(data)
               backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
             }
           ]
-        }
+        };
 
         var pieChartCanvas = $('#barchart3').get(0).getContext('2d')
         var pieData        = donutData;
@@ -288,6 +308,48 @@ function Collapsef1(data)
           data: pieData,
           options: pieOptions
         });
+    } else if (data['chart'] === 'chart4') {
+        var areaChartData = {
+          labels  : data['label'],
+          datasets: [
+            {
+              label               : 'Статистика жалоб в ТУ',
+              backgroundColor     : 'rgba(60,141,188,0.9)',
+              borderColor         : 'rgba(60,141,188,0.8)',
+              pointRadius          : false,
+              pointColor          : '#3b8bba',
+              pointStrokeColor    : 'rgba(60,141,188,1)',
+              pointHighlightFill  : '#fff',
+              pointHighlightStroke: 'rgba(60,141,188,1)',
+              data                : data['data']
+            }
+          ]
+        };
+
+        var areaChartOptions = {
+          maintainAspectRatio : false,
+          responsive : true
+        };
+
+        var barChartCanvas = $('#barchart4').get(0).getContext('2d');
+        var barChartData = jQuery.extend(true, {}, areaChartData);
+        var temp0 = areaChartData.datasets[0];
+        barChartData.datasets[0] = temp0;
+
+        var barChartOptions = {
+          responsive              : true,
+          maintainAspectRatio     : false,
+          datasetFill             : false
+        };
+        var barChart = new Chart(barChartCanvas, {
+          type: 'bar',
+          data: barChartData,
+          options: areaChartOptions
+        });
+        var text = '<div class="row"> <p>Количество жалоб: <span class="badge badge-primary">' + data['notes'][0] + '</span></p></div>' +
+            '<div class="row"><p>Не распределено ТУ: <span class="badge badge-danger">' + data['notes'][1] + '</span></p></div>' +
+            '<div class="row"><p>Количество распределенных: <span class="badge badge-success">' + data['notes'][2] + '</span></p></div>';
+        $('#barchart4').closest('.card-body').append(text);
     } else if (data['chart'] === 'error') {
         toastr["error"]('Ошибка выполнения')
     }

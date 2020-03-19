@@ -559,7 +559,7 @@ $('#del-{{ i.pk }}').click(function () {
 function onAjaxSuccess(data)
 {
 
-    if (data['nom'] == 0) {
+    if (data['nom'] === 0) {
         Swal.fire({
             title: data['title'],
             text: data['message'],

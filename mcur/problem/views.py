@@ -1075,6 +1075,7 @@ def dashboard(request):
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             dates = {}
+            notes = []
             if request.method == 'POST':
                 if request.POST['chart'] == 'chart1':
                     tempdate = []
@@ -1104,9 +1105,21 @@ def dashboard(request):
                     for i in temporg:
                         tempdate.append(i.name)
                         kolvo.append(len(Term.objects.filter(Q(org=i) & Q(problem__visible='1'))))
+                elif request.POST['chart'] == 'chart4':
+                    tempty = Minis.objects.all()
+                    tempdate = []
+                    kolvo = []
+                    for i in tempty:
+                        tempdate.append(i.name)
+                        te = len(Problem.objects.filter(Q(ciogv=i) & Q(visible='1')))
+                        kolvo.append(te)
+                    prob = Problem.objects.filter(Q(visible='1'))
+                    notes.append(len(prob))
+                    notes.append(len(Problem.objects.filter(Q(ciogv=None) & Q(visible='1'))))
+                    notes.append(len(prob.exclude(ciogv=None)))
                 else:
                     return JsonResponse({'chart': 'error'})
-                otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart']}
+                otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart'], 'notes': notes}
                 return JsonResponse(otv)
             return render(request, 'problem/dashboard.html')
         else:
