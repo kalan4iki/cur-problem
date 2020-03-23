@@ -154,7 +154,8 @@ class Problem(models.Model):
                               verbose_name='Тематика', blank=True, null=True, related_name='problems')
     podcat = models.ForeignKey(Podcategory, on_delete=models.PROTECT, help_text='Подкатегория проблемы',
                                verbose_name='Подкатегория', blank=True, null=True, related_name='problems')
-    ciogv = models.ForeignKey(Minis, on_delete=models.PROTECT, blank=True, verbose_name='Тер. управление', null=True)
+    ciogv = models.ForeignKey(Minis, on_delete=models.PROTECT, blank=True, verbose_name='Тер. управление', default=None,
+                              null=True, related_name='problems')
     text = models.TextField(help_text='Текст проблемы', verbose_name='Текст', blank=True, null=True)
     adres = models.CharField(max_length=255, help_text='Адрес проблемы',
                              verbose_name='Адрес', blank=True, null=True)

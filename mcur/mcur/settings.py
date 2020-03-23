@@ -207,7 +207,7 @@ EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'noreply@skiog.ru'
-EMAIL_HOST_PASSWORD = '211563'
+EMAIL_HOST_PASSWORD = 'W3y71PVTGM6JR409UCie4TBNvJtUcvwZ'
 DEFAULT_FROM_EMAIL = 'noreply@skiog.ru'
 DEFAULT_TO_EMAIL = 'noreply@skiog.ru'
 

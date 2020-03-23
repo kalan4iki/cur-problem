@@ -328,7 +328,7 @@ class ProblemListView(SingleTableMixin, FilterView):
                     q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
                 terms1 = Term.objects.filter((Q(resolutions__in=terms) | q1) & (Q(status='0') | Q(status='1')))
                 prob = Problem.objects.filter(terms__in=terms1, visible='1', statussys='1')
-            elif userlk.has_perm('problem.user_ty'):
+            elif userlk.has_perm('problem.user_ty') and not userlk.is_superuser:
                 prob = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(ciogv=userlk.userprofile.ty))
             else:
                 #term = Term.objects.filter(Q(status='0') & Q(status='1'))
@@ -524,6 +524,30 @@ class ProblemMeListView(SingleTableMixin, FilterView):
                 context['title'] = 'Мои жалобы'
         return context
 
+
+class ProblemTyListView(SingleTableMixin, FilterView):
+    table_class = ProblemTable
+    model = Problem
+    template_name = "problem/allproblem.html"
+    filterset_class = ProblemFilter
+
+    def get_context_data(self, **kwargs):
+        context = super(ProblemTyListView, self).get_context_data(**kwargs)
+        if not self.request.user.is_authenticated:
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
+        else:
+            userlk = User.objects.get(username=self.request.user.username)
+            if userlk.has_perm('problem.user_moderator'):
+                prob = Problem.objects.filter(Q(ciogv=None) & Q(visible='1'))
+                filterme = ProblemFilter(self.request.GET, queryset=prob)
+                table = ProblemTable(filterme.qs)
+                RequestConfig(self.request, ).configure(table )
+                context['filter'] = filterme
+                context['table'] = table
+                context['name'] = 'Обращения без ТУ'
+                context['dop'] = f'Всего: {len(filterme.qs)}.'
+                context['title'] = 'Обращения без ТУ'
+        return context
 
 
 class error_page:
@@ -812,6 +836,10 @@ def lk(request):
                     termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
                     kolvo = len(termas2)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box8':# ТУ лист
+                    termas2 = Problem.objects.filter(Q(ciogv=None) & Q(visible='1'))
+                    kolvo = len(termas2)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
                 else:
                     return JsonResponse({'mes': 'error'})
             elif request.user.has_perm('problem.user_executor'):
@@ -1009,7 +1037,6 @@ def createuser(request):
         title = 'Создание пользователя'
         if request.user.has_perm('problem.user_supermoderator'):
             if request.method == 'POST':
-                print(request.POST)
                 password = ''
                 for i in range(8):
                     password += random.choice(chars)

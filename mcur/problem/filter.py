@@ -1,5 +1,5 @@
 import django_filters
-from .models import Problem, Category, Status
+from .models import Problem, Category, Status, Minis
 from .tables import ProblemTable
 from django_filters import ModelMultipleChoiceFilter
 from django_filters.views import FilterView
@@ -12,17 +12,17 @@ def Categories(request):
 class ProblemFilter(django_filters.FilterSet):
     temat = ModelMultipleChoiceFilter(queryset=Category.objects.all())
     status = ModelMultipleChoiceFilter(queryset=Status.objects.all())
+    ciogv = ModelMultipleChoiceFilter(queryset=Minis.objects.all())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #print(kwargs)
-        #data = kwargs.get('data', None)
         self.filters['temat'].queryset = Category.objects.filter(problems__in=kwargs['queryset']).distinct()
         self.filters['status'].queryset = Status.objects.filter(problems__in=kwargs['queryset']).distinct()
+        self.filters['ciogv'].queryset = Minis.objects.filter(problems__in=kwargs['queryset']).distinct()
 
     class Meta:
         model = Problem
-        fields = ['temat', 'status', 'statussys']
+        fields = ['temat', 'status', 'ciogv', 'statussys']
 
 
 

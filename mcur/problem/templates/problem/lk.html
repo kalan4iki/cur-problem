@@ -39,7 +39,7 @@
         <div class="small-box bg-info" id="box2">
             <div class="inner">
               <h3>{{ kolvo.kolno }}</h3>
-              <p>Не распределенные жалобы</p>
+              <p>Не распределенные обращения</p>
             </div>
             <div class="icon">
               <i class="fas fa-info"></i>
@@ -49,14 +49,28 @@
             </a>
         </div>
     </div>
-     <div class="col-12 col-sm-6 col-md-6">
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-info" id="box8">
+            <div class="inner">
+              <h3></h3>
+              <p>Обращения без ТУ</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-info"></i>
+            </div>
+            <a href="{% url 'typroblem' %}" class="small-box-footer">
+              Подробнее <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+     <div class="col-12 col-sm-6 col-md-3">
      {% else %}
      <div class="col-12 col-sm-6 col-md-12">
      {% endif %}
       <div class="small-box bg-info" id="box3">
         <div class="inner">
           <h3>{{ kolvo.kolall }}</h3>
-          <p>Всего не закрытых жалоб</p>
+          <p>Всего не закрытых обращения</p>
         </div>
         <div class="icon">
           <i class="fas fa-info"></i>
@@ -73,7 +87,7 @@
     <div class="small-box bg-success" id="box4">
         <div class="inner">
           <h3>{{ kolvo.me }}</h3>
-          <p>Моих жалоб</p>
+          <p>Моих обращения</p>
         </div>
         <div class="icon">
           <i class="fas fa-user-plus"></i>
@@ -103,7 +117,7 @@
         <div class="small-box bg-primary" id="box5">
         <div class="inner">
           <h3>{{ kolvo.podx }}</h3>
-          <p>Подходит срок жалоб</p>
+          <p>Подходит срок обращения</p>
         </div>
         <div class="icon">
           <i class="fas fa-exclamation-triangle"></i>
@@ -117,7 +131,7 @@
       <div class="small-box bg-warning" id="box6">
         <div class="inner">
           <h3>{{ kolvo.today }}</h3>
-          <p>Жалоб на сегодня</p>
+          <p>Обращения на сегодня</p>
         </div>
         <div class="icon">
           <i class="fas fa-exclamation-triangle"></i>
@@ -131,7 +145,7 @@
       <div class="small-box bg-danger" id="box7">
         <div class="inner">
           <h3>{{ kolvo.prosr }}</h3>
-          <p>Просроченных жалоб</p>
+          <p>Просроченных обращений</p>
         </div>
         <div class="icon">
           <i class="fas fa-ban"></i>
@@ -146,7 +160,7 @@
   <div class="small-box bg-info" id="box3">
     <div class="inner">
       <h3>{{ kolvo.kolall }}</h3>
-      <p>Всего не закрытых жалоб</p>
+      <p>Всего не закрытых обращений</p>
     </div>
     <div class="icon">
       <i class="fas fa-info"></i>
