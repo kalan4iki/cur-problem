@@ -44,7 +44,10 @@ import xlwt
 import mcur.settings as settings
 import random
 import os
+import logging
 
+
+logger = logging.getLogger(__name__)
 chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
 
@@ -506,11 +509,11 @@ class ProblemMeListView(SingleTableMixin, FilterView):
             userlk = User.objects.get(username=self.request.user.username)
             if userlk.has_perm('problem.user_moderator'):
                 nowdatetime = datetime.now()
-                nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+                # nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
                 q1 = Q(curatuser=userlk)
                 termas = Termhistory.objects.filter(q1)
-                termas1 = Term.objects.filter(q1 | Q(resolutions__in = termas))
-                prob = Problem.objects.filter(Q(terms__in=termas1))
+                termas1 = Term.objects.filter(q1 | Q(resolutions__in=termas))
+                prob = Problem.objects.filter(Q(terms__in=termas1) & Q(visible='1'))
                 filterme = ProblemFilter(self.request.GET, queryset=prob)
                 table = ProblemTable(filterme.qs)
                 RequestConfig(self.request, ).configure(table )
@@ -778,7 +781,7 @@ def lk(request):
                 elif request.POST['box'] == 'box4':# Мои жалобы
                     q1 = Q(curatuser=userlk)
                     termas = Term.objects.filter(q1)
-                    termas2 = Problem.objects.filter(Q(terms__in=termas))
+                    termas2 = Problem.objects.filter(Q(terms__in=termas) & Q(visible='1'))
                     kolvo = len(termas2)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
                 elif request.POST['box'] == 'box5':# Подходит срок
@@ -1180,6 +1183,7 @@ def statandact(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if request.user.has_perm('problem.user_supermoderator'):
+            logger.error('Test')
             content = {}
             content['status'] = ['Закрыто', 'Получен ответ', 'Решено', 'На рассмотрении', 'На уточнении', 'Премодерация']
             content['kolvo'] = []

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
+from celery.app.amqp import Queue, Exchange
 from sys import platform
 import os
 
@@ -182,6 +183,14 @@ CORS_URLS_REGEX = r'^/api/.*$'
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     "handlers": {"mail_admins": {"level": "ERROR", "class": "django.utils.log.AdminEmailHandler"}},
     "loggers": {
         "django.request": {"handlers": ["mail_admins"], "level": "ERROR", "propagate": True}
@@ -204,3 +213,17 @@ DEFAULT_TO_EMAIL = 'noreply@skiog.ru'
 
 #Celery
 CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_QUEUES = (
+    Queue('high', Exchange('high'), routing_key='high'),
+    Queue('normal', Exchange('normal'), routing_key='normal'),
+    Queue('low', Exchange('low'), routing_key='low'),
+)
+CELERY_DEFAULT_QUEUE = 'normal'
+CELERY_DEFAULT_EXCHANGE = 'normal'
+CELERY_DEFAULT_ROUTING_KEY = 'normal'
+CELERY_ROUTES = {
+    # -- HIGH PRIORITY QUEUE -- #
+    'myapp.tasks.check_payment_status': {'queue': 'high'},
+    # -- LOW PRIORITY QUEUE -- #
+    'myapp.tasks.close_session': {'queue': 'low'},
+}
