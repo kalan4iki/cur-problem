@@ -15,6 +15,11 @@ from datetime import date, datetime
 import time
 import traceback
 import codecs
+import logging
+
+
+logger = logging.getLogger('django.server')
+logger_mail = logging.getLogger('django.request')
 
 def StartBrowser():
     opts = Options()
@@ -178,97 +183,63 @@ class Command(BaseCommand):
             b = ActionHistory.objects.filter(status='0')
             if len(b) > 0:
                 for i in b:
-                    if i.act.nact == '1':#Просмотреть все жалобы
-                        if i.arg != None:
-                            parsingall(browser, i.arg, '0')
-                            j = 1
-                            while True:
-                                i.note = f'Страница {j}'
-                                i.save()
-                                source = browser.page_source
-                                parsTable(source)
-                                ele = browser.find_element_by_class_name('jtable-page-number-next')
-                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
-                                    break
-                                else:
-                                    ele.click()
-                                j += 1
-                                time.sleep(2)
-                    elif i.act.nact == '2':#Посмотреть не закрытые жалобы
-                        if i.arg == 'all':
-                            prob = Problem.objects.filter(Q(visible='1') | Q(visible='2'))
-                            als = len(prob)
-                            ke = 1
-                            for j in prob:
-                                i.note = f'Проблем {ke} их {als}'
-                                pars(browser, j.nomdobr)
-                                source = browser.page_source
-                                temp = parsTable(source)
-                                i.save()
-                                ke += 1
-                                if temp == 'non':
-                                    j.visible = '0'
-                                    j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
-                                    j.save()
-                                else:
-                                    j.note = ''
-                                    j.save()
-                        else:
-                            pars(browser, i.arg)
-                            source = browser.page_source
-                            er = parsTable(source)
-                            if er == 'non':
-                                tempsss = Problem.objects.get(nomdobr=i.arg)
-                                tempsss.visible = '0'
-                                tempsss.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru. Индивидуальное обновление.'
-                                i.note = 'Жалоба скрыта.'
-                                i.save()
-                                tempsss.save()
+                    try:
+                        if i.act.nact == '1':#Просмотреть все жалобы
+                            if i.arg != None:
+                                parsingall(browser, i.arg, '0')
+                                j = 1
+                                while True:
+                                    i.note = f'Страница {j}'
+                                    i.save()
+                                    source = browser.page_source
+                                    parsTable(source)
+                                    ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                    if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                        break
+                                    else:
+                                        ele.click()
+                                    j += 1
+                                    time.sleep(2)
+                        elif i.act.nact == '2':#Посмотреть не закрытые жалобы
+                            if i.arg == 'all':
+                                prob = Problem.objects.filter(Q(visible='1') | Q(visible='2'))
+                                als = len(prob)
+                                ke = 1
+                                for j in prob:
+                                    i.note = f'Проблем {ke} их {als}'
+                                    pars(browser, j.nomdobr)
+                                    source = browser.page_source
+                                    temp = parsTable(source)
+                                    i.save()
+                                    ke += 1
+                                    if temp == 'non':
+                                        j.visible = '0'
+                                        j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
+                                        j.save()
+                                    else:
+                                        j.note = ''
+                                        j.save()
                             else:
-                                i.note = 'Жалоба обновлена.'
-                                i.save()
-                    elif i.act.nact == '3':#Выключить парсер
-                        i.status = '1'
-                        i.save()
-                        break
-                    elif i.act.nact == '4':#Посмотреть до определенного момента
-                        if i.arg != None:
-                            parsingall(browser, i.arg, '1')
-                            j = 1
-                            while True:
-                                ele = browser.find_element_by_class_name('jtable-page-number-next')
-                                i.note = f'Страница {j}'
-                                i.save()
+                                pars(browser, i.arg)
                                 source = browser.page_source
-                                parsTable(source)
-                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
-                                    break
+                                er = parsTable(source)
+                                if er == 'non':
+                                    tempsss = Problem.objects.get(nomdobr=i.arg)
+                                    tempsss.visible = '0'
+                                    tempsss.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru. Индивидуальное обновление.'
+                                    i.note = 'Жалоба скрыта.'
+                                    i.save()
+                                    tempsss.save()
                                 else:
-                                    ele.click()
-                                j += 1
-                                time.sleep(2)
-                    elif i.act.nact == '5':#Посмотреть временной промежуток
-                        if i.arg != None:
-                            tempdate = i.arg.split(',')
-                            parsingall(browser, tempdate, '2')
-                            j = 1
-                            while True:
-                                ele = browser.find_element_by_class_name('jtable-page-number-next')
-                                i.note = f'Страница {j}'
-                                i.save()
-                                source = browser.page_source
-                                parsTable(source)
-                                if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
-                                    break
-                                else:
-                                    ele.click()
-                                j += 1
-                                time.sleep(2)
-                    elif i.act.nact == '6':#Посмотреть срок решения от
-                        if i.arg != None:
-                            datetemp = i.arg.split(',')
-                            if len(datetemp) == 1:
-                                parsingall(browser, i.arg, '3')
+                                    i.note = 'Жалоба обновлена.'
+                                    i.save()
+                        elif i.act.nact == '3':#Выключить парсер
+                            i.status = '1'
+                            i.save()
+                            break
+                        elif i.act.nact == '4':#Посмотреть до определенного момента
+                            if i.arg != None:
+                                parsingall(browser, i.arg, '1')
                                 j = 1
                                 while True:
                                     ele = browser.find_element_by_class_name('jtable-page-number-next')
@@ -282,8 +253,10 @@ class Command(BaseCommand):
                                         ele.click()
                                     j += 1
                                     time.sleep(2)
-                            elif len(datetemp) == 2:
-                                parsingall(browser, datetemp, '4')
+                        elif i.act.nact == '5':#Посмотреть временной промежуток
+                            if i.arg != None:
+                                tempdate = i.arg.split(',')
+                                parsingall(browser, tempdate, '2')
                                 j = 1
                                 while True:
                                     ele = browser.find_element_by_class_name('jtable-page-number-next')
@@ -291,50 +264,88 @@ class Command(BaseCommand):
                                     i.save()
                                     source = browser.page_source
                                     parsTable(source)
-                                    if ele.get_attribute(
-                                            'class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                    if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
                                         break
                                     else:
                                         ele.click()
                                     j += 1
                                     time.sleep(2)
-                    elif i.act.nact == '7':#Обновить сегодняшние жалобы
-                        nowdatetime = datetime.now()
-                        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-                        prob = Problem.objects.filter(visible='1', dateotv=nowdate)
-                        als = len(prob)
-                        ke = 1
-                        for j in prob:
-                            i.note = f'Проблем {ke} их {als}'
-                            pars(browser, j.nomdobr)
-                            source = browser.page_source
-                            temp = parsTable(source)
+                        elif i.act.nact == '6':#Посмотреть срок решения от
+                            if i.arg != None:
+                                datetemp = i.arg.split(',')
+                                if len(datetemp) == 1:
+                                    parsingall(browser, i.arg, '3')
+                                    j = 1
+                                    while True:
+                                        ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                        i.note = f'Страница {j}'
+                                        i.save()
+                                        source = browser.page_source
+                                        parsTable(source)
+                                        if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                            break
+                                        else:
+                                            ele.click()
+                                        j += 1
+                                        time.sleep(2)
+                                elif len(datetemp) == 2:
+                                    parsingall(browser, datetemp, '4')
+                                    j = 1
+                                    while True:
+                                        ele = browser.find_element_by_class_name('jtable-page-number-next')
+                                        i.note = f'Страница {j}'
+                                        i.save()
+                                        source = browser.page_source
+                                        parsTable(source)
+                                        if ele.get_attribute(
+                                                'class') == 'jtable-page-number-next jtable-page-number-disabled':
+                                            break
+                                        else:
+                                            ele.click()
+                                        j += 1
+                                        time.sleep(2)
+                        elif i.act.nact == '7':#Обновить сегодняшние жалобы
+                            nowdatetime = datetime.now()
+                            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+                            prob = Problem.objects.filter(visible='1', dateotv=nowdate)
+                            als = len(prob)
+                            ke = 1
+                            for j in prob:
+                                i.note = f'Проблем {ke} их {als}'
+                                pars(browser, j.nomdobr)
+                                source = browser.page_source
+                                temp = parsTable(source)
+                                i.save()
+                                ke += 1
+                                if temp == 'non':
+                                    j.visible = '0'
+                                    j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
+                                    j.save()
+                        elif i.act.nact == '8':#Обновление браузера
+                            session = browser.session_id
+                            parsers = Parser.objects.get(session=session)
+                            parsers.delete()
+                            browser.close()
+                            browser.quit()
+                            browser = StartBrowser()  # Инициализация браузера
+                            url = 'http://vmeste.mosreg.ru'
+                            username = 'tsa@istra-adm.ru'
+                            password = '12345678'
+                            loginDobrodel(browser, url, {'username': username, 'password': password})
+                        elif i.act.nact == '9':#Получить скриншот
+                            nowdatetime = datetime.now()
+                            name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.png'
+                            url = MEDIA_ROOT+'photos/' + name
+                            a = browser.save_screenshot(url)
+                            i.note = 'https://skiog.ru' + MEDIA_URL+'photos/' + name
                             i.save()
-                            ke += 1
-                            if temp == 'non':
-                                j.visible = '0'
-                                j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
-                                j.save()
-                    elif i.act.nact == '8':#Обновление браузера
-                        session = browser.session_id
-                        parsers = Parser.objects.get(session=session)
-                        parsers.delete()
-                        browser.close()
-                        browser.quit()
-                        browser = StartBrowser()  # Инициализация браузера
-                        url = 'http://vmeste.mosreg.ru'
-                        username = 'tsa@istra-adm.ru'
-                        password = '12345678'
-                        loginDobrodel(browser, url, {'username': username, 'password': password})
-                    elif i.act.nact == '9':#Получить скриншот
-                        nowdatetime = datetime.now()
-                        name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.png'
-                        url = MEDIA_ROOT+'photos/' + name
-                        a = browser.save_screenshot(url)
-                        i.note = 'https://skiog.ru' + MEDIA_URL+'photos/' + name
+                        i.status = '1'
                         i.save()
-                    i.status = '1'
-                    i.save()
+                    except:
+                        i.status = '2'
+                        i.save()
+                        logger.info('[PARSER]: ' + traceback.format_exc())
+                        logger_mail.error('[PARSER]: ' + traceback.format_exc())
         time.sleep(2)
         browser.close()
         browser.quit()

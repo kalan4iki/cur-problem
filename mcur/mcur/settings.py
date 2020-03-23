@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 from celery.app.amqp import Queue, Exchange
+from django.utils.log import DEFAULT_LOGGING
 from sys import platform
 import os
 
@@ -181,21 +182,90 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[{server_time}] {message}',
+            'style': '{',
+        }
     },
-    "handlers": {"mail_admins": {"level": "ERROR", "class": "django.utils.log.AdminEmailHandler"}},
-    "loggers": {
-        "django.request": {"handlers": ["mail_admins"], "level": "ERROR", "propagate": True}
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        },
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
     },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'mail_admins'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        "django.request": {
+             "handlers": ["mail_admins"],
+             "level": "ERROR",
+             "propagate": True
+        }
+    }
 }
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+#         },
+#         'simple': {
+#             'format': '%(levelname)s %(message)s'
+#         },
+#     },
+#     "handlers": {
+#         'null': {
+#             'level': 'DEBUG',
+#             'class': 'logging.NullHandler',
+#         },
+#         "mail_admins": {
+#             "level": "ERROR",
+#             "class": "django.utils.log.AdminEmailHandler"}
+#     },
+#     "loggers": {
+#         'django': {
+#             'handlers': ['null'],
+#             'propagate': True,
+#             'level': 'INFO',
+#         },
+#         "django.request": {
+#             "handlers": ["mail_admins"],
+#             "level": "ERROR",
+#             "propagate": True}
+#     },
+# }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -203,6 +273,7 @@ LOGIN_REDIRECT_URL =  '/index/'
 
 LOGIN_URL = '/login/'
 
+# Email
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
@@ -211,7 +282,7 @@ EMAIL_HOST_PASSWORD = 'W3y71PVTGM6JR409UCie4TBNvJtUcvwZ'
 DEFAULT_FROM_EMAIL = 'noreply@skiog.ru'
 DEFAULT_TO_EMAIL = 'noreply@skiog.ru'
 
-#Celery
+# Celery
 CELERY_BROKER_URL = 'amqp://localhost'
 CELERY_QUEUES = (
     Queue('high', Exchange('high'), routing_key='high'),

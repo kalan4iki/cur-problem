@@ -47,7 +47,8 @@ import os
 import logging
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('django.server')
+logger_mail = logging.getLogger('django.request')
 chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
 
@@ -841,6 +842,7 @@ def lk(request):
                     kolvo = len(termas2)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
                 else:
+                    # logging.error('')
                     return JsonResponse({'mes': 'error'})
             elif request.user.has_perm('problem.user_executor'):
                 if request.POST['box'] == 'box1':  # Ответы
@@ -1210,7 +1212,8 @@ def statandact(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if request.user.has_perm('problem.user_supermoderator'):
-            logger.error('Test')
+            # logger.info('Test 1 opp')
+            # logger_mail.error('Test 2 opp')
             content = {}
             content['status'] = ['Закрыто', 'Получен ответ', 'Решено', 'На рассмотрении', 'На уточнении', 'Премодерация']
             content['kolvo'] = []
