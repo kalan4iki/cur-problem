@@ -19,7 +19,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
-                <div class="card card-success collapsed-card">
+                <div class="card collapsed-card">
                   <div class="card-header">
                     <h3 class="card-title">Назначения</h3>
 
@@ -36,9 +36,9 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card card-warning collapsed-card">
+                <div class="card collapsed-card">
                   <div class="card-header">
-                    <h3 class="card-title">Жалобы</h3>
+                    <h3 class="card-title">Обращения</h3>
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart2"><i class="fas fa-plus"></i>
                       </button>
@@ -53,7 +53,7 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="card card-warning collapsed-card">
+                <div class="card collapsed-card">
                   <div class="card-header">
                     <h3 class="card-title">Статистика организаций</h3>
                     <div class="card-tools">
@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                 <div class="card card-warning collapsed-card">
+                 <div class="card collapsed-card">
                   <div class="card-header">
                     <h3 class="card-title">Статистика ТУ</h3>
                     <div class="card-tools">
@@ -100,7 +100,7 @@
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
                             </div>
                              <div class="col-md-2">
-                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые жалобы</button>
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые обращения</button>
                             </div>
                              <div class="col-md-2">
 
@@ -122,7 +122,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Отчет жалоб за определенный период</h4>
+        <h4 class="modal-title">Отчет обращений за определенный период</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -133,7 +133,7 @@
             <div class="row">
               <div class="col">
                 <div id="div_id_date" class="form-group">
-                  <label for="id_date" class="">Дата создания жалобы от<span class="asteriskField">*</span></label>
+                  <label for="id_date" class="">Дата создания обращения от<span class="asteriskField">*</span></label>
                   <div class="">
                     <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_from" required>
                     <small id="hint_id_date"></small>
@@ -142,7 +142,7 @@
               </div>
                 <div class="col">
                 <div id="div_id_date" class="form-group">
-                  <label for="id_date" class="">Дата создания жалобы до<span class="asteriskField">*</span></label>
+                  <label for="id_date" class="">Дата создания обращения до<span class="asteriskField">*</span></label>
                   <div class="">
                     <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_before" required>
                     <small id="hint_id_date"></small>
@@ -255,7 +255,7 @@ function Collapsef1(data)
             labels  : data['label'],
             datasets: [
                 {
-                  label               : 'Количество жалоб подходящий срок ответа',
+                  label               : 'Количество обращений подходящий срок ответа',
                   backgroundColor     : 'rgba(60,141,188,0.9)',
                   borderColor         : 'rgba(60,141,188,0.8)',
                   pointRadius          : false,
@@ -313,7 +313,7 @@ function Collapsef1(data)
           labels  : data['label'],
           datasets: [
             {
-              label               : 'Статистика жалоб в ТУ',
+              label               : 'Статистика обращение в ТУ',
               backgroundColor     : 'rgba(60,141,188,0.9)',
               borderColor         : 'rgba(60,141,188,0.8)',
               pointRadius          : false,
@@ -346,7 +346,7 @@ function Collapsef1(data)
           data: barChartData,
           options: areaChartOptions
         });
-        var text = '<div class="row"> <p>Количество жалоб: <span class="badge badge-primary">' + data['notes'][0] + '</span></p></div>' +
+        var text = '<div class="row"> <p>Количество обращений: <span class="badge badge-primary">' + data['notes'][0] + '</span></p></div>' +
             '<div class="row"><p>Не распределено ТУ: <span class="badge badge-danger">' + data['notes'][1] + '</span></p></div>' +
             '<div class="row"><p>Количество распределенных: <span class="badge badge-success">' + data['notes'][2] + '</span></p></div>';
         $('#barchart4').closest('.card-body').append(text);

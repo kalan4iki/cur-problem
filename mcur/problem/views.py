@@ -1096,7 +1096,7 @@ def dashboard(request):
                         q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
                             status__in=Status.objects.filter(name='Указан срок')))
                         termas = Term.objects.filter(q1)
-                        termas2 = Problem.objects.filter(Q(terms__in=termas) | q21 & q22)
+                        termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
                         kolvo.append(len(termas2))
                 elif request.POST['chart'] == 'chart3':
                     temporg = Curator.objects.all().exclude(name='Территориальное управление')

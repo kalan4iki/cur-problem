@@ -201,3 +201,6 @@ EMAIL_HOST_USER = 'noreply@skiog.ru'
 EMAIL_HOST_PASSWORD = '211563'
 DEFAULT_FROM_EMAIL = 'noreply@skiog.ru'
 DEFAULT_TO_EMAIL = 'noreply@skiog.ru'
+
+#Celery
+CELERY_BROKER_URL = 'amqp://localhost'
