@@ -356,7 +356,7 @@ class ProblemNoListView(SingleTableMixin, FilterView):
         if not self.request.user.is_authenticated:
             return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
-            prob = Problem.objects.filter(visible='1', statussys='2')
+            prob = Problem.objects.filter(visible='1', terms=None)
             if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
             filterno = ProblemFilter(self.request.GET, queryset=prob)
