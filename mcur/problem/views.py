@@ -94,7 +94,7 @@ def api_action(request):
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             if request.POST['action'] == 'action1':
-                title = 'Скрытие жалоб'
+                title = 'Скрытие обращений'
                 status = ['Закрыто', 'Получен ответ', 'Решено']
                 status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
                 allprob = 0
@@ -105,7 +105,7 @@ def api_action(request):
                 allprob += len(prob)
                 prob.update(visible='2')
                 mes = f'''Успешно выполнено!
-    Количество исправленных жалоб: {allprob}'''
+    Количество исправленных обращения: {allprob}'''
                 nom = 0
             elif request.POST['action'] == 'action2':
                 a = ActionHistory()
@@ -301,7 +301,7 @@ def api_answer_detail(request):
 
 def Mailsend(email, date, nomd):
     data = f'''
-<p>Вам направлена задача сроком до {date}. На жалобу <a href='https://skiog.ru/problem/{nomd}'>№{nomd}</a></p>
+<p>Вам направлена задача сроком до {date}. На обращение <a href='https://skiog.ru/problem/{nomd}'>№{nomd}</a></p>
 <p></p>
 <p>______________<p> 
 <p>Администрация информационной системы skiog.ru </p>          
@@ -339,9 +339,9 @@ class ProblemListView(SingleTableMixin, FilterView):
             RequestConfig(self.request, ).configure(table)
             context['filter'] = filterall
             context['table'] = table
-            context['name'] = 'Все жалобы'
+            context['name'] = 'Все обращения'
             context['dop'] = f'Всего: {len(filterall.qs)}.'
-            context['title'] = 'Все жалобы'
+            context['title'] = 'Все обращения'
         return context
 
 
@@ -364,7 +364,7 @@ class ProblemNoListView(SingleTableMixin, FilterView):
             RequestConfig(self.request, ).configure(table)
             context['filter'] = filterno
             context['table'] = table
-            context['name'] = 'Не распределенные жалобы'
+            context['name'] = 'Не распределенные обращения'
             context['dop'] = f'Всего: {len(filterno.qs)}.'
             context['title'] = 'Не распределенные'
         return context
@@ -408,7 +408,7 @@ class ProblemPodxListView(SingleTableMixin, FilterView):
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filterpodx
             context['table'] = table
-            context['name'] = 'Подходит срок жалоб'
+            context['name'] = 'Подходит срок обращения'
             context['dop'] = f'Всего: {len(filterpodx.qs)}.'
             context['title'] = 'Подходит срок'
         return context
@@ -449,7 +449,7 @@ class ProblemProsrListView(SingleTableMixin, FilterView):
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filterpros
             context['table'] = table
-            context['name'] = 'Просроченные жалобы'
+            context['name'] = 'Просроченные обращения'
             context['dop'] = f'Всего: {len(filterpros.qs)}.'
             context['title'] = 'Просроченные'
         return context
@@ -490,7 +490,7 @@ class ProblemTodayListView(SingleTableMixin, FilterView):
             RequestConfig(self.request, ).configure(table )
             context['filter'] = filtertodo
             context['table'] = table
-            context['name'] = 'Жалобы на сегодня'
+            context['name'] = 'Обращения на сегодня'
             context['dop'] = f'Всего: {len(filtertodo.qs)}.'
             context['title'] = 'На сегодня'
         return context
@@ -520,9 +520,9 @@ class ProblemMeListView(SingleTableMixin, FilterView):
                 RequestConfig(self.request, ).configure(table )
                 context['filter'] = filterme
                 context['table'] = table
-                context['name'] = 'Мои жалобы'
+                context['name'] = 'Мои обращения'
                 context['dop'] = f'Всего: {len(filterme.qs)}.'
-                context['title'] = 'Мои жалобы'
+                context['title'] = 'Мои обращения'
         return context
 
 
@@ -700,7 +700,7 @@ def add(request):
                     else:
                         return redirect("index")
                 else:
-                    messages.warning(request, 'Данная жалоба существует.')
+                    messages.warning(request, 'Данное обращение существует.')
                     return redirect("index")
             else:
                 return redirect("problem", pk=Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
@@ -797,13 +797,13 @@ def lk(request):
                 if request.POST['box'] == 'box1':# Ответы
                     kolvo = len(Problem.objects.filter(visible='1', statussys='2', terms__answers__user=userlk))
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
-                elif request.POST['box'] == 'box2':# Не рапсред. жалобы
+                elif request.POST['box'] == 'box2':# Не рапсред. обращения
                     kolvo = len(Problem.objects.filter(visible='1', statussys='2'))
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
-                elif request.POST['box'] == 'box3':# Все жалобы
+                elif request.POST['box'] == 'box3':# Все обращения
                     kolvo = len(Problem.objects.filter(visible='1'))
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
-                elif request.POST['box'] == 'box4':# Мои жалобы
+                elif request.POST['box'] == 'box4':# Мои обращения
                     q1 = Q(curatuser=userlk)
                     termas = Term.objects.filter(q1)
                     termas2 = Problem.objects.filter(Q(terms__in=termas) & Q(visible='1'))
@@ -818,7 +818,7 @@ def lk(request):
                     termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
                     kolvo = len(termas2)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
-                elif request.POST['box'] == 'box6':# Жалобы на сегодня
+                elif request.POST['box'] == 'box6':# Обращения на сегодня
                     q1 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
                     q21 = Q(dateotv=nowdate)
                     q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
@@ -852,7 +852,7 @@ def lk(request):
                     termas3 = Problem.objects.filter(visible='1', terms__in=termas2)
                     kolvo = len(termas3)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
-                elif request.POST['box'] == 'box3':  # Все жалобы
+                elif request.POST['box'] == 'box3':  # Все обращения
                     q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
                     termas = Termhistory.objects.filter(q1)
                     if userlk.userprofile.dep == None:
@@ -876,7 +876,7 @@ def lk(request):
                     termas2 = Problem.objects.filter(Q(terms__in=termas1) & q21 & q2)
                     kolvo = len(termas2)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
-                elif request.POST['box'] == 'box6':  # Жалобы на сегодня
+                elif request.POST['box'] == 'box6':  # Обращения на сегодня
                     q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
                     termas = Termhistory.objects.filter(q1)
                     if userlk.userprofile.dep == None:
@@ -903,7 +903,7 @@ def lk(request):
                 else:
                     return JsonResponse({'mes': 'error'})
             elif request.user.has_perm('problem.user_ty'):
-                if request.POST['box'] == 'box3':  # Все жалобы
+                if request.POST['box'] == 'box3':  # Все обращения
                     termas3 = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(ciogv=userlk.userprofile.ty))
                     kolvo = len(termas3)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
@@ -916,7 +916,7 @@ def closedproblem(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        name = 'Закрытые жалобы'
+        name = 'Закрытые обращения'
         userlk = User.objects.get(username=request.user.username)
         otv = Answer.objects.filter(user=userlk)
         prob = Problem.objects.filter(terms__answers__in = otv, visible = '1')
@@ -1173,7 +1173,7 @@ def export_pdf(request, pk):
         c = canvas.Canvas(response, pagesize=A4)
         pdfmetrics.registerFont(TTFont("Times", times))
         url = 'http://127.0.0.1:8000/problem/'
-        barcode_string = f'<font name="Times" size="16">Жалоба №<a href="{url}{prob.nomdobr}" underline="True">{prob.nomdobr}</a></font>'
+        barcode_string = f'<font name="Times" size="16">Обращение №<a href="{url}{prob.nomdobr}" underline="True">{prob.nomdobr}</a></font>'
         p = Paragraph(barcode_string, style=style["Normal"])
         p.wrapOn(c, width, height)
         p.drawOn(c, 20, row, mm)
@@ -1193,7 +1193,7 @@ def export_pdf(request, pk):
         p = Paragraph(barcode_string, style=style["Normal"])
         p.wrapOn(c, width, height)
         p.drawOn(c, 20, row-100, mm)
-        barcode_string = f'''<font name="Times" size="16">Текс жалобы: 
+        barcode_string = f'''<font name="Times" size="16">Текс обращения: 
     </font> <font name="Times" size="14"> 
     <p>{prob.text}</p>
     </font>'''
@@ -1307,7 +1307,7 @@ def addty(request):
                     serializer = ActionSerializer(a)
                     return JsonResponse(serializer.data, safe=False)
                 else:
-                    mes = 'Ошибка, данной жалобы не существует.'
+                    mes = 'Ошибка, данного обращения не существует.'
                     nom = 1
                     a = ActionObject(title=title, nom=nom, message=mes)
                     serializer = ActionSerializer(a)

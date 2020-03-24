@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile, Image, Category, Podcategory, Status,
-                     Termhistory, Department)
+                     Termhistory, Department, Author)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission
 from django.contrib.admin.models import LogEntry
@@ -11,6 +11,12 @@ class ImageInline(admin.StackedInline):
     model = Image
     can_delete = False
     verbose_name_plural = 'Фотографии'
+
+
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('fio', 'email',)
+    list_display_links = ('fio',)
 
 
 @admin.register(LogEntry)

@@ -133,6 +133,19 @@ class Access(models.Model):
         return self.user
 
 
+class Author(models.Model):
+    fio = models.CharField(max_length=250, help_text='ФИО заявителя', verbose_name='ФИО', blank=True, null=True)
+    email = models.EmailField(help_text='Почта заявителя', verbose_name='Почта', blank=True, null=True)
+
+    class Meta:
+        ordering = ['email']
+        verbose_name = 'автор'
+        verbose_name_plural = 'авторы'
+
+    def __str__(self):
+        return f'{self.fio} - {self.email}'
+
+
 class Problem(models.Model):
     pars = {
         ('0', 'На обновлении'),
@@ -148,8 +161,7 @@ class Problem(models.Model):
         ('1', 'В работе'),
         ('2', 'На модерации'),
     }
-    nomdobr = models.CharField(max_length=20, help_text='Номер проблемы',
-                               verbose_name='Номер', unique=True)
+    nomdobr = models.CharField(max_length=20, help_text='Номер проблемы', verbose_name='Номер', unique=True)
     temat = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Тематика проблемы',
                               verbose_name='Тематика', blank=True, null=True, related_name='problems')
     podcat = models.ForeignKey(Podcategory, on_delete=models.PROTECT, help_text='Подкатегория проблемы',
@@ -157,9 +169,10 @@ class Problem(models.Model):
     ciogv = models.ForeignKey(Minis, on_delete=models.PROTECT, blank=True, verbose_name='Тер. управление', default=None,
                               null=True, related_name='problems')
     text = models.TextField(help_text='Текст проблемы', verbose_name='Текст', blank=True, null=True)
-    adres = models.CharField(max_length=255, help_text='Адрес проблемы',
-                             verbose_name='Адрес', blank=True, null=True)
+    adres = models.CharField(max_length=255, help_text='Адрес проблемы', verbose_name='Адрес', blank=True, null=True)
     url = models.URLField(help_text='URL проблемы', verbose_name='URL', blank=True, null=True)
+    author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True, default=None, blank=True,
+                               verbose_name='Автор обращения')
     datecre = models.DateField(help_text='Дата создания', verbose_name='Дата создания', blank=True, null=True)
     dateotv = models.DateField(help_text='Дата ответа по доброделу', verbose_name='Дата ответа по доброделу',
                                blank=True, null=True)
@@ -175,8 +188,8 @@ class Problem(models.Model):
 
     class Meta:
         ordering = ['dateotv']
-        verbose_name = 'жалоба'
-        verbose_name_plural = 'жалобы'
+        verbose_name = 'обращение'
+        verbose_name_plural = 'обращения'
 
     def __str__(self):
         return self.nomdobr
