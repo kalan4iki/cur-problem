@@ -36,7 +36,8 @@ ALLOWED_HOSTS = [
 '127.0.0.1',
 '192.168.10.82',
 '192.168.10.25',
-'skiog.ru'
+'skiog.ru',
+'local.skiog.ru'
 ]
 
 
