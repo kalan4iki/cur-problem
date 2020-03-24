@@ -24,3 +24,5 @@ tablib
 urllib3
 xlwt
 reportlab
+celery
+flower

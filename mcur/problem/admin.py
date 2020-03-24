@@ -3,7 +3,7 @@ from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile,
                      Termhistory, Department)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission
-
+from django.contrib.admin.models import LogEntry
 # Register your models here.
 
 
@@ -11,6 +11,12 @@ class ImageInline(admin.StackedInline):
     model = Image
     can_delete = False
     verbose_name_plural = 'Фотографии'
+
+
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ('object_id', 'object_repr', 'change_message', 'user',)
+    list_display_links = ('object_id',)
 
 
 @admin.register(Permission)
