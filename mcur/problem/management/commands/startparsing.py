@@ -401,6 +401,7 @@ class Command(BaseCommand):
                         elif i.act.nact == '10':#Парсинг авторов
                             prob = Problem.objects.filter((Q(visible='1') | Q(visible='2')) & Q(author=None))
                             i.note = f'Обращений {len(prob)}'
+                            i.save()
                             parsProblem(browser, prob)
                         i.status = '1'
                         i.save()
