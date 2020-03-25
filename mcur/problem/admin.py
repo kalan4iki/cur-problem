@@ -12,11 +12,21 @@ class ImageInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Фотографии'
 
+class AuthorInline(admin.StackedInline):
+    model = Problem
+    can_delete = False
+    verbose_name_plural = 'Обращения'
+    fields = ('nomdobr', 'temat', 'podcat')
+    readonly_fields = ('nomdobr', 'temat', 'podcat')
+
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('fio', 'email', 'tel')
+    list_display = ('fio', 'email', 'tel', 'problem_all')
     list_display_links = ('fio',)
+    sortable_by = ('fio', 'email', 'tel', 'problem_all')
+    search_fields = ('email', 'tel')
+    inlines = (AuthorInline,)
 
 
 @admin.register(LogEntry)
@@ -146,6 +156,8 @@ class AccessAdmin(admin.ModelAdmin):
     list_display = ('user',)
     list_display_links = ('user',)
     search_fields = ('user',)
+
+
 
 
 class UserInline(admin.StackedInline):

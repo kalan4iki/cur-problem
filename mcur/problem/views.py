@@ -1166,7 +1166,7 @@ def dashboard(request):
                     for i in author:
                         temp[i.pk] = len(i.problems.all())
                     temp = sorted(temp.items(), key=itemgetter(1), reverse = True)
-                    for i in range(10):
+                    for i in range(25):
                         nom = temp[i][0]
                         autho = Author.objects.get(pk=nom)
                         a = {}

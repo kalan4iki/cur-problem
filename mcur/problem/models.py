@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import F
+
 
 
 class Person(User):
@@ -145,6 +147,9 @@ class Author(models.Model):
 
     def __str__(self):
         return f'{self.fio} - {self.email}'
+
+    def problem_all(self):
+        return len(self.problems.all())
 
 
 class Problem(models.Model):
