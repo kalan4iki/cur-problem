@@ -162,6 +162,14 @@ def api_action(request):
                 mes = f'''Успешно выполнено!
                 Задание запущено.'''
                 nom = 0
+            elif request.POST['action'] == 'action8':
+                a = ActionHistory()
+                a.act = Action.objects.get(nact='10')
+                a.save()
+                title = 'Добавление задачи'
+                mes = f'''Успешно выполнено!
+                Задание запущено.'''
+                nom = 0
             else:
                 title = 'Ошибка'
                 mes = 'Ошибка при выполнении!'
