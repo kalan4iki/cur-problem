@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 from sys import platform
-from problem.models import Problem, Category, Podcategory, Status, Image
+from problem.models import Problem, Category, Podcategory, Status, Image, Author
 from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
 from mcur.settings import MEDIA_ROOT, MEDIA_URL
@@ -20,6 +20,7 @@ import logging
 
 
 logger = logging.getLogger('django.server')
+loggerfile = logging.getLogger('file')
 logger_mail = logging.getLogger('django.request')
 
 def StartBrowser():
@@ -48,6 +49,81 @@ def loginDobrodel(brow, url, vxod):
     except:
         print(traceback.format_exc())
 
+
+def parsProblem(browser, prob=None):#TODO Доделать парсинг авторов
+        url = 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='
+        if prob == None:
+            prob = Problem.objects.filter((Q(visible='1') | Q(visible='2')) & Q(author=None))
+            print(f'Начало парсинга авторов, количество обращение: {len(prob)}')
+        for i in prob:
+            if i.author == None:
+                nom = i.nomdobr
+                browser.get(f'{url}{nom}')
+                time.sleep(2)
+                source = browser.page_source
+                bs = BeautifulSoup(source, 'lxml')
+                prov = bs.find('div', class_='left')
+                if len(prov) > 0:
+                    proverka = prov.text
+                    if len(proverka.split('№')) == 2:
+                        if nom == proverka.split('№')[1]:
+                            fio = bs.find('div', class_='t-user-name').text
+                            a = None
+                            tel = None
+                            email = None
+                            dop = bs.find_all('div', class_='t-user-email')
+                            dops = []
+                            for j in dop:
+                                temp = j.text
+                                if temp != '':
+                                    dops.append(temp)
+                            if len(dops) == 0:
+                                if Author.objects.filter(fio=fio).exists():
+                                    a = Author.objects.get(fio=fio)
+                                else:
+                                    a = Author(fio=fio)
+                                    a.save()
+                                    loggerfile.info(f'[PARSER][INFO]: Создан автор {a.pk} - {fio}')
+                            elif len(dops) > 1:
+                                email = dops[0]
+                                tel = dops[1].split(':')[1].replace(' ', '')
+                                if Author.objects.filter(email=email).exists():
+                                    a = Author.objects.get(email=email)
+                                else:
+                                    a = Author(fio=fio, email=email, tel=tel)
+                                    a.save()
+                                    loggerfile.info(f'[PARSER][INFO]: Создан автор {a.pk} - {fio} - {email} - {tel}')
+                            else:
+                                if dops[0].find('@') != -1:
+                                    email = dops[0]
+                                    if Author.objects.filter(email=email).exists():
+                                        a = Author.objects.get(email=email)
+                                    else:
+                                        a = Author(fio=fio, email=email)
+                                        a.save()
+                                        loggerfile.info(f'[PARSER][INFO]: Создан автор {a.pk} - {fio} - {email}')
+                                else:
+                                    tel = dops[0].split(':')[1].replace(' ', '')
+                                    if Author.objects.filter(tel=tel).exists():
+                                        a = Author.objects.get(tel=tel)
+                                    else:
+                                        a = Author(fio=fio, tel=tel)
+                                        a.save()
+                                        loggerfile.info(f'[PARSER][INFO]: Создан автор {a.pk} - {fio} - {tel}')
+                            i.author = a
+                            i.save()
+                            loggerfile.info(f'[PARSER][INFO]: Создана связь [обращение {i.nomdobr} - автор {a.pk}]')
+                        else:
+                            logger.error(f'[PARSER][ERROR]: Не совпадение обращения {nom}.')
+                    else:
+                        logger.error(f'[PARSER][ERROR]: Не найдено id.')
+                else:
+                    logger.error(f'[PARSER][ERROR]: обращение {nom} на сайте не найдено.')
+        urls = 'http://vmeste.mosreg.ru'
+        browser.get(urls)
+        time.sleep(2)
+
+
 def parsingall(browser, date, dopos):
     browser.find_element_by_id('datefrom').clear()
     browser.find_element_by_id('dateto').clear()
@@ -74,14 +150,6 @@ def parsingall(browser, date, dopos):
     a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
     a.select_by_value('25')
     time.sleep(5)
-'''
-bs = BeautifulSoup(browser.page_source, 'lxml')
-sele = bs.find('span', class_='jtable-goto-page').find('select').find_all('option')
-pages = []
-for i in sele:
-    pages.append(i.text)
-return pages
-'''
 
 
 def parsTable(source):
@@ -132,8 +200,6 @@ def parsTable(source):
                     prob.visible = visi
                 allprob += f'{prob.nomdobr},'
                 prob.save()
-            loging = Loggings(name='2', note=allprob)
-            loging.save()
         else:
             return 'non'
     except:
@@ -152,22 +218,14 @@ def pars(browser, nom):
     time.sleep(1)
 
 
-# def parsimg(browser):
-#     prob = Problem.objects.get(visible='1')
-#     url = 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='
-#     for k in prob:
-#         browser.get()
-#         source = browser.page_source
-#         bs = BeautifulSoup(source, 'lxml')
-#         image = bs.find_all('ul', class_='imagesContainer bxslider')
-#         if len(image) > 0:
-#             for i in image:
-#                 temp = []
-#                 a = i.find_all('li')
-#                 for j in a:
-#                     dir = os.path.join(settings.MEDIA_ROOT, 'photos')
-#                     temp.append(j.attrs['name'])
-#                     wget.download()
+def debugs():
+    opts = Options()
+    browser = webdriver.Chrome('C:\chromedriver.exe', options=opts)
+    url = 'http://vmeste.mosreg.ru'
+    username = 'tsa@istra-adm.ru'
+    password = '12345678'
+    loginDobrodel(browser, url, {'username': username, 'password': password})
+    return browser
 
 
 class Command(BaseCommand):
@@ -340,6 +398,10 @@ class Command(BaseCommand):
                             a = browser.save_screenshot(url)
                             i.note = 'https://skiog.ru' + MEDIA_URL+'photos/' + name
                             i.save()
+                        elif i.act.nact == '10':#Парсинг авторов
+                            prob = Problem.objects.filter((Q(visible='1') | Q(visible='2')) & Q(author=None))
+                            i.note = f'Обращений {len(prob)}'
+                            parsProblem(browser, prob)
                         i.status = '1'
                         i.save()
                     except:

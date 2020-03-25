@@ -15,7 +15,7 @@ class ImageInline(admin.StackedInline):
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('fio', 'email',)
+    list_display = ('fio', 'email', 'tel')
     list_display_links = ('fio',)
 
 

@@ -32,13 +32,14 @@ from reportlab.lib.units import mm
 
 # other
 from .models import (Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category,
-                     UserProfile, Minis)
+                     UserProfile, Minis, Author)
 from parsers.models import ActionHistory, Action, Parser
 from .tables import ProblemTable, ParsTable, UserTable, HistTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser, TyForm)
 from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
 from sys import platform
+from operator import itemgetter
 import traceback
 import xlwt
 import mcur.settings as settings
@@ -1149,6 +1150,23 @@ def dashboard(request):
                     notes.append(len(prob))
                     notes.append(len(Problem.objects.filter(Q(ciogv=None) & Q(visible='1'))))
                     notes.append(len(prob.exclude(ciogv=None)))
+                elif request.POST['chart'] == 'chart5':
+                    tempdate = ''
+                    author = Author.objects.all()
+                    temp = {}
+                    kolvo = []
+                    for i in author:
+                        temp[i.pk] = len(i.problems.all())
+                    temp = sorted(temp.items(), key=itemgetter(1), reverse = True)
+                    for i in range(10):
+                        nom = temp[i][0]
+                        autho = Author.objects.get(pk=nom)
+                        a = {}
+                        a['fio'] = autho.fio
+                        a['email'] = autho.email
+                        a['tel'] = autho.tel
+                        a['kolvo'] = temp[i][1]
+                        kolvo.append(a)
                 else:
                     return JsonResponse({'chart': 'error'})
                 otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart'], 'notes': notes}

@@ -136,6 +136,7 @@ class Access(models.Model):
 class Author(models.Model):
     fio = models.CharField(max_length=250, help_text='ФИО заявителя', verbose_name='ФИО', blank=True, null=True)
     email = models.EmailField(help_text='Почта заявителя', verbose_name='Почта', blank=True, null=True)
+    tel = models.CharField(max_length=50, help_text='Телефон заявителя', verbose_name='Телефон', blank=True, null=True)
 
     class Meta:
         ordering = ['email']
@@ -172,7 +173,7 @@ class Problem(models.Model):
     adres = models.CharField(max_length=255, help_text='Адрес проблемы', verbose_name='Адрес', blank=True, null=True)
     url = models.URLField(help_text='URL проблемы', verbose_name='URL', blank=True, null=True)
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True, default=None, blank=True,
-                               verbose_name='Автор обращения')
+                               verbose_name='Автор обращения', related_name='problems')
     datecre = models.DateField(help_text='Дата создания', verbose_name='Дата создания', blank=True, null=True)
     dateotv = models.DateField(help_text='Дата ответа по доброделу', verbose_name='Дата ответа по доброделу',
                                blank=True, null=True)
