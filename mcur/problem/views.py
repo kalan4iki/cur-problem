@@ -75,7 +75,7 @@ def apis(request):
         else:
             return JsonResponse({'status': 'error', 'text': 'Invalid Token'})
     else:
-        return JsonResponse({'status': 'error', 'text': 'Invalid request'})
+        return JsonResponse({'status': 'error', 'text': 'Invalid request', 'request': request.GET})
 
 @api_view(['GET'])
 def api_problem(request):
