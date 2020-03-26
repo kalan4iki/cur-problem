@@ -60,13 +60,14 @@ class ProblemSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def apis(request):
-    if 'token' in request.GET:
-        token = request.GET['token']
+    zapr = request.POST
+    if 'token' in zapr :
+        token = zapr['token']
         if User.objects.filter(userprofile__uuid=token).exists():
-            if 'action' in request.GET:
-                act = request.GET['action']
+            if 'action' in zapr:
+                act = zapr['action']
                 user = User.objects.get(userprofile__uuid=token)
                 text = {'username': user.username, 'action': act}
                 return JsonResponse({'status': 'успешно', 'text': text})
@@ -75,7 +76,7 @@ def apis(request):
         else:
             return JsonResponse({'status': 'error', 'text': 'Invalid Token'})
     else:
-        return JsonResponse({'status': 'error', 'text': 'Invalid request', 'request': request.GET})
+        return JsonResponse({'status': 'error', 'text': 'Invalid request', 'request': zapr})
 
 @api_view(['GET'])
 def api_problem(request):
