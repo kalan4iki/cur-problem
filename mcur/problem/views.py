@@ -69,13 +69,13 @@ def apis(request):
                 act = request.GET['action']
                 user = User.objects.get(userprofile__uuid=token)
                 text = {'username': user.username, 'action': act}
-                return JsonResponse({'status': 'успешно', 'text': request.GET})
+                return JsonResponse({'status': 'успешно', 'text': text})
             else:
-                return JsonResponse({'status': 'error', 'text': 'Недоступное действие'})
+                return JsonResponse({'status': 'error', 'text': 'Inaccessible action'})
         else:
-            return JsonResponse({'status': 'error', 'text': 'Не правильный токен'})
+            return JsonResponse({'status': 'error', 'text': 'Invalid Token'})
     else:
-        return JsonResponse({'status': 'error', 'text': 'Не правильный запрос'})
+        return JsonResponse({'status': 'error', 'text': 'Invalid request'})
 
 @api_view(['GET'])
 def api_problem(request):
