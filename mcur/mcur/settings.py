@@ -221,6 +221,12 @@ LOGGING = {
             'formatter': 'django.server',
             'class': 'logging.FileHandler',
             'filename': f'{MEDIA_ROOT}info.log',
+        },
+        'file_error': {
+            'level': 'ERROR',
+            'formatter': 'django.server',
+            'class': 'logging.FileHandler',
+            'filename': f'{MEDIA_ROOT}error.log',
         }
     },
     'loggers': {
@@ -234,7 +240,7 @@ LOGGING = {
             'propagate': False,
         },
         "django.request": {
-             "handlers": ["mail_admins"],
+             "handlers": ["mail_admins", "file_error"],
              "level": "ERROR",
              "propagate": True
         },

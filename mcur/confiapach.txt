@@ -14,8 +14,7 @@ sudo a2enmod rewrite
 Перезагрузка apache2:
 sudo service apache2 restart
 
-Ошибка apache2:
-sudo nano /var/log/apache2/error.log
+
 [/apache2]
 ./configure --with-apxs=/usr/local/apache/bin/apxs   --with-python=/usr/local/bin/python3.6
 
@@ -34,3 +33,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable parser.service
 sudo systemctl start parser.service
 sudo systemctl stop parser.service
+
+[Остлеживание логов]
+Установка приложения
+sudo apt install lnav
+Ошибка apache2:
+sudo lnav /var/log/apache2/error.log
