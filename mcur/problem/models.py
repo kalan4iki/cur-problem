@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import F
-
+import uuid
 
 
 class Person(User):
@@ -106,6 +106,7 @@ class UserProfile(models.Model):
                             blank=True)
     post = models.CharField(max_length=100, help_text='Должность', verbose_name='Должность', default=' ', null=True,
                             blank=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name='Токен')
 
     def __unicode__(self):
         return self.user

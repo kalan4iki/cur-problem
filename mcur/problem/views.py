@@ -40,6 +40,7 @@ from .filter import ProblemListView, ProblemFilter
 from datetime import date, timedelta, datetime
 from sys import platform
 from operator import itemgetter
+import uuid
 import traceback
 import xlwt
 import mcur.settings as settings
@@ -58,6 +59,23 @@ class ProblemSerializer(serializers.ModelSerializer):
         model = Problem
         fields = ('__all__')
 
+
+@api_view(['GET'])
+def apis(request):
+    if 'token' in request.GET:
+        token = request.GET['token']
+        if User.objects.filter(userprofile__uuid=token).exists():
+            if 'action' in request.GET:
+                act = request.GET['action']
+                user = User.objects.get(userprofile__uuid=token)
+                text = {'username': user.username, 'action': act}
+                return JsonResponse({'status': 'успешно', 'text': request.GET})
+            else:
+                return JsonResponse({'status': 'error', 'text': 'Недоступное действие'})
+        else:
+            return JsonResponse({'status': 'error', 'text': 'Не правильный токен'})
+    else:
+        return JsonResponse({'status': 'error', 'text': 'Не правильный запрос'})
 
 @api_view(['GET'])
 def api_problem(request):

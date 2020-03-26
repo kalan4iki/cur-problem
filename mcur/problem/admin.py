@@ -163,6 +163,8 @@ class AccessAdmin(admin.ModelAdmin):
 class UserInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
+    fields = ('org', 'dep', 'ty', 'post', 'uuid')
+    readonly_fields = ('uuid',)
     verbose_name_plural = 'Доп. информация'
 
 
