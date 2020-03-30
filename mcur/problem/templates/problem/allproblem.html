@@ -45,6 +45,17 @@
                 <div class="col-auto">
                   {{ filter.form.statussys|as_crispy_field }}
                 </div>
+                <div class="col-auto">
+                    <div id="div_id_dateotv" class="form-group">
+                        <label for="id_dateotv" class="">
+                            Дата ответа по доброделу
+                        </label>
+                        <div class="">
+                            <input type="date" name="dateotv" class="dateinput form-control" id="id_dateotv">
+                        </div>
+                    </div>
+{#                  {{ filter.form.dateotv|as_crispy_field }}#}
+                </div>
                 <div class="col-auto" style="top: 20px;">
                   <button class="btn btn-block btn-primary">Фильтр</button>
                 </div>

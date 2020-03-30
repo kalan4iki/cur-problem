@@ -1,7 +1,7 @@
 import django_filters
 from .models import Problem, Category, Status, Minis
 from .tables import ProblemTable
-from django_filters import ModelMultipleChoiceFilter
+from django_filters import ModelMultipleChoiceFilter, DateFilter, DateRangeFilter
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 
@@ -13,6 +13,7 @@ class ProblemFilter(django_filters.FilterSet):
     temat = ModelMultipleChoiceFilter(queryset=Category.objects.all())
     status = ModelMultipleChoiceFilter(queryset=Status.objects.all())
     ciogv = ModelMultipleChoiceFilter(queryset=Minis.objects.all())
+    dateotv = DateFilter()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,7 +23,7 @@ class ProblemFilter(django_filters.FilterSet):
 
     class Meta:
         model = Problem
-        fields = ['temat', 'status', 'ciogv', 'statussys']
+        fields = ['temat', 'status', 'ciogv', 'statussys', 'dateotv']
 
 
 
