@@ -197,7 +197,8 @@ class lk_moderator:
 
     def b2(request, act): #Не распределенные
         userlk = request.user
-        prob = Problem.objects.filter(visible='1', statussys='2')
+        #prob = Problem.objects.filter(visible='1', statussys='2')
+        prob = Problem.objects.filter(Q(visible='1') & Q(terms=None))
         if act == 1:
             kolvo = len(prob)
             return kolvo
