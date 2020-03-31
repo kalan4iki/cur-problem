@@ -117,7 +117,7 @@ def api_action(request):
             if request.POST['action'] == 'action1':
                 title = 'Скрытие обращений'
                 status = ['Закрыто', 'Получен ответ', 'Решено']
-                status2 = ['На рассмотрении', 'На уточнении', 'Премодерация']
+                status2 = ['На рассмотрении', 'На уточнении', 'Премодерация', 'Премодерация (незавершённая регистрация)']
                 allprob = 0
                 prob = Problem.objects.filter(Q(visible='1') & (Q(status__name__in=status)))
                 allprob += len(prob)
@@ -1170,7 +1170,7 @@ def statandact(request):
             # logger.info('Test 1 opp')
             # logger_mail.error('Test 2 opp')
             content = {}
-            content['status'] = ['Закрыто', 'Получен ответ', 'Решено', 'На рассмотрении', 'На уточнении', 'Премодерация']
+            content['status'] = ['Закрыто', 'Получен ответ', 'Решено', 'На рассмотрении', 'На уточнении', 'Премодерация', 'Премодерация (незавершённая регистрация)']
             content['kolvo'] = []
             for i in content['status']:
                 content['kolvo'].append(len(Problem.objects.filter(visible='1', status__name=i)))

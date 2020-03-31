@@ -43,3 +43,5 @@ sudo lnav /var/log/apache2/error.log
 Логи сайта:
 sudo lnav /home/media/error.log
 sudo lnav /home/media/info.log
+
+cd /var/www/cur-problem & sudo git pull & sudo service apache2 restart
