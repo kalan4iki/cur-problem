@@ -459,52 +459,7 @@
     </div>
   </div>
 {% if user.is_superuser %}
-<div class="row">
-   <div class="col-md-12">
-       <div class="card direct-chat direct-chat-primary">
-      <div class="card-header">
-        <h3 class="card-title">Коментарии по жалобе</h3>
-        <div class="card-tools">
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="direct-chat-messages">
-          <div class="direct-chat-msg">
-            <div class="direct-chat-infos clearfix">
-              <span class="direct-chat-name float-left">{{ user.first_name }} {{ user.last_name }}</span>
-              <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
-            </div>
-            <img class="direct-chat-img" src="{% static 'adminlte/dist/img/logo.png' %}" alt="">
-            <div class="direct-chat-text">
-              Тестовое сообщение!
-            </div>
-          </div>
-          <div class="direct-chat-msg">
-            <div class="direct-chat-infos clearfix">
-              <span class="direct-chat-name float-left">{{ user.first_name }} {{ user.last_name }}</span>
-              <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
-            </div>
-            <img class="direct-chat-img" src="{% static 'adminlte/dist/img/logo.png' %}" alt="">
-            <div class="direct-chat-text">
-              Тестовое сообщение!
-            </div>
-          </div>
-        </div>
-        <!--/.direct-chat-messages-->
-      </div>
-      <div class="card-footer">
-        <form action="#" method="post">
-          <div class="input-group">
-            <input type="text" name="message" placeholder="Сообщение ..." class="form-control">
-            <span class="input-group-append">
-              <button type="button" class="btn btn-primary">Отправить</button>
-            </span>
-          </div>
-        </form>
-      </div>
-    </div>
-   </div>
-</div>
+{% include 'chat/chatproblem.html' with nd=np.nomdobr %}
 {% endif %}
 </section>
 {% endblock %}
@@ -579,5 +534,7 @@ function onAjaxSuccess(data)
 function reloadModal() {
     location.reload()
 }
+
+
 </script>
 {% endblock %}

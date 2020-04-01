@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'problem.apps.ProblemConfig',
     'parsers.apps.ParsersConfig',
+    'chat.apps.ChatConfig',
     'crispy_forms',
     'tinymce',
     'django_filters',

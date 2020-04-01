@@ -1,0 +1,79 @@
+{% load static %}
+<div class="row">
+   <div class="col-md-12 ">
+       <div class="card direct-chat direct-chat-primary">
+      <div class="card-header">
+        <h3 class="card-title">Коментарии по жалобе</h3>
+        <div class="card-tools">
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="direct-chat-messages">
+
+        </div>
+        <!--/.direct-chat-messages-->
+      </div>
+      <div class="card-footer">
+        <form action="{% url 'ChatProblem' %}" method="post" id="sendmes">
+            {% csrf_token %}
+          <div class="input-group">
+            <input type="text" name="message" placeholder="Сообщение ..." class="form-control">
+            <span class="input-group-append">
+              <button type="submit" class="btn btn-primary">Отправить</button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+   </div>
+</div>
+<script src="{% static 'adminlte/plugins/jquery/jquery.min.js' %}"></script>
+<script>
+$(function () {
+    var logo = "{% static 'adminlte/dist/img/logo.png' %}";
+    var url = "{% url 'ChatProblem' %}";
+    var nd = {{ nd }};
+
+    var CSRFtoken = $.cookie('csrftoken');
+    var post = $.post(url, {csrfmiddlewaretoken: CSRFtoken, nd:nd, action:1}, onChatSuccess);
+
+
+    function onChatSuccess(data) {
+        var mes = data['mes'];
+        mes.forEach(function (item, i, arr) {
+            var html = '<div class="direct-chat-msg">\n' +
+            '            <div class="direct-chat-infos clearfix">\n' +
+            '              <span class="direct-chat-name float-left">' + item["user"] + '</span>\n' +
+            '              <span class="direct-chat-timestamp float-right">' + item["date"] + '</span>\n' +
+            '            </div>\n' +
+            '            <img class="direct-chat-img" src="' + logo + '" alt="">\n' +
+            '            <div class="direct-chat-text">\n' + item['text'] + '\n' +
+            '            </div>\n' +
+            '          </div>';
+            $('.direct-chat-messages').append(html);
+        });
+    }
+});
+$('#sendmes').submit(function (event) {
+    event.preventDefault();
+    var $form = $( this ),
+        url = $form.attr( 'action' ),
+        text = $form.find('input[name="message"]').val(),
+        nd = '{{ nd }}',
+        CSRFtoken = $.cookie('csrftoken');
+    var temp = {csrfmiddlewaretoken: CSRFtoken,  nd:nd, text: text, action:2};
+    var posting = $.post( url, temp, onAjaxSuccess);
+    
+    function onAjaxSuccess() {
+        Swal.fire({
+            title: 'Успешно',
+            text: 'Комментарий оставлен',
+            icon: 'success',
+            onClose: reloadModal
+        })
+    }
+    function reloadModal() {
+    location.reload()
+    }
+})
+</script>

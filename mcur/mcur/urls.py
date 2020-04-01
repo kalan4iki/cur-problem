@@ -19,6 +19,7 @@ from problem.views import error_page
 urlpatterns = [
     path('admin/', admin.site.urls, name=admin),
     path('', include('problem.urls')),
+    path('chat/', include('chat.urls')),
 ]
 
 handler400 = error_page.e400
