@@ -106,10 +106,21 @@ DATABASES = {
         'NAME': 'mcur',
         'USER': 'django',
         'PASSWORD': '211563',
-        'HOST': '176.62.188.10',
-        'PORT': '54133',
+        'HOST': '192.168.10.25',
+        'PORT': '3306',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'mcur',
+#         'USER': 'django',
+#         'PASSWORD': '211563',
+#         'HOST': '176.62.188.10',
+#         'PORT': '54133',
+#     }
+# }
 
 
 # Password validation
