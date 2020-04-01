@@ -106,18 +106,11 @@ DATABASES = {
         'NAME': 'mcur',
         'USER': 'django',
         'PASSWORD': '211563',
-        'HOST': '192.168.10.25',
-        'PORT': '3306',
+        'HOST': '176.62.188.10',
+        'PORT': '54133',
     }
 }
-'''
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-'''
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -284,3 +277,7 @@ CELERY_ROUTES = {
     # -- LOW PRIORITY QUEUE -- #
     'myapp.tasks.close_session': {'queue': 'low'},
 }
+
+NO_VISIBLE_1 = [5, 6, 7]
+NO_VISIBLE_2 = [10, 1, 4, 11, 12, 3, 13]
+NO_VISIBLE = [NO_VISIBLE_1, NO_VISIBLE_2]

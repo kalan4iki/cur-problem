@@ -62,6 +62,17 @@ class ProblemSerializer(serializers.ModelSerializer):
 
 
 @api_view(['POST'])
+def dopaction(request):
+    pkstat = settings.NO_VISIBLE
+    allkolvo = 0
+    prob = Problem.objects.filter(Q(visible='1') & (Q(status__pk__in=pkstat[0])))
+    allkolvo += len(prob)
+    prob = Problem.objects.filter(Q(visible='1') & (Q(status__pk__in=pkstat[1])))
+    allkolvo += len(prob)
+    return JsonResponse({'kolvo': allkolvo})
+
+
+@api_view(['POST'])
 def apis(request):
     zapr = request.POST
     if 'token' in zapr :
@@ -116,13 +127,13 @@ def api_action(request):
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
             if request.POST['action'] == 'action1':
                 title = 'Скрытие обращений'
-                status = ['Закрыто', 'Получен ответ', 'Решено']
-                status2 = ['На рассмотрении', 'На уточнении', 'Премодерация', 'Премодерация (незавершённая регистрация)']
+                status = settings.NO_VISIBLE[0]
+                status2 = settings.NO_VISIBLE[1]
                 allprob = 0
-                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name__in=status)))
+                prob = Problem.objects.filter(Q(visible='1') & (Q(status__pk__in=status)))
                 allprob += len(prob)
                 prob.update(visible='0')
-                prob = Problem.objects.filter(Q(visible='1') & (Q(status__name__in=status2)))
+                prob = Problem.objects.filter(Q(visible='1') & (Q(status__pk__in=status2)))
                 allprob += len(prob)
                 prob.update(visible='2')
                 mes = f'''Успешно выполнено!

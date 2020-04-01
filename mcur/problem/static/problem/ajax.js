@@ -16,7 +16,7 @@ window.onload = function() {
         not2.innerHTML = '<i class="fas fa-envelope mr-2"></i>' + data['kolvosogl'] + ' ответов на согласовании';
       }
     }
-  }
+  };
 
   function answerLoad() {
     zapros.open('GET', domain + 'api/answer/', true);
@@ -24,4 +24,6 @@ window.onload = function() {
   }
 
   answerLoad();
-}
+};
+
+

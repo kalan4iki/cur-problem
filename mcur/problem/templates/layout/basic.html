@@ -78,6 +78,22 @@
         </ul>
       </li>
       {% if perms.problem.user_moderator  %}
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="fa fa-cogs"></i>
+          <span class="badge badge-success navbar-badge" id=''></span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header" id=''>Дополнительные действия</span>
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-item" id='daction1'>
+            <i class="fa fa-eye-slash mr-2"></i>
+          </button>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-divider"></div>
+          <a href="" class="dropdown-item dropdown-footer"></a>
+        </div>
+      </li>
       <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
@@ -298,6 +314,31 @@
 <script src="{% static 'adminlte/dist/js/pages/dashboard.js' %}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{% static 'adminlte/dist/js/demo.js' %}"></script>
+<script>
+    $(function () {
+        var url = '{% url "dopaction" %}',
+            CSRFtoken = $.cookie('csrftoken');
+        var post = $.post(url, {csrfmiddlewaretoken: CSRFtoken}, succespost);
+
+        function succespost(data) {
+            html = '<span class="badge badge-primary">' + data['kolvo'] + '</span> скрыть обращения';
+            $('#daction1').append(html);
+        }
+    });
+    $('#daction1').click(function () {
+        var url = '{% url 'api_action' %}',
+            CSRFtoken = $.cookie('csrftoken');
+        var post = $.post(url, {csrfmiddlewaretoken: CSRFtoken, action:'action1'}, doppsacc);
+    });
+    function doppsacc(data)
+    {
+        if (data['nom'] === 0) {
+            toastr["success"](data['message'], data['title'])
+        } else {
+            toastr["error"](data['message'], data['title'])
+        }
+    }
+</script>
 {% block ends %}
 
 {% endblock %}
