@@ -121,7 +121,7 @@ class ActionObject(object):
 
 @api_view(['POST'])
 def api_action(request):
-    if request.user.has_perm('problem.user_supermoderator'):
+    if request.user.has_perm('problem.user_moderator'):
         if request.method == 'POST':
             nowdatetime = datetime.now()
             nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
