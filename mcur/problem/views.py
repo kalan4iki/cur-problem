@@ -350,6 +350,36 @@ def Mailsend(email, date, nomd):
     send_mail('SKIOG', None, 'noreply@skiog.ru', [emai], fail_silently=False, html_message=data)
 
 
+def ProblemOrgView(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.user.has_perm('problem.user_moderator'):
+            prob = []
+            term = []
+            cur = Curator.objects.all().exclude(name='Территориальное управление')
+            if request.GET:
+                if request.GET['organization']:
+                    temp = request.GET['organization']
+                    term = Term.objects.filter(pk=int(temp))
+                    print(term)
+                    prob = Problem.objects.filter(terms__in=term)
+                else:
+                    prob = Problem.objects.filter(visible='1').exclude(terms=None)
+            else:
+                prob = Problem.objects.filter(visible='1').exclude(terms=None)
+            table = ProblemTable(prob)
+            RequestConfig(request, ).configure(table)
+            filter2 = cur
+            table = table
+            name = 'Обращения по организациям'
+            dop = f'Всего: {len(prob)}.'
+            title = 'Обращения по организациям'
+            return render(request, "problem/allproblem.html", {'table': table, 'name': name, 'dop': dop, 'title': title, 'filter2': filter2})
+        else:
+            return redirect('index')
+
+
 class ProblemListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
@@ -396,6 +426,7 @@ class ProblemNoListView(SingleTableMixin, FilterView):
             if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
             filterno = ProblemFilter(self.request.GET, queryset=prob)
+            print(self.request.GET)
             table = ProblemTable(filterno.qs)
             RequestConfig(self.request, ).configure(table)
             context['filter'] = filterno

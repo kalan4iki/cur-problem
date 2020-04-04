@@ -57,8 +57,7 @@ class Status(models.Model):
 
 
 class Curator(models.Model):
-    name = models.CharField(max_length=100, help_text='Куратор проблемы',
-                            verbose_name='Куратор')
+    name = models.CharField(max_length=100, help_text='Куратор проблемы', verbose_name='Организация')
 
     class Meta:
         ordering = ['name']
@@ -214,17 +213,17 @@ class Term(models.Model):
     datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
                                null=True)
     date = models.DateField(help_text='Срок', verbose_name='Срок', null=True)
-    org = models.ForeignKey(Curator, on_delete=models.SET_NULL,
-                            verbose_name='Организация', blank=True, null=True)
-    curat = models.ForeignKey(Department, on_delete=models.SET_NULL,
-                              verbose_name='Отдел', blank=True, null=True)
+    org = models.ForeignKey(Curator, on_delete=models.SET_NULL, verbose_name='Организация', blank=True, null=True,
+                            related_name='terms')
+    curat = models.ForeignKey(Department, on_delete=models.SET_NULL, verbose_name='Отдел', blank=True, null=True,
+                              related_name='terms')
     curatuser = models.ForeignKey(Person, on_delete=models.SET_NULL, related_name='curatuser',
                                   verbose_name='Сотрудник', blank=True, null=True)
     desck = models.TextField(help_text='Описание', verbose_name='Описание', blank=True, null=True)
     status = models.CharField(max_length=50, help_text='Статус ответа', verbose_name='Статус', default='0',
                               choices=stats)
-    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True,
-                                verbose_name='Проблема', related_name='terms')
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, null=True, verbose_name='Проблема',
+                                related_name='terms')
     anwr = models.BooleanField(default=False, verbose_name='Наличие ответа')
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, default=None, null=True)
 
