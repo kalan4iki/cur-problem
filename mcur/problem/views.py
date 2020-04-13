@@ -374,9 +374,8 @@ def ProblemOrgView(request):
             if request.GET:
                 if request.GET['organization']:
                     temp = request.GET['organization']
-                    term = Term.objects.filter(pk=int(temp))
-                    print(term)
-                    prob = Problem.objects.filter(terms__in=term)
+                    term = Term.objects.filter(org__pk=int(temp))
+                    prob = Problem.objects.filter(visible='1', terms__in=term).distinct()
                 else:
                     prob = Problem.objects.filter(visible='1').exclude(terms=None)
             else:
