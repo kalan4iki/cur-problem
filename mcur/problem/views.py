@@ -20,6 +20,7 @@ from django_filters.views import FilterView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import serializers
+from rest_framework.settings import api_settings
 
 #reportlab
 from reportlab.lib.pagesizes import A4
@@ -110,6 +111,18 @@ class ActionSerializer(serializers.Serializer):
     title = serializers.CharField()
     nom = serializers.IntegerField()
     message = serializers.CharField()
+
+
+class ProblemsSerializer(serializers.Serializer):
+    nomdobr = serializers.CharField()
+    dateotv = serializers.DateField(format='%d.%m.%Y')
+    temat = serializers.CharField()
+    podcat = serializers.CharField()
+    statussys = serializers.CharField(source='get_statussys_display')
+    status = serializers.CharField()
+
+    class Meta:
+        model = Problem
 
 
 class ActionObject(object):
@@ -1023,6 +1036,8 @@ def createuser(request):
                 for i in range(8):
                     password += random.choice(chars)
                 user = User.objects.create_user(request.POST['username'], request.POST['email'], password)
+                user.first_name = request.POST['first_name']
+                user.last_name = request.POST['last_name']
                 org = Curator.objects.get(pk=request.POST['org'])
                 a = UserProfile(user=user, org=org)
                 if request.POST['dep']:
@@ -1321,3 +1336,72 @@ def addty(request):
             a = ActionObject(title=title, nom=nom, message=mes)
             serializer = ActionSerializer(a)
             return JsonResponse(serializer.data, safe=False)
+
+
+def zapros(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.user.has_perm('problem.user_moderator'):
+            if request.GET:
+                if request.GET['action'] == 'api':
+                    if request.GET['org']:
+                        temp = request.GET['org']
+                        org = Curator.objects.get(pk=temp)
+                        dep = Department.objects.filter(org=org)
+                        temp = []
+                        for i in dep:
+                            temp.append([i.pk, i.name])
+                        return JsonResponse({'dep': temp})
+                    else:
+                        return JsonResponse({'test': 'test'})
+                elif request.GET['action'] == 'form':
+                    org = request.GET.getlist('org', [])
+                    dep = request.GET.getlist('dep[]', [])
+                    cat = request.GET.getlist('cat[]', [])
+                    dates = request.GET.getlist('date', [])
+                    q1 = []
+                    q2 = []
+                    if org:
+                        temp = Curator.objects.filter(pk=int(org[0]))
+                        q1.append(Q(org__in=temp))
+                    else:
+                        q1.append(Q())
+                    if dep:
+                        temp = []
+                        for i in dep:
+                            temp.append(int(i))
+                        depza = Department.objects.filter(pk__in=tuple(temp))
+                        q1.append(Q(curat__in=depza))
+                    else:
+                        q1.append(Q())
+                    if cat:
+                        temp = []
+                        for i in cat:
+                            temp.append(int(i))
+                        catza = Category.objects.filter(pk__in=tuple(temp))
+                        q2.append(Q(temat__in=catza))
+                    else:
+                        q2.append(Q())
+                    if dates != ['']:
+                        temp = dates[0].split('-')
+                        dateza = date(int(temp[0]), int(temp[1]), int(temp[2]))
+                        q2.append(Q(dateotv=dateza))
+                    else:
+                        q2.append(Q())
+                    term = Term.objects.filter(q1[0] & q1[1])
+                    prob = Problem.objects.filter(q2[0] & q2[1] & Q(terms__in=term) & (Q(visible='1') &
+                                                   Q(statussys='1')))
+                    serial = ProblemsSerializer(prob, many=True)
+                    #content = {'problem': serial.data, 'kolvo': len(prob)}
+                    return JsonResponse(serial.data, safe=False)
+                else:
+                    return JsonResponse({'test': 'test'})
+            else:
+                content = {}
+                content['form'] = {}
+                content['form']['org'] = Curator.objects.all().exclude(name='Территориальное управление')
+                content['form']['category'] = Category.objects.all()
+                return render(request, 'problem/zapros.html', {'content': content})
+        else:
+            return redirect('index')

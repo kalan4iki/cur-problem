@@ -1,0 +1,187 @@
+{% extends "layout/basic.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}Запрос информации{% endblock %}
+{% block nav2 %}active{% endblock %}
+{% block content %}
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">Запрос обращений</h1>
+      </div><!-- /.col -->
+      <div class="col-sm-6 ">
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <button type="button" class="btn btn-block btn-info btn-lg" data-toggle="modal" data-target="#modal-zapros">Выполнить запрос</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card" id="cardjsgrid" hidden>
+                <div class="card-body">
+                    <div id="jsGrid1" class="jsgrid">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="modal-zapros" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Запрос</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <form action="" method="get" id="formzapros">
+            <div class="modal-body">
+                {% if content.form %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Организация</label>
+                                <select name="org" class="form-control" id="id_org">
+                                    <option value="">---------</option>
+                                    {% for i in content.form.org %}
+                                    <option value="{{ i.pk }}">{{ i.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Отдел</label>
+                                <select name="dep" multiple="" class="form-control" id="id_dep">
+                                    <option value="">---------</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Категория</label>
+                                <select name="cat" multiple="" class="form-control" id="id_cat">
+                                    {% for i in content.form.category %}
+                                    <option value="{{ i.pk }}">{{ i.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="div_id_dateotv" class="form-group">
+                                <label for="id_dateotv">
+                                    Дата ответа по доброделу
+                                </label>
+                                <div class="">
+                                    <input type="date" name="dateotv" class="dateinput form-control" id="id_dateotv">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+              <button type="submit" class="btn btn-primary">Оправить</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block ends %}
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/jsgrid/jsgrid.min.css' %}">
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/jsgrid/jsgrid-theme.min.css' %}">
+    <script src="{% static 'adminlte/plugins/jsgrid/jsgrid.min.js' %}"></script>
+    <script>
+        var domain = 'https://skiog.ru/';
+        $('#id_org').change(function () {
+            var sele1 = $('#id_org').val();
+            if (sele1 !== '') {
+                var url = '{% url "zapros" %}',
+                CSRFtoken = $.cookie('csrftoken'),
+                content = {csrfmiddlewaretoken: CSRFtoken, org: sele1, action:'api'};
+                var posting = $.get( url, content, onAjaxSuccess);
+            } else {
+                var optin = $('<option value=""></option>');
+                optin.text('---------');
+                var sele2 = $('#id_dep');
+                sele2.find('option').remove();
+                sele2.append(optin)
+            }
+        });
+        function onAjaxSuccess(data)
+        {
+            var optin = $('<option value=""></option>');
+            optin.text('---------');
+            var sele2 = $('#id_dep');
+            sele2.find('option').remove();
+            sele2.append(optin);
+            data['dep'].forEach(function (item, i, arr) {
+                var optin = $('<option value=""></option>');
+                optin.val(item[0]);
+                optin.text(item[1]);
+                sele2.append(optin)
+            })
+        };
+        $('#formzapros').submit(function (event) {
+            event.preventDefault();
+            var $form = $( this ),
+                url = '{% url "zapros" %}',
+                CSRFtoken = $.cookie('csrftoken'),
+                org = $form.find('select[name="org"]').val(),
+                dep = $form.find('select[name="dep"]').val(),
+                cat = $form.find('select[name="cat"]').val(),
+                date = $form.find('input[name="dateotv"]').val(),
+                content = {csrfmiddlewaretoken: CSRFtoken, action:'form', org: org, dep: dep, cat: cat, date:date},
+                get = $.get(url, content, formsucc);
+        });
+        function formsucc(data) {
+            $('#modal-zapros').modal('hide');
+            $("#cardjsgrid").removeAttr('hidden');
+            $("#jsGrid1").jsGrid({
+                height: "100%",
+                width: "100%",
+                paging: true,
+                filtering: true,
+                pageSize: 15,
+                pageButtonCount: 5,
+
+                autoload: true,
+                rowClick: function(args) {
+                    window.open(domain + 'problem/' + args.item['nomdobr'], '_blank');
+                },
+                data: data,
+
+                fields: [
+                    { name: "nomdobr", type: "text", title: "Номер добродела"},
+                    { name: "dateotv", type: "text", title: "Дата ответа по доброделу"},
+                    { name: "temat", type: "text", title: "Тематика"},
+                    { name: "podcat", type: "text", title: "Подкатегория"},
+                    { name: "statussys", type: "text", title: "Статус в доброделе"},
+                    { name: "status", type: "text", title: "Статус"},
+                    { type: "control", editButton: false, deleteButton: false}
+                ]
+            });
+        }
+
+    </script>
+{% endblock %}

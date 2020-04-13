@@ -375,22 +375,21 @@ function Collapsef1(data)
             '<div class="row"><p>Количество распределенных: <span class="badge badge-success">' + data['notes'][2] + '</span></p></div>';
         $('#barchart4').closest('.card-body').append(text);
     } else if (data['chart'] === 'chart5') {
+      $(function () {
+        $("#jsGrid1").jsGrid({
+            height: "100%",
+            width: "100%",
 
-  $(function () {
-    $("#jsGrid1").jsGrid({
-        height: "100%",
-        width: "100%",
+            data: data['data'],
 
-        data: data['data'],
-
-        fields: [
-            { name: "fio", type: "text", title: "ФИО", width: 190 },
-            { name: "email", type: "text", title: "Почта", width: 130 },
-            { name: "tel", type: "text", title: "Телефон", width: 80 },
-            { name: "kolvo", type: "text", title: "Количество обращений"}
-        ]
+            fields: [
+                { name: "fio", type: "text", title: "ФИО", width: 190 },
+                { name: "email", type: "text", title: "Почта", width: 130 },
+                { name: "tel", type: "text", title: "Телефон", width: 80 },
+                { name: "kolvo", type: "text", title: "Количество обращений"}
+            ]
+            });
         });
-    });
     } else if (data['chart'] === 'error') {
         toastr["error"]('Ошибка выполнения')
     }

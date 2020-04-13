@@ -25,7 +25,7 @@ class lk_executor:
         else:
             q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
             termas = Termhistory.objects.filter(q1)
-            q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
+            q1 = Q(curatuser=userlk)
         termas2 = Term.objects.filter((q1 | Q(resolutions__in=termas)) & (Q(status='0') | Q(status='1')))
         prob = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(terms__in=termas2))
         if act == 1:
