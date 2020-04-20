@@ -11,8 +11,10 @@ from sys import platform
 from problem.models import Problem, Category, Podcategory, Status, Image, Author
 from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
-from mcur.settings import MEDIA_ROOT, MEDIA_URL
+from mcur.settings import MEDIA_ROOT, MEDIA_URL, NO_VISIBLE
 from datetime import date, datetime
+from django.db import transaction
+import xml.etree.ElementTree as xml
 import time
 import traceback
 import codecs
@@ -50,7 +52,13 @@ def loginDobrodel(brow, url, vxod):
         print(traceback.format_exc())
 
 
-def parsProblem(browser, prob=None):#TODO Доделать парсинг авторов
+class RefreshProblem(object):
+
+    def __init__(self, *args, **kwargs):
+        temp = ''
+
+
+def parsProblem(browser, prob=None):
         url = 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='
         if prob == None:
             prob = Problem.objects.filter((Q(visible='1') | Q(visible='2')) & Q(author=None))
@@ -152,12 +160,76 @@ def parsingall(browser, date, dopos):
     time.sleep(5)
 
 
-def parsTable(source):
+class CardParse(object):
+    actionqs = []
+    xmlcard = xml.Element("main")
+    act = xml.Element('Action')
+    problems = xml.Element('Problem')
+
+    def __init__(self, *args, **kwargs):
+        self.actionqs = kwargs['action']
+        self.xmlcard.append(self.act)
+        self.xmlcard.append(self.problems)
+        actid = xml.SubElement(self.act, "id")
+        actid.text = str(self.actionqs.pk)
+        actname = xml.SubElement(self.act, "name")
+        actname.text = str(self.actionqs.act)
+        actarg = xml.SubElement(self.act, "arg")
+        actarg.text = str(self.actionqs.arg)
+
+
+    def update(self, data):
+        id = xml.Element(data['nomdobr'])
+        self.xmlcard.append(id)
+        newstatus = xml.SubElement(id, 'newstatus')
+        newstatus.text = data['status'].name
+        laststatus = xml.SubElement(id, 'laststatus')
+        success = xml.SubElement(id, 'success')
+        temp = ''
+        if Problem.objects.filter(nomdobr=data['nomdobr']).exists():
+            prob = Problem.objects.get(nomdobr=data['nomdobr'])
+            laststatus.text = prob.status.name
+            prob.temat = data['temat']
+            prob.podcat = data['podcat']
+            prob.text = data['text']
+            prob.adres = data['adres']
+            prob.datecre = data['datecre']
+            prob.dateotv = data['dateotv']
+            temp = prob.status.name
+            prob.status = data['status']
+            prob.parsing = data['parsing']
+            prob.visible = data['visible']
+        else:
+            prob = Problem(nomdobr=data['nomdobr'], temat=data['temat'], podcat=data['podcat'], text=data['text'],
+                           adres=data['adres'], datecre=data['datecre'], status=data['status'], parsing=data['parsing'],
+                           dateotv=data['dateotv'], visible=data['visible'])
+        # print(f'######### - {prob.nomdobr}')
+        # print(f'(last -{temp}) - (new - {prob.status.name})')
+        prob.save()
+        prob = Problem.objects.get(nomdobr=data['nomdobr'])
+        if prob.status == data['status']:
+            success.text = 'Successfully'
+        else:
+            success.text = 'Unsuccessfully'
+        # print(f'Проверка - {prob.status.name}')
+        # print('#########')
+
+    def close(self, **kwargs):
+        if 'error' in kwargs:
+            errors = xml.Element('Errors')
+            self.xmlcard.append(errors)
+        path = MEDIA_ROOT + 'cardpars/'
+        fn = f'act-{self.actionqs.pk}.xml'
+        tree = xml.ElementTree(self.xmlcard)
+        with open(path + fn, 'wb') as fh:
+            tree.write(fh, encoding="utf-8")
+
+
+def parsTable(source, card):
     try:
         bs = BeautifulSoup(source, 'lxml')
         table = bs.find_all('tr', class_='jtable-data-row')
         if len(table) > 0:
-            allprob = ''
             for i in table:
                 temp = i.find_all('td')
                 temp2 = []
@@ -173,33 +245,52 @@ def parsTable(source):
                 if not Category.objects.filter(name=temp2[5]).exists():
                     cat = Category(name=temp2[5])
                     cat.save()
+                else:
+                    cat = Category.objects.get(name=temp2[5])
                 if not Podcategory.objects.filter(name=temp2[6]).exists():
                     podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
                     podcat.save()
+                else:
+                    podcat = Podcategory.objects.get(name=temp2[6])
                 if not Status.objects.filter(name=temp2[13]).exists():
                     stat = Status(name=temp2[13])
                     stat.save()
                 else:
                     stat = Status.objects.get(name=temp2[13])
                 visi = '1'
-                if not Problem.objects.filter(nomdobr=temp2[0]).exists():
-                    prob = Problem(nomdobr=temp2[0], temat=Category.objects.get(name=temp2[5]),
-                                   podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
-                                   datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
-                                   dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
-                else:
-                    prob = Problem.objects.get(nomdobr=temp2[0])
-                    prob.temat = Category.objects.get(name=temp2[5])
-                    prob.podcat = Podcategory.objects.get(name=temp2[6])
-                    prob.text = temp2[3]
-                    prob.adres = temp2[2]
-                    prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
-                    prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
-                    prob.status = stat
-                    prob.parsing = '1'
-                    prob.visible = visi
-                allprob += f'{prob.nomdobr},'
-                prob.save()
+                # if NO_VISIBLE[0] in stat.pk:
+                #     visi = '0'
+                # elif NO_VISIBLE[1] in stat.pk:
+                #     visi = '2'
+                data = {}
+                data['nomdobr'] = temp2[0]
+                data['temat'] = cat
+                data['podcat'] = podcat
+                data['text'] = temp2[3]
+                data['adres'] = temp2[2]
+                data['datecre'] = f'{date[2]}-{date[1]}-{date[0]}'
+                data['dateotv'] = f'{date2[2]}-{date2[1]}-{date2[0]}'
+                data['status'] = stat
+                data['parsing'] = '1'
+                data['visible'] = visi
+                card.update(data=data)
+                # if not Problem.objects.filter(nomdobr=temp2[0]).exists():
+                #     prob = Problem(nomdobr=temp2[0], temat=Category.objects.get(name=temp2[5]),
+                #                    podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
+                #                    datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
+                #                    dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
+                # else:
+                #     prob = Problem.objects.get(nomdobr=temp2[0])
+                #     prob.temat = Category.objects.get(name=temp2[5])
+                #     prob.podcat = Podcategory.objects.get(name=temp2[6])
+                #     prob.text = temp2[3]
+                #     prob.adres = temp2[2]
+                #     prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
+                #     prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
+                #     prob.status = stat
+                #     prob.parsing = '1'
+                #     prob.visible = visi
+                # prob.save()
         else:
             return 'non'
     except:
@@ -242,6 +333,7 @@ class Command(BaseCommand):
             b = ActionHistory.objects.filter(status='0')
             if len(b) > 0:
                 for i in b:
+                    card = CardParse(action=i)
                     try:
                         if i.act.nact == '1':#Просмотреть все жалобы
                             if i.arg != None:
@@ -251,7 +343,7 @@ class Command(BaseCommand):
                                     i.note = f'Страница {j}'
                                     i.save()
                                     source = browser.page_source
-                                    parsTable(source)
+                                    parsTable(source, card)
                                     ele = browser.find_element_by_class_name('jtable-page-number-next')
                                     if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
                                         break
@@ -268,20 +360,17 @@ class Command(BaseCommand):
                                     i.note = f'Проблем {ke} их {als}'
                                     pars(browser, j.nomdobr)
                                     source = browser.page_source
-                                    temp = parsTable(source)
+                                    temp = parsTable(source, card)
                                     i.save()
                                     ke += 1
                                     if temp == 'non':
                                         j.visible = '0'
                                         j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
                                         j.save()
-                                    else:
-                                        j.note = ''
-                                        j.save()
                             else:
                                 pars(browser, i.arg)
                                 source = browser.page_source
-                                er = parsTable(source)
+                                er = parsTable(source, card)
                                 if er == 'non':
                                     tempsss = Problem.objects.get(nomdobr=i.arg)
                                     tempsss.visible = '0'
@@ -305,7 +394,7 @@ class Command(BaseCommand):
                                     i.note = f'Страница {j}'
                                     i.save()
                                     source = browser.page_source
-                                    parsTable(source)
+                                    parsTable(source, card)
                                     if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
                                         break
                                     else:
@@ -322,7 +411,7 @@ class Command(BaseCommand):
                                     i.note = f'Страница {j}'
                                     i.save()
                                     source = browser.page_source
-                                    parsTable(source)
+                                    parsTable(source, card)
                                     if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
                                         break
                                     else:
@@ -340,7 +429,7 @@ class Command(BaseCommand):
                                         i.note = f'Страница {j}'
                                         i.save()
                                         source = browser.page_source
-                                        parsTable(source)
+                                        parsTable(source, card)
                                         if ele.get_attribute('class') == 'jtable-page-number-next jtable-page-number-disabled':
                                             break
                                         else:
@@ -355,7 +444,7 @@ class Command(BaseCommand):
                                         i.note = f'Страница {j}'
                                         i.save()
                                         source = browser.page_source
-                                        parsTable(source)
+                                        parsTable(source, card)
                                         if ele.get_attribute(
                                                 'class') == 'jtable-page-number-next jtable-page-number-disabled':
                                             break
@@ -373,7 +462,7 @@ class Command(BaseCommand):
                                 i.note = f'Проблем {ke} их {als}'
                                 pars(browser, j.nomdobr)
                                 source = browser.page_source
-                                temp = parsTable(source)
+                                temp = parsTable(source, card)
                                 i.save()
                                 ke += 1
                                 if temp == 'non':
@@ -405,9 +494,11 @@ class Command(BaseCommand):
                             parsProblem(browser, prob)
                         i.status = '1'
                         i.save()
+                        card.close()
                     except:
                         i.status = '2'
                         i.save()
+                        card.close(error='error')
                         logger.info('[PARSER]: ' + traceback.format_exc())
                         logger_mail.error('[PARSER]: ' + traceback.format_exc())
         time.sleep(2)

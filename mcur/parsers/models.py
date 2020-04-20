@@ -31,8 +31,8 @@ class Parser(models.Model):
 
 
 class Action(models.Model):
-    name = models.CharField(max_length = 40, verbose_name='Название действия')
-    nact = models.CharField(max_length = 40, verbose_name='Номер действия')
+    name = models.CharField(max_length=40, verbose_name='Название действия')
+    nact = models.CharField(max_length=40, verbose_name='Номер действия')
 
     class Meta:
         ordering = ['pk']
