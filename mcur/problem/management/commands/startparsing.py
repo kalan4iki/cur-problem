@@ -195,7 +195,6 @@ class CardParse(object):
             prob.adres = data['adres']
             prob.datecre = data['datecre']
             prob.dateotv = data['dateotv']
-            temp = prob.status.name
             prob.status = data['status']
             prob.parsing = data['parsing']
             prob.visible = data['visible']
@@ -211,6 +210,7 @@ class CardParse(object):
             success.text = 'Successfully'
         else:
             success.text = 'Unsuccessfully'
+        time.sleep(2)
         # print(f'Проверка - {prob.status.name}')
         # print('#########')
 
