@@ -29,7 +29,7 @@ class Category(models.Model):
 
 
 class Podcategory(models.Model):
-    name = models.CharField(max_length=255, help_text='Подкатегория проблемы',
+    name = models.CharField(max_length=400, help_text='Подкатегория проблемы',
                             verbose_name='Подкатегория')
     categ = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Категория проблемы',
                               verbose_name='Категория')

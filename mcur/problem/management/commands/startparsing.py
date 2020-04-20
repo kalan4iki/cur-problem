@@ -210,7 +210,7 @@ class CardParse(object):
             success.text = 'Successfully'
         else:
             success.text = 'Unsuccessfully'
-        time.sleep(2)
+        # time.sleep(2)
         # print(f'Проверка - {prob.status.name}')
         # print('#########')
 
@@ -247,6 +247,7 @@ def parsTable(source, card):
                     cat.save()
                 else:
                     cat = Category.objects.get(name=temp2[5])
+                print(temp2[6])
                 if not Podcategory.objects.filter(name=temp2[6]).exists():
                     podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
                     podcat.save()
