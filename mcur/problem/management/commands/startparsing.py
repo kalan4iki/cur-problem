@@ -247,7 +247,6 @@ def parsTable(source, card):
                     cat.save()
                 else:
                     cat = Category.objects.get(name=temp2[5])
-                print(temp2[6])
                 if not Podcategory.objects.filter(name=temp2[6]).exists():
                     podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
                     podcat.save()
@@ -259,10 +258,10 @@ def parsTable(source, card):
                 else:
                     stat = Status.objects.get(name=temp2[13])
                 visi = '1'
-                # if NO_VISIBLE[0] in stat.pk:
-                #     visi = '0'
-                # elif NO_VISIBLE[1] in stat.pk:
-                #     visi = '2'
+                if stat.pk in NO_VISIBLE[0]:
+                    visi = '0'
+                elif stat.pk in NO_VISIBLE[1]:
+                    visi = '2'
                 data = {}
                 data['nomdobr'] = temp2[0]
                 data['temat'] = cat
