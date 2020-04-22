@@ -134,14 +134,15 @@ class lk_dispatcher:
         userlk = request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-        q1 = Q(curatuser=userlk)
-        termas = Termhistory.objects.filter(q1)
-        q1 = Q(org=userlk.userprofile.org) | Q(curat__org=userlk.userprofile.org) | Q(curatuser=userlk)
-        q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-        termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-        q2 = Q(visible='1')
-        q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
-        termas2 = Problem.objects.filter(Q(terms__in=termas1) & q21 & q2)
+        # Проверка резолюций
+        q1 = Q(terms__resolutions__curatuser=userlk)
+        # Проверка направлений
+        q2 = (Q(terms__org=userlk.userprofile.org) | Q(terms__curat__org=userlk.userprofile.org) | Q(terms__curatuser=userlk))
+        q3 = (Q(terms__status__in=['0', '1']) & Q(terms__date__range=(nowdate + timedelta(1), nowdate + timedelta(4))))
+        # Проверка обращений
+        q4 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
+        q5 = Q(visible='1') & Q(statussys='1')
+        termas2 = Problem.objects.filter((q1 | (q2 & q3) | q4) & q5)
         if act == 1:
             kolvo = len(termas2)
             return kolvo
@@ -152,14 +153,15 @@ class lk_dispatcher:
         userlk = request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-        q1 = Q(curatuser=userlk)
-        termas = Termhistory.objects.filter(q1)
-        q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk) | Q(curat__org=userlk.userprofile.org)
-        q2 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
-        termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-        q2 = Q(visible='1') & Q(statussys='1')
-        q21 = Q(dateotv=nowdate)
-        termas2 = Problem.objects.filter((Q(terms__in=termas1) & q21) & q2)
+        #Проверка резолюций
+        q1 = Q(terms__resolutions__curatuser=userlk)
+        #Проверка направлений
+        q2 = (Q(terms__org=userlk.userprofile.org) | Q(terms__curat__org=userlk.userprofile.org) | Q(terms__curatuser=userlk))
+        q3 = Q(terms__status__in=['0', '1']) & Q(terms__date=nowdate)
+        #Проверка обращений
+        q4 = Q(dateotv=nowdate)
+        q5 = Q(visible='1') & Q(statussys='1')
+        termas2 = Problem.objects.filter((q1 | (q2 & q3) | q4) & q5)
         if act == 1:
             kolvo = len(termas2)
             return kolvo
