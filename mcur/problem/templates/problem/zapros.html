@@ -57,7 +57,7 @@
                             <div class="form-group">
                                 <label>Организация</label>
                                 <select name="org" class="form-control" id="id_org">
-                                    <option value="">---------</option>
+                                    <option value="None">---------</option>
                                     {% for i in content.form.org %}
                                     <option value="{{ i.pk }}">{{ i.name }}</option>
                                     {% endfor %}
@@ -67,8 +67,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Отдел</label>
-                                <select name="dep" multiple="" class="form-control" id="id_dep">
-                                    <option value="">---------</option>
+                                <select name="dep" class="form-control" id="id_dep">
+                                    <option value="None">---------</option>
                                 </select>
                             </div>
                         </div>
@@ -115,13 +115,14 @@
         var domain = 'https://skiog.ru/';
         $('#id_org').change(function () {
             var sele1 = $('#id_org').val();
-            if (sele1 !== '') {
+            if (sele1 !== 'None') {
                 var url = '{% url "zapros" %}',
                 CSRFtoken = $.cookie('csrftoken'),
                 content = {csrfmiddlewaretoken: CSRFtoken, org: sele1, action:'api'};
                 var posting = $.get( url, content, onAjaxSuccess);
             } else {
                 var optin = $('<option value=""></option>');
+                optin.val('None');
                 optin.text('---------');
                 var sele2 = $('#id_dep');
                 sele2.find('option').remove();
@@ -131,6 +132,7 @@
         function onAjaxSuccess(data)
         {
             var optin = $('<option value=""></option>');
+            optin.val('None');
             optin.text('---------');
             var sele2 = $('#id_dep');
             sele2.find('option').remove();
@@ -141,7 +143,7 @@
                 optin.text(item[1]);
                 sele2.append(optin)
             })
-        };
+        }
         $('#formzapros').submit(function (event) {
             event.preventDefault();
             var $form = $( this ),
@@ -157,7 +159,9 @@
         function formsucc(data) {
             $('#modal-zapros').modal('hide');
             $("#cardjsgrid").removeAttr('hidden');
-            $("#jsGrid1").jsGrid({
+            var table = $("#jsGrid1");
+            table.empty();
+            table.jsGrid({
                 height: "100%",
                 width: "100%",
                 paging: true,

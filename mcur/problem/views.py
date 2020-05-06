@@ -31,21 +31,22 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph
 from reportlab.lib.units import mm
 
-# other
+#project
 from .models import (Problem, Curator, Term, Answer, Image, Status, Termhistory, Department, Person, Category,
                      UserProfile, Minis, Author)
 from parsers.models import ActionHistory, Action, Parser
 from .tables import ProblemTable, ParsTable, UserTable, HistTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser, TyForm)
 from .filter import ProblemListView, ProblemFilter
+from .logick import lk_dispatcher, lk_executor, lk_moderator, lk_ty
+from mcur import settings
+
+
+# other
 from datetime import date, timedelta, datetime
 from sys import platform
 from operator import itemgetter
-from .logick import lk_dispatcher, lk_executor, lk_moderator, lk_ty
-import uuid
-import traceback
 import xlwt
-import mcur.settings as settings
 import random
 import os
 import logging
@@ -392,6 +393,34 @@ def ProblemOrgView(request):
             return redirect('index')
 
 
+def export_xls(problem):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="problems.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('problems')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес', 'Дата жалобы',
+               'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+    rows = problem.values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                                                             'text', 'adres', 'datecre',
+                                                                             'dateotv', 'status__name', 'statussys')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            if col_num == 6 or col_num == 7:
+                ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}', font_style)
+            else:
+                ws.write(row_num, col_num, row[col_num], font_style)
+    wb.save(response)
+    return response
+
+
 class ProblemListView(SingleTableMixin, FilterView):
     table_class = ProblemTable
     model = Problem
@@ -434,10 +463,37 @@ class ProblemNoListView(SingleTableMixin, FilterView):
         if not self.request.user.is_authenticated:
             return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
         else:
+            action = self.request.GET.get('action', None)
             prob = lk_moderator.b2(request=self.request, act=2)
             if not self.request.user.has_perm('problem.user_moderator'):
                 return redirect('index')
             filterno = ProblemFilter(self.request.GET, queryset=prob)
+            if action == 'export_xls':
+                response = HttpResponse(content_type='application/ms-excel')
+                response['Content-Disposition'] = 'attachment; filename="problems.xls"'
+                wb = xlwt.Workbook(encoding='utf-8')
+                ws = wb.add_sheet('problems')
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+                columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
+                           'Дата жалобы', 'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
+                for col_num in range(len(columns)):
+                    ws.write(row_num, col_num, columns[col_num], font_style)
+                font_style = xlwt.XFStyle()
+                rows = filterno.queryset.values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                           'text', 'adres', 'datecre',
+                                           'dateotv', 'status__name', 'statussys')
+                for row in rows:
+                    row_num += 1
+                    for col_num in range(len(row)):
+                        if col_num == 6 or col_num == 7:
+                            ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
+                                     font_style)
+                        else:
+                            ws.write(row_num, col_num, row[col_num], font_style)
+                wb.save(response)
+                return response
             print(self.request.GET)
             table = ProblemTable(filterno.qs)
             RequestConfig(self.request, ).configure(table)
@@ -702,8 +758,11 @@ def prob(request, pk):
                     dep = None
                     userorg = None
                 resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
-                return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd, 'formadd': termadd, 'np': prob, 'terms': terms, 'resform': resform})
+                return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd,
+                                                                'formadd': termadd, 'np': prob, 'terms': terms,
+                                                                'resform': resform})
             else:
+                messages.error(request, 'Нет доступа к обращению.')
                 return redirect('index')
         else:
             return redirect('index')
@@ -830,9 +889,9 @@ def lk(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        userlk = User.objects.get(username=request.user.username)
+        #userlk = User.objects.get(username=request.user.username)
         nowdatetime = datetime.now()
-        nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+        #nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
         if request.method == 'POST':
             if request.user.has_perm('problem.user_moderator'):
                 if request.POST['box'] == 'box1':# Ответы
@@ -976,6 +1035,7 @@ def exportxls(request):
     font_style = xlwt.XFStyle()
     userlk = User.objects.get(username=request.user.username)
     if request.user.has_perm('problem.user_moderator'):
+        #prob = filterall = ProblemFilter(request.GET, queryset=prob)
         rows = Problem.objects.all().values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
                                                                              'text', 'adres', 'datecre',
                                                                              'dateotv', 'status__name', 'statussys')
@@ -1355,25 +1415,24 @@ def zapros(request):
                     else:
                         return JsonResponse({'test': 'test'})
                 elif request.GET['action'] == 'form':
-                    org = request.GET.getlist('org', [])
-                    dep = request.GET.getlist('dep[]', [])
-                    cat = request.GET.getlist('cat[]', [])
-                    dates = request.GET.getlist('date', [])
+                    zapr = dict(request.__dict__['GET'])
+                    org = zapr.get('org', None)
+                    dep = zapr.get('dep', None)
+                    cat = zapr.get('cat[]', None)
+                    dates = zapr.get('date', None)
                     q1 = []
                     q2 = []
-                    if org:
+                    if dep[0] != 'None' and dep[0] != None:
+                        q1 = []
+                        q1.append(Q())
+                        depza = Department.objects.filter(pk=int(dep[0]))
+                        q1.append(Q(curat__in=depza))
+                    elif org[0] != 'None' and org[0] != None:
                         temp = Curator.objects.filter(pk=int(org[0]))
                         q1.append(Q(org__in=temp))
-                    else:
                         q1.append(Q())
-                    if dep:
-                        temp = []
-                        for i in dep:
-                            temp.append(int(i))
-                        depza = Department.objects.filter(pk__in=tuple(temp))
-                        q1.append(Q(curat__in=depza))
                     else:
-                        q1.append(Q())
+                        q1 = None
                     if cat:
                         temp = []
                         for i in cat:
@@ -1388,11 +1447,15 @@ def zapros(request):
                         q2.append(Q(dateotv=dateza))
                     else:
                         q2.append(Q())
-                    term = Term.objects.filter(q1[0] & q1[1])
-                    prob = Problem.objects.filter(q2[0] & q2[1] & Q(terms__in=term) & (Q(visible='1') &
-                                                   Q(statussys='1')))
+                    term = ''
+                    prob = ''
+                    if q1:
+                        term = Term.objects.filter(q1[0] & q1[1])
+                        prob = Problem.objects.filter(
+                            q2[0] & q2[1] & Q(terms__in=term) & (Q(visible='1') & Q(statussys='1')))
+                    else:
+                        prob = Problem.objects.filter(q2[0] & q2[1] & (Q(visible='1') & Q(statussys='1')))
                     serial = ProblemsSerializer(prob, many=True)
-                    #content = {'problem': serial.data, 'kolvo': len(prob)}
                     return JsonResponse(serial.data, safe=False)
                 else:
                     return JsonResponse({'test': 'test'})

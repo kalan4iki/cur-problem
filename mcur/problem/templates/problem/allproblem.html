@@ -15,6 +15,11 @@
       <div class="col-sm-6 ">
         {% if perms.problem.user_dispatcher %}
         <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right">
+              <i class="fas fa-download"></i> Выгрузить No
+        </a>
+        {% endif %}
+        {% if perms.problem.user_dispatcher %}
+        <a class="btn btn-app float-sm-right" id="exportxls">
               <i class="fas fa-download"></i> Выгрузить
         </a>
         {% endif %}
@@ -81,7 +86,7 @@
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <form action="" method="get">
+        <form action="" method="get" id="formfilter">
             <div class="modal-body">
                 <div class="row">
                     <div class="col-4">
@@ -124,4 +129,25 @@
     <!-- /.modal-dialog -->
 </div>
 {% endif %}
+{% endblock %}
+{% block ends %}
+<script>
+    var button = $('#exportxls');
+    if (location.search === '') {
+        var url = location.href + '?action=export_xls';
+    } else {
+        var url = location.href + '&action=export_xls';
+    }
+    button.attr('href', url);
+    {#$('#exportxls').click(function (event) {#}
+    {#    var $data = {};#}
+    {#    $('#formfilter').find ('input, select').each(function() {#}
+    {#      $data[this.name] = $(this).val();#}
+    {#    });#}
+    {#    $data['action'] = 'export_xls';#}
+    {#    $data['csrfmiddlewaretoken'] = $.cookie('csrftoken');#}
+    {#    var url = location.pathname;#}
+    {#    var gets = $.get(url, $data);#}
+    {#})#}
+</script>
 {% endblock %}

@@ -17,6 +17,8 @@
   </div><!-- /.container-fluid -->
 </div>
 <section class="content">
+
+
 {% csrf_token %}
 {% if not perms.problem.user_ty or user.is_superuser %}
   <div class="row">
@@ -232,5 +234,11 @@ function onAjaxSuccess(data) {
         box.find('.inner').find('h3').text(data['kolvo']);
     }
 }
+
+{% if messages %}
+    {% for message in messages %}
+        toastr[{% if message.tags %}'{{ message.tags }}'{% else %}'info'{% endif %}]('{{ message }}', 'Уведомление');
+    {% endfor %}
+{% endif %}
 </script>
 {% endblock %}
