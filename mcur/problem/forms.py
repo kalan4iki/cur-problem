@@ -50,7 +50,7 @@ class AnswerForm(Form):
 class TermForm(ModelForm):
     class Meta:
         model = Term
-        fields = {'date', 'desck','org', 'curat', 'curatuser'}
+        fields = {'date', 'desck','org', 'curat', 'curatuser', 'further'}
         TA = Textarea
         TA.template_name="widgets/textarea.html"
         widgets = {'desck': TA}

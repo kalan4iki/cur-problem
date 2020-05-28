@@ -90,6 +90,7 @@
             </div>
             </div>
             {{ formadd.desck|as_crispy_field }}
+            {{ formadd.further|as_crispy_field }}
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -472,9 +473,10 @@ $('#termform').submit(function (event) {
         sele2 = $form.find('select[name="curat"]').val(),
         sele3 = $form.find('select[name="curatuser"]').val(),
         text = $form.find('textarea[name="desck"]').val(),
+        further = $form.find('input[name="further"]').prop('checked'),
         url = $form.attr( 'action' ),
         CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text}, onAjaxSuccess);
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text, further:further}, onAjaxSuccess);
     $('#modal-addterm').modal('hide');
 });
 

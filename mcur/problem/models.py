@@ -226,6 +226,7 @@ class Term(models.Model):
                                 related_name='terms')
     anwr = models.BooleanField(default=False, verbose_name='Наличие ответа')
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, default=None, null=True)
+    further = models.BooleanField(verbose_name='Для дальнейшего рассмотрения', default=False)
 
     class Meta:
         ordering = ['date']
