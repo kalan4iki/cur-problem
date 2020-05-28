@@ -13,12 +13,12 @@
         <h1 class="m-0 text-dark">{{ name }}. {{ dop }}</h1>
       </div><!-- /.col -->
       <div class="col-sm-6 ">
-        {% if perms.problem.user_dispatcher %}
+        {% if perms.problem.user_supermoderator %}
         <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right">
               <i class="fas fa-download"></i> Выгрузить No
         </a>
         {% endif %}
-        {% if perms.problem.user_dispatcher %}
+        {% if perms.problem.user_supermoderator %}
         <a class="btn btn-app float-sm-right" id="exportxls">
               <i class="fas fa-download"></i> Выгрузить
         </a>
