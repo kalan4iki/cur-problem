@@ -18,6 +18,34 @@
     <section class="content">
     <div class="container-fluid">
         <div class="row">
+            <div class="col">
+                    <div class="card">
+                      <div class="card-header">
+                            <h3 class="card-title">Отчеты</h3>
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <div class="row">
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
+                                </div>
+                                 <div class="col-md-2">
+                                    <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые обращения</button>
+                                </div>
+                                 <div class="col-md-2">
+
+                                </div>
+                             </div>
+                      </div>
+                      <!-- /.card-body -->
+                    </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-6">
                 <div class="card collapsed-card">
                   <div class="card-header">
@@ -105,30 +133,40 @@
                 {% endif %}
             </div>
             <div class="col-md-6">
-                <div class="card">
+                <div class="card collapsed-card">
                   <div class="card-header">
-                        <h3 class="card-title">Отчеты</h3>
+                    <h3 class="card-title">Новые обращения</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart6"><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="row">
-                            <div class="col-md-3">
-                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
-                            </div>
-                             <div class="col-md-2">
-                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые обращения</button>
-                            </div>
-                             <div class="col-md-2">
-
-                            </div>
-                         </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="card collapsed-card">
+                  <div class="card-header">
+                    <h3 class="card-title">Топ 5 категорий за период</h3>
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart7"><i class="fas fa-plus"></i>
+                      </button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                      <div id="jsGrid2" class="jsgrid">
+                      </div>
                   </div>
                   <!-- /.card-body -->
                 </div>
+            </div>
+            <div class="col-6">
+
             </div>
         </div>
     </div>
@@ -194,11 +232,9 @@ $('.addchart').click(function (eventObject) {
             '</div>');
         rod1.removeClass('collapsed-card');
         if (but1.attr('id') === 'chart5') {
-
         } else {
             appendchart1(rod1.find('.card-body'), but1.attr('id'));
         }
-
         but1.find('i').removeClass('fas fa-plus').addClass('fa fa-refresh');
         var url = '{% url 'dashboard' %}',
             CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
@@ -375,19 +411,76 @@ function Collapsef1(data)
             '<div class="row"><p>Количество распределенных: <span class="badge badge-success">' + data['notes'][2] + '</span></p></div>';
         $('#barchart4').closest('.card-body').append(text);
     } else if (data['chart'] === 'chart5') {
-      $(function () {
-        $("#jsGrid1").jsGrid({
-            height: "100%",
-            width: "100%",
+        $(function () {
+            $("#jsGrid1").jsGrid({
+                height: "100%",
+                width: "100%",
 
-            data: data['data'],
+                data: data['data'],
 
-            fields: [
-                { name: "fio", type: "text", title: "ФИО", width: 190 },
-                { name: "email", type: "text", title: "Почта", width: 130 },
-                { name: "tel", type: "text", title: "Телефон", width: 80 },
-                { name: "kolvo", type: "text", title: "Количество обращений"}
-            ]
+                fields: [
+                    {name: "fio", type: "text", title: "ФИО", width: 190},
+                    {name: "email", type: "text", title: "Почта", width: 130},
+                    {name: "tel", type: "text", title: "Телефон", width: 80},
+                    {name: "kolvo", type: "text", title: "Количество обращений"}
+                ]
+            });
+        });
+    } else if(data['chart'] === 'chart6'){
+        var areaChartData = {
+          labels  : data['label'],
+          datasets: [
+            {
+              label               : 'Количетсво новых обращений',
+              backgroundColor     : 'rgba(60,141,188,0.9)',
+              borderColor         : 'rgba(60,141,188,0.8)',
+              pointRadius          : false,
+              pointColor          : '#3b8bba',
+              pointStrokeColor    : 'rgba(60,141,188,1)',
+              pointHighlightFill  : '#fff',
+              pointHighlightStroke: 'rgba(60,141,188,1)',
+              data                : data['data']
+            }
+          ]
+        };
+
+        var areaChartOptions = {
+          maintainAspectRatio : false,
+          responsive : true
+        };
+
+        var barChartCanvas = $('#barchart6').get(0).getContext('2d');
+        var barChartData = jQuery.extend(true, {}, areaChartData);
+        var temp0 = areaChartData.datasets[0];
+        barChartData.datasets[0] = temp0;
+
+        var barChartOptions = {
+          responsive              : true,
+          maintainAspectRatio     : false,
+          datasetFill             : false
+        };
+
+        var barChart = new Chart(barChartCanvas, {
+          type: 'bar',
+          data: barChartData,
+          options: areaChartOptions
+        });
+    } else if (data['chart'] === 'chart7') {
+        $(function () {
+            $("#jsGrid2").jsGrid({
+                height: "100%",
+                width: "100%",
+
+                data: data['data'],
+
+                fields: [
+                    {name: "nam", type: "text", title: "Категория", width: 190},
+                    {name: 'd1', type: "text", title: data['notes'][0]},
+                    {name: 'd2', type: "text", title: data['notes'][1]},
+                    {name: 'd3', type: "text", title: data['notes'][2]},
+                    {name: 'd4', type: "text", title: data['notes'][3]},
+                    {name: 'd5', type: "text", title: data['notes'][4]}
+                ]
             });
         });
     } else if (data['chart'] === 'error') {

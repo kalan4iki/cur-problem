@@ -12,12 +12,21 @@ class ImageInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Фотографии'
 
-class AuthorInline(admin.StackedInline):
+
+class AuthorInline(admin.TabularInline):
     model = Problem
     can_delete = False
     verbose_name_plural = 'Обращения'
     fields = ('nomdobr', 'temat', 'podcat')
     readonly_fields = ('nomdobr', 'temat', 'podcat')
+
+
+class TermInline(admin.TabularInline):
+    model = Term
+    can_delete = False
+    verbose_name_plural = 'Назначения'
+    fields = ('pk', 'date', 'org', 'curat', 'curatuser')
+    readonly_fields = ('pk', 'date', 'org', 'curat', 'curatuser')
 
 
 @admin.register(Author)
@@ -97,6 +106,7 @@ class ProblemAdmin(admin.ModelAdmin):
     search_fields = ('nomdobr',)
     list_filter = ('visible', 'dateotv', 'status__name', 'note', 'temat', 'ciogv__name',)
     actions = ('pars', 'novisib', 'termnovisib', 'visib')
+    inlines = (TermInline,)
 
     def pars(self, request, queryset):
         for prob in queryset:

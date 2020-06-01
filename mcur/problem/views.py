@@ -494,7 +494,6 @@ class ProblemNoListView(SingleTableMixin, FilterView):
                             ws.write(row_num, col_num, row[col_num], font_style)
                 wb.save(response)
                 return response
-            print(self.request.GET)
             table = ProblemTable(filterno.qs)
             RequestConfig(self.request, ).configure(table)
             context['filter'] = filterno
@@ -736,6 +735,9 @@ def Answer_modify(request, pk):
 
 
 def prob(request, pk):
+    back = str(request.META.get('HTTP_REFERER'))
+    if back.find('None') != -1:
+        back = False
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
@@ -785,7 +787,7 @@ def prob(request, pk):
                 resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
                 return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd,
                                                                 'formadd': termadd, 'np': prob, 'terms': terms,
-                                                                'resform': resform})
+                                                                'resform': resform, 'back': back})
             else:
                 messages.error(request, 'Нет доступа к обращению.')
                 return redirect('index')
@@ -904,6 +906,40 @@ def delterm(request, pk):
                 return JsonResponse(serializer.data, safe=False)
         else:
             mes = 'Ошибка, не достаточно прав на удаление назначения.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
+
+
+def delty(request, pk):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        title = 'Удаление ТУ обращения'
+        if request.user.has_perm('problem.user_moderator'):
+            if Term.objects.filter(pk=pk).exists():
+                if request.method == 'POST':
+
+                    mes = 'Удалено'
+                    nom = 0
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+                else:
+                    mes = 'Ошибка, неправильный запрос.'
+                    nom = 1
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+            else:
+                mes = 'Ошибка'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+        else:
+            mes = 'Ошибка, не достаточно прав на удаление.'
             nom = 1
             a = ActionObject(title=title, nom=nom, message=mes)
             serializer = ActionSerializer(a)
@@ -1240,7 +1276,7 @@ def dashboard(request):
                     kolvo = []
                     for i in author:
                         temp[i.pk] = len(i.problems.all())
-                    temp = sorted(temp.items(), key=itemgetter(1), reverse = True)
+                    temp = sorted(temp.items(), key=itemgetter(1), reverse=True)
                     for i in range(25):
                         nom = temp[i][0]
                         autho = Author.objects.get(pk=nom)
@@ -1249,6 +1285,40 @@ def dashboard(request):
                         a['email'] = autho.email
                         a['tel'] = autho.tel
                         a['kolvo'] = temp[i][1]
+                        kolvo.append(a)
+                    print(kolvo)
+                elif request.POST['chart'] == 'chart6':
+                    tempdate = []
+                    for i in range(6, 0, -1):
+                        tempdate.append(nowdate-timedelta(i))
+                    tempdate.append(nowdate)
+                    kolvo = []
+                    for i in tempdate:
+                        kolvo.append(len(Problem.objects.filter(datecre=i)))
+                elif request.POST['chart'] == 'chart7':
+                    cats = Category.objects.all()
+                    kolvo = []
+                    tempdate = []
+                    notes = []
+                    for i in range(4, 0, -1):
+                        temp = nowdate - timedelta(i)
+                        tempdate.append(temp)
+                        notes.append(temp.strftime('%d.%m.%Y'))
+                    tempdate.append(nowdate)
+                    notes.append(nowdate.strftime('%d.%m.%Y'))
+                    temp = {}
+                    for j in cats:
+                        temp[j.pk] = len(Problem.objects.filter(temat=j, datecre__range=[tempdate[0], tempdate[-1]]))
+                    temp = sorted(temp.items(), key=itemgetter(1), reverse=True)
+                    kolvo = []
+                    for i in range(5):
+                        nom = temp[i][0]
+                        cat = Category.objects.get(pk=nom)
+                        a = {'nam': cat.name}
+                        c = 1
+                        for j in tempdate:
+                            a[f'd{c}'] = len(Problem.objects.filter(temat=cat, datecre=j))
+                            c += 1
                         kolvo.append(a)
                 else:
                     return JsonResponse({'chart': 'error'})
@@ -1300,7 +1370,6 @@ def export_pdf(request, pk):
     <p>{prob.text}</p>
     </font>'''
         p = Paragraph(barcode_string, style=style["Normal"])
-        print(p)
         p.wrapOn(c, width-10, height)
         p.drawOn(c, 20, row-250, mm)
         # Close the PDF object cleanly, and we're done.

@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import render, redirect
 from django.db.models import F
 import uuid
 
@@ -238,7 +239,7 @@ class Term(models.Model):
         return temp
 
     def get_absolute_url(self):
-        return reverse("termview", args=(self.pk,))
+        return reverse('problem', kwargs={'pk': self.problem.nomdobr})
 
     def on_close(self):
         if self.status == '0':
