@@ -4,7 +4,8 @@ from .views import (api_problem, api_problem_detail, api_answer_detail, prob, ad
                     zaptable, add, termadd, delterm, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd, zapros,
                     createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action,
-                    listuser, term_approve, api_report, addty, ProblemTyListView, apis, dopaction, ProblemOrgView)
+                    listuser, term_approve, api_report, addty, ProblemTyListView, apis, dopaction, ProblemOrgView,
+                    ProblemFuListView)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -40,6 +41,7 @@ urlpatterns = [
     url(r'typroblem/', ProblemTyListView.as_view(), name='typroblem'),
     url(r'orgproblem/', ProblemOrgView, name='orgproblem'),
     url(r'^export/xls/$', exportxls, name='exportxls'),
+    url(r'fuproblem/', ProblemFuListView.as_view(), name='fuproblem'),
     path('answer/action/aprrove/<int:pk>', Answer_approve, name='answer_approve'),
     path('answer/action/modify/<int:pk>', Answer_modify, name='answer_modify'),
     path('calendary/', development, name='calendary'),

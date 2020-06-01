@@ -9,7 +9,8 @@ class Command(BaseCommand):
     help = 'Команда запуска парсера vmeste.mosreg.ru'
 
     def handle(self, *args, **options):
-        pkauthor = [1515,155,189,540,500,561,982,198,55,157,261,130,99,82,100]
+        #pkauthor = [946,1515,155,189,540,500,561,982,198,55,157,261,130,99,82,100]
+        pkauthor = [946]
         for aupk in pkauthor:
             author = Author.objects.get(pk=aupk)
             print(f'''Автор: 
@@ -28,7 +29,7 @@ class Command(BaseCommand):
                 temp = [1,2,3]
                 for r in temp:
                     if int(r) == 1:
-                        dateot = '01.05.2020'
+                        dateot = '01.05.2018'
                         datedo = '27.05.2020'
                     elif int(r) == 2:
                         dateot = '15.05.2020'

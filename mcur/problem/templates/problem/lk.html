@@ -172,6 +172,24 @@
         </a>
       </div>
     {% endif %}
+    {% if perms.problem.user_moderator %}
+    <div class="row">
+        <div class="col ">
+          <div class="small-box bg-info" id="box9">
+            <div class="inner">
+              <h3></h3>
+              <p>Обещанные обращения</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <a href="{% url 'fuproblem' %}" class="small-box-footer">
+              Подробнее <i class="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col-12">
            <div class="card">

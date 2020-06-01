@@ -648,6 +648,31 @@ class ProblemTyListView(SingleTableMixin, FilterView):
         return context
 
 
+class ProblemFuListView(SingleTableMixin, FilterView):
+    table_class = ProblemTable
+    model = Problem
+    template_name = "problem/allproblem.html"
+    filterset_class = ProblemFilter
+
+    def get_context_data(self, **kwargs):
+        context = super(ProblemFuListView, self).get_context_data(**kwargs)
+        if not self.request.user.is_authenticated:
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
+        else:
+            userlk = User.objects.get(username=self.request.user.username)
+            if userlk.has_perm('problem.user_moderator'):
+                prob = lk_moderator.b9(request=self.request, act=2)
+                filterme = ProblemFilter(self.request.GET, queryset=prob)
+                table = ProblemTable(filterme.qs)
+                RequestConfig(self.request, ).configure(table )
+                context['filter'] = filterme
+                context['table'] = table
+                context['name'] = 'Обещанные обращения'
+                context['dop'] = f'Всего: {len(filterme.qs)}.'
+                context['title'] = 'Обещанные обращения'
+        return context
+
+
 class error_page:
     def e400(request, exception):
         errors = 'Ошибка 400!'
@@ -918,6 +943,9 @@ def lk(request):
                 elif request.POST['box'] == 'box8':# ТУ лист
                     kolvo = lk_moderator.b8(request=request, act=1)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box9':# ТУ лист
+                    kolvo = lk_moderator.b9(request=request, act=1)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
                 else:
                     return JsonResponse({'mes': 'error'})
             elif request.user.has_perm('problem.user_dispatcher'):
@@ -1126,6 +1154,7 @@ def createuser(request):
             serializer = ActionSerializer(a)
             return JsonResponse(serializer.data, safe=False)
 
+
 def addparsing(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -1152,6 +1181,7 @@ def addparsing(request, pk):
             a = ActionObject(title=title, nom=nom, message=mes)
             serializer = ActionSerializer(a)
             return JsonResponse(serializer.data, safe=False)
+
 
 def dashboard(request):
     if not request.user.is_authenticated:
@@ -1228,6 +1258,7 @@ def dashboard(request):
         else:
             redirect('index')
 
+
 def export_pdf(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -1278,13 +1309,12 @@ def export_pdf(request, pk):
         c.save()
         return response
 
+
 def statandact(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if request.user.has_perm('problem.user_supermoderator'):
-            # logger.info('Test 1 opp')
-            # logger_mail.error('Test 2 opp')
             content = {}
             content['status'] = ['Закрыто', 'Получен ответ', 'Решено', 'На рассмотрении', 'На уточнении', 'Премодерация', 'Премодерация (незавершённая регистрация)']
             content['kolvo'] = []
@@ -1314,6 +1344,7 @@ def statandact(request):
         else:
             return redirect('index')
 
+
 def listuser(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -1325,6 +1356,7 @@ def listuser(request):
             return render(request, 'problem/listuser.html', {'table': table, 'formcreate': formcreate})
         else:
             return redirect('index')
+
 
 def term_approve(request, pk):
     if not request.user.is_authenticated:
@@ -1360,6 +1392,7 @@ def term_approve(request, pk):
             a = ActionObject(title=title, nom=nom, message=mes)
             serializer = ActionSerializer(a)
             return JsonResponse(serializer.data, safe=False)
+
 
 def addty(request):
     if not request.user.is_authenticated:

@@ -285,6 +285,17 @@ class lk_moderator:
         elif act == 2:
             return prob
 
+    def b9(request, act):
+        userlk = request.user
+        term = Term.objects.filter(further=True)
+        prob = Problem.objects.filter(terms__in=term)
+        if act == 1:
+            kolvo = len(prob)
+            return kolvo
+        elif act == 2:
+            return prob
+
+
 # Область тер. управления
 class lk_ty:
     def b1(request, act): #Все обращения
