@@ -92,7 +92,14 @@
             </div>
             </div>
             {{ formadd.desck|as_crispy_field }}
-            {{ formadd.further|as_crispy_field }}
+            <div class="row">
+                <div class="col-6">
+                    {{ formadd.further|as_crispy_field }}
+                </div>
+                <div class="col-6">
+                    {{ formadd.furtherdate|as_crispy_field }}
+                </div>
+            </div>
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -249,7 +256,7 @@
         </div>
         <!-- /.card -->
       {% for i in terms %}
-      <div class="card {{resdat.i.pk}} card-widget collapsed-card">
+      <div class="card {{resdat.i.pk}} {% if i.further %}card-warning{% endif %} card-widget collapsed-card">
         <div class="card-header ">
           <div class="user-block">
             <img class="img-circle" src="{% static 'adminlte/dist/img/term.png' %}" alt="User Image">
@@ -264,13 +271,16 @@
             | {{ i.curatuser.first_name }} {{ i.curatuser.last_name }} |
             {% endif %}
             </span>
-            <span class="description">Дата создания - {{ i.datecre }} Статус - <b>{{i.get_status_display}}. </b>Срок исполнения - <b>{{i.date}}</b> </span>
+            <span class="description">{% if not i.further %}Дата создания - {{ i.datecre }}{% endif %} Статус - <b>{{i.get_status_display}}. </b>Срок исполнения - <b>{{i.date}}</b>
+            {% if i.further %}<span class="badge badge-info">Обещанное: {{i.furtherdate}}</span>{% endif %}</span>
           </div>
           <!-- /.user-block -->
           <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Развернуть/свернуть"><i class="fas fa-plus"></i>
             </button>
               {% if perms.problem.user_moderator %}
+            <button type="button" class="btn btn-tool" id="" title="Редактировать"><i class="fa fa-pencil"></i>
+            </button>
             <button type="button" class="btn btn-tool" id="approve-{{ i.pk }}" title="Утвердить назначение"><i class="fa fa-check"></i>
             </button>
             <button type="button" class="btn btn-tool" id="del-{{ i.pk }}" title="Удалить"><i class="fas fa-times"></i>
@@ -476,9 +486,10 @@ $('#termform').submit(function (event) {
         sele3 = $form.find('select[name="curatuser"]').val(),
         text = $form.find('textarea[name="desck"]').val(),
         further = $form.find('input[name="further"]').prop('checked'),
+        furtherdate = $form.find('input[name="furtherdate"]').val(),
         url = $form.attr( 'action' ),
         CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text, further:further}, onAjaxSuccess);
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text, further:further, furtherdate:furtherdate}, onAjaxSuccess);
     $('#modal-addterm').modal('hide');
 });
 
@@ -512,6 +523,21 @@ $('#del-{{ i.pk }}').click(function () {
     });
 {% endif %}
 {% endfor %}
+
+$(document).ready(function () {
+    var fd = $('#id_furtherdate');
+    fd.attr('readonly', true);
+    fd.attr('type', 'date');
+});
+
+$('#id_further').change(function () {
+    var cb = $( this );
+    if(this.checked) {
+       cb.parents("div[class='row']").find('#id_furtherdate').attr('readonly', false)
+    } else {
+       cb.parents("div[class='row']").find('#id_furtherdate').attr('readonly', true)
+    }
+});
 
 function onAjaxSuccess(data)
 {

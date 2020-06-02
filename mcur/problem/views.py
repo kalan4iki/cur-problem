@@ -247,7 +247,6 @@ def api_report(request):
                     datebefore = date.fromisoformat(request.POST['datebefore'])
                 wb = xlwt.Workbook(encoding='utf-8')
                 ws = wb.add_sheet('problems')
-                # Sheet header, first row
                 row_num = 0
                 font_style = xlwt.XFStyle()
                 font_style.font.bold = True
@@ -256,10 +255,9 @@ def api_report(request):
                            'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
                 for col_num in range(len(columns)):
                     ws.write(row_num, col_num, columns[col_num], font_style)
-                # Sheet body, remaining rows
                 font_style = xlwt.XFStyle()
-                rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
-                                                         'text', 'adres', 'datecre',
+                rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr',
+                                                        'temat__name', 'podcat__name', 'text', 'adres', 'datecre',
                                                          'dateotv', 'status__name', 'statussys')
                 for row in rows:
                     row_num += 1
@@ -283,7 +281,6 @@ def api_report(request):
             if request.POST['report'] == '2':
                 wb = xlwt.Workbook(encoding='utf-8')
                 ws = wb.add_sheet('problems')
-                # Sheet header, first row
                 row_num = 0
                 font_style = xlwt.XFStyle()
                 font_style.font.bold = True
@@ -292,7 +289,6 @@ def api_report(request):
                            'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
                 for col_num in range(len(columns)):
                     ws.write(row_num, col_num, columns[col_num], font_style)
-                # Sheet body, remaining rows
                 font_style = xlwt.XFStyle()
                 rows = Problem.objects.filter(visible='1').values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
                                                          'text', 'adres', 'datecre',
@@ -327,40 +323,52 @@ def api_report(request):
                     datebefore = date.fromisoformat(request.POST['datebefore'])
                 wb = xlwt.Workbook(encoding='utf-8')
                 ws = wb.add_sheet('problems')
-                # Sheet header, first row
                 row_num = 0
                 font_style = xlwt.XFStyle()
                 font_style.font.bold = True
+                font_style.alignment.horz = 0x02
                 cats = Category.objects.all()
-                kolvo = []
                 tempdate = []
                 notes = []
                 days = datebefore - datefrom
                 tempdate.append(datefrom)
                 notes.append('Наименование')
                 notes.append(datefrom.strftime('%d.%m.%Y'))
+                first_col = ws.col(0)
+                first_col.width = 256 * 20
                 for i in range(days.days):
-                    temp = tempdate[-1] - timedelta(i)
-                    tempdate.append(temp)
-                    notes.append(temp.strftime('%d.%m.%Y'))
+                    td = tempdate[-1] + timedelta(1)
+                    tempdate.append(td)
+                    notes.append(td.strftime('%d.%m.%Y'))
+                    col = ws.col(i+1)
+                    col.width = 256 * 10
+                col = ws.col(days.days+1)
+                col.width = 256 * 10
+                col = ws.col(days.days + 2)
+                col.width = 256 * 10
+                notes.append('Итого')
                 temp = []
                 for i in cats:
                     c = []
+                    d = 0
                     c.append(i.name)
                     for j in tempdate:
-                        c.append(len(Problem.objects.filter(temat=i, datecre=j)))
+                        ea = len(Problem.objects.filter(temat=i, datecre=j))
+                        d += ea
+                        c.append(ea)
+                    c.append(d)
                     temp.append(c)
                 columns = notes
                 for col_num in range(len(columns)):
                     ws.write(row_num, col_num, columns[col_num], font_style)
                 font_style = xlwt.XFStyle()
+                temp = sorted(temp, key=itemgetter(days.days+2), reverse=True)
                 rows = temp
-                print(rows)
                 for row in rows:
                     row_num += 1
                     for col_num in range(len(row)):
                         ws.write(row_num, col_num, row[col_num], font_style)
-                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
+                name = f'cats-{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
                 wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
                 if 'linux' in platform.lower():
                     url = f'https://skiog.ru/media/xls/{name}'
@@ -902,6 +910,8 @@ def termadd(request, pk):
                     nd = Problem.objects.get(pk=pk)
                     a.problem = nd
                     a.user = request.user
+                    if a.further == False:
+                        a.furtherdate = None
                     a.save()
                     nd.statussys = '1'
                     nd.save()

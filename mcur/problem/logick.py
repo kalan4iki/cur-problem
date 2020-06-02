@@ -287,7 +287,7 @@ class lk_moderator:
 
     def b9(request, act):
         userlk = request.user
-        term = Term.objects.filter(further=True)
+        term = Term.objects.filter(further=True).order_by('furtherdate')
         prob = Problem.objects.filter(terms__in=term)
         if act == 1:
             kolvo = len(prob)

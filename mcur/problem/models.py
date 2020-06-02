@@ -228,6 +228,7 @@ class Term(models.Model):
     anwr = models.BooleanField(default=False, verbose_name='Наличие ответа')
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, default=None, null=True)
     further = models.BooleanField(verbose_name='Для дальнейшего рассмотрения', default=False)
+    furtherdate = models.DateField(verbose_name='Срок обещания', default=None, null=True, blank=True)
 
     class Meta:
         ordering = ['date']
