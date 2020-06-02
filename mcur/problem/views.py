@@ -316,6 +316,61 @@ def api_report(request):
                 nom = 0
                 cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
                 return JsonResponse(cont)
+            if request.POST['report'] == '3':
+                if 'linux' in platform.lower():
+                    temp = request.POST['datefrom'].split('-')
+                    datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
+                    temp = request.POST['datebefore'].split('-')
+                    datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
+                else:
+                    datefrom = date.fromisoformat(request.POST['datefrom'])
+                    datebefore = date.fromisoformat(request.POST['datebefore'])
+                wb = xlwt.Workbook(encoding='utf-8')
+                ws = wb.add_sheet('problems')
+                # Sheet header, first row
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+                cats = Category.objects.all()
+                kolvo = []
+                tempdate = []
+                notes = []
+                days = datebefore - datefrom
+                tempdate.append(datefrom)
+                notes.append('Наименование')
+                notes.append(datefrom.strftime('%d.%m.%Y'))
+                for i in range(days.days):
+                    temp = tempdate[-1] - timedelta(i)
+                    tempdate.append(temp)
+                    notes.append(temp.strftime('%d.%m.%Y'))
+                temp = []
+                for i in cats:
+                    c = []
+                    c.append(i.name)
+                    for j in tempdate:
+                        c.append(len(Problem.objects.filter(temat=i, datecre=j)))
+                    temp.append(c)
+                columns = notes
+                for col_num in range(len(columns)):
+                    ws.write(row_num, col_num, columns[col_num], font_style)
+                font_style = xlwt.XFStyle()
+                rows = temp
+                print(rows)
+                for row in rows:
+                    row_num += 1
+                    for col_num in range(len(row)):
+                        ws.write(row_num, col_num, row[col_num], font_style)
+                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
+                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
+                if 'linux' in platform.lower():
+                    url = f'https://skiog.ru/media/xls/{name}'
+                else:
+                    url = f'http://127.0.0.1:8000/media/xls/{name}'
+                title = 'Успешно'
+                mes = 'Отчет подготовлен!'
+                nom = 0
+                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
+                return JsonResponse(cont)
             else:
                 title = 'Ошибка'
                 mes = 'Ошибка при выполнении!'
@@ -1266,9 +1321,6 @@ def dashboard(request):
                         te = len(Problem.objects.filter(Q(ciogv=i) & Q(visible='1')))
                         kolvo.append(te)
                     prob = Problem.objects.filter(Q(visible='1'))
-                    notes.append(len(prob))
-                    notes.append(len(Problem.objects.filter(Q(ciogv=None) & Q(visible='1'))))
-                    notes.append(len(prob.exclude(ciogv=None)))
                 elif request.POST['chart'] == 'chart5':
                     tempdate = ''
                     author = Author.objects.all()
@@ -1286,7 +1338,6 @@ def dashboard(request):
                         a['tel'] = autho.tel
                         a['kolvo'] = temp[i][1]
                         kolvo.append(a)
-                    print(kolvo)
                 elif request.POST['chart'] == 'chart6':
                     tempdate = []
                     for i in range(6, 0, -1):
@@ -1310,7 +1361,6 @@ def dashboard(request):
                     for j in cats:
                         temp[j.pk] = len(Problem.objects.filter(temat=j, datecre__range=[tempdate[0], tempdate[-1]]))
                     temp = sorted(temp.items(), key=itemgetter(1), reverse=True)
-                    kolvo = []
                     for i in range(5):
                         nom = temp[i][0]
                         cat = Category.objects.get(pk=nom)
@@ -1344,7 +1394,7 @@ def export_pdf(request, pk):
         row = 800
         c = canvas.Canvas(response, pagesize=A4)
         pdfmetrics.registerFont(TTFont("Times", times))
-        url = 'http://127.0.0.1:8000/problem/'
+        url = 'http://skiog.ru/problem/'
         barcode_string = f'<font name="Times" size="16">Обращение №<a href="{url}{prob.nomdobr}" underline="True">{prob.nomdobr}</a></font>'
         p = Paragraph(barcode_string, style=style["Normal"])
         p.wrapOn(c, width, height)

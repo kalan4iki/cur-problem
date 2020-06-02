@@ -30,16 +30,16 @@
                       </div>
                       <div class="card-body">
                         <div class="row">
-                                <div class="col-md-3">
-                                    <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
-                                </div>
-                                 <div class="col-md-2">
-                                    <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые обращения</button>
-                                </div>
-                                 <div class="col-md-2">
-
-                                </div>
-                             </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
+                            </div>
+                             <div class="col-md-2">
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые обращения</button>
+                            </div>
+                             <div class="col-md-2">
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport3" data-toggle="modal" data-target="#modal-report3">Статистика по категориям</button>
+                            </div>
+                         </div>
                       </div>
                       <!-- /.card-body -->
                     </div>
@@ -162,7 +162,6 @@
                       <div id="jsGrid2" class="jsgrid">
                       </div>
                   </div>
-                  <!-- /.card-body -->
                 </div>
             </div>
             <div class="col-6">
@@ -183,6 +182,51 @@
         </button>
       </div>
         <form role="form" action="{% url 'api_report' %}" method="post" id="report1">
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <div id="div_id_date" class="form-group">
+                  <label for="id_date" class="">Дата создания обращения от<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_from" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+                <div class="col">
+                <div id="div_id_date" class="form-group">
+                  <label for="id_date" class="">Дата создания обращения до<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_before" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Запросить</button>
+        </div>
+        </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- Modal -->
+<div class="modal fade" id="modal-report3">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Отчет статистики по категориям за период</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form role="form" action="{% url 'api_report' %}" method="post" id="report3">
         {% csrf_token %}
         <div class="modal-body">
             <div class="row">
@@ -406,10 +450,7 @@ function Collapsef1(data)
             data: barChartData,
             options: areaChartOptions
         });
-        var text = '<div class="row"> <p>Количество обращений: <span class="badge badge-primary">' + data['notes'][0] + '</span></p></div>' +
-            '<div class="row"><p>Не распределено ТУ: <span class="badge badge-danger">' + data['notes'][1] + '</span></p></div>' +
-            '<div class="row"><p>Количество распределенных: <span class="badge badge-success">' + data['notes'][2] + '</span></p></div>';
-        $('#barchart4').closest('.card-body').append(text);
+
     } else if (data['chart'] === 'chart5') {
         $(function () {
             $("#jsGrid1").jsGrid({
@@ -507,6 +548,17 @@ $('#butreport2').click(function () {
         CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
     var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, report: '2'}, onAjaxSuccess);
 });
+
+$('#report3').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            datefrom = $form.find('input[id="id_date_from"]').val(),
+            datebefore = $form.find('input[id="id_date_before"]').val(),
+            url = $form.attr( 'action' ),
+            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, datefrom: datefrom, datebefore: datebefore, report: '3'}, onAjaxSuccess);
+        $('#modal-report1').modal('hide');
+    });
 
 function onAjaxSuccess(data)
 {
