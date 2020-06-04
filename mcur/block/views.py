@@ -37,6 +37,8 @@ def addresult(request):
             res = Result.objects.create(block=blo, chstatus=di['status'], text=di['text'], user=request.user)
             res.save()
             blo.status = di['status']
+            payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {di['status']}"}
+            send_user_notification(user=blo.user, payload=payload, ttl=1000)
             blo.save()
             content = {}
             return JsonResponse(content)
