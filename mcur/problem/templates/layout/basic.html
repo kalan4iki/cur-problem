@@ -176,6 +176,8 @@
               </p>
             </a>
           </li>
+        {% endif %}
+        {% if perms.block.moderator or perms.block.executor %}
             <li class="nav-item ">
             <a href="{% url 'blockindex' %}" class="nav-link {% block nav9 %} {% endblock %}">
               <i class="nav-icon fas fa-ban"></i>

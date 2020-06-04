@@ -2,11 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from crispy_forms.helper import FormHelper
 from django import forms
-from django.forms import (ModelForm, DateField, Form, DateInput, ModelChoiceField, ImageField, Textarea, CharField)
+from django.forms import (Form, ImageField, CharField)
 from django.core.files.base import ContentFile
-from django.views.decorators.http import require_GET, require_POST
-from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import Group
 from webpush import send_user_notification
 from problem.models import Person
@@ -14,7 +11,6 @@ from .models import Appeal, Image, Result
 from mcur.settings import MEDIA_ROOT, MEDIA_URL, WEBPUSH_SETTINGS
 
 import zipfile
-import json
 
 
 class AppealForm(Form):
@@ -30,7 +26,7 @@ class AppealForm(Form):
 
 
 def addresult(request):
-    if request.user.has_perm('problem.user_moderator'):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
         if request.method == 'POST':
             di = request.POST
             blo = Appeal.objects.get(nomdobr=di['pk'])
@@ -53,7 +49,7 @@ def QStolist(queryset):
 
 
 def table(request):
-    if request.user.has_perm('problem.user_moderator'):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
             di = request.POST
             status = di['status'].split('-')[1]
@@ -76,8 +72,9 @@ def obr_view(request):
             content = {'app': temp}
             return JsonResponse(content)
 
+
 def downimage(request):
-    if request.user.has_perm('problem.user_moderator'):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
             a = Appeal.objects.get(nomdobr=request.POST['pk'])
             if Image.objects.filter(otv=a).exists():
@@ -96,8 +93,9 @@ def downimage(request):
             else:
                 return redirect('blockindex')
 
+
 def main(request):
-    if request.user.has_perm('problem.user_moderator'):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
             form = AppealForm(request.POST, request.FILES)
             if form.is_valid():
@@ -126,23 +124,3 @@ def main(request):
             content['addform'] = addform
             content['NOTIFICATION_KEY'] = notkey
             return render(request, 'problem/block.html', content)
-
-
-@require_POST
-@csrf_exempt
-def send_push(request):
-    try:
-        body = request.body
-        data = json.loads(body)
-
-        if 'head' not in data or 'body' not in data or 'id' not in data:
-            return JsonResponse(status=400, data={"message": "Invalid data format"})
-
-        user_id = data['id']
-        user = get_object_or_404(Person, pk=user_id)
-        payload = {'head': data['head'], 'body': data['body']}
-        send_user_notification(user=user, payload=payload, ttl=1000)
-
-        return JsonResponse(status=200, data={"message": "Web push successful"})
-    except TypeError:
-        return JsonResponse(status=500, data={"message": "An error occurred"})

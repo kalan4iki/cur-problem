@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% block title %}Жалоба №{{ np.nomdobr }}{% endblock %}
+{% block title %}Обращение №{{ np.nomdobr }}{% endblock %}
 {% block nav2 %}active{% endblock %}
 {% block content %}
 <!-- Content Header (Page header) -->
@@ -39,7 +39,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Добавление срока для жалобы №{{ np.nomdobr }}</h4>
+        <h4 class="modal-title">Добавление срока для обращения №{{ np.nomdobr }}</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -397,7 +397,7 @@
     <div class="col-md-6">
       <div class="card">
           <div class="card-header ui-sortable-handle">
-            <h3 class="card-title">Жалоба №{{ np.nomdobr }}. Статус в доброделе: <strong>{{ np.status }}</strong>. Статус: <strong>{{ np.get_statussys_display }}</strong></h3>
+            <h3 class="card-title">Обращение №{{ np.nomdobr }}. Статус в доброделе: <strong>{{ np.status }}</strong>. Статус: <strong>{{ np.get_statussys_display }}</strong></h3>
             <div class="card-tools">
               {% if user.is_staff %}
               <a type="button" href="{% url 'admin:index' %}problem/problem/{{np.pk}}/change/" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="В кабинете администратора" target="_blank">
@@ -455,7 +455,7 @@
               </div>
             </div>
             <div id="div_id_text" class="form-group">
-              <label for="id_text" class="">Текс жалобы</label>
+              <label for="id_text" class="">Текс обращения</label>
               <div class="">
                 <textarea class="form-control" rows="5" placeholder="{{ np.text }}" disabled=""></textarea>
               </div>
@@ -465,7 +465,7 @@
             {% if np.visible == '0' %}
             <div class="overlay">
                 <i class="fa fa-eye-slash fa-5x" aria-hidden="true"></i>
-                <h3><b>Жалоба скрыта в системе</b></h3>
+                <h3><b>Обращение скрыто в системе</b></h3>
             </div>
             {% endif %}
       </div>
