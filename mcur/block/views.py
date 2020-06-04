@@ -111,7 +111,7 @@ def main(request):
                         photo.save()
                     appe.save()
                     group = Group.objects.get(pk=6)
-                    users = Person.objects.filter(group=group)
+                    users = Person.objects.filter(groups=group)
                     for i in users:
                         payload = {"head": "На блокировку", "body": f"Обращение №{appe.nomdobr}"}
                         send_user_notification(user=i, payload=payload, ttl=1000)
