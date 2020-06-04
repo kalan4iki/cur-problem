@@ -1,0 +1,347 @@
+{% extends "layout/basic.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% load webpush_notifications %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Блокировка{% endblock %}
+{% block nav9 %}active{% endblock %}
+{% block head %}
+{% webpush_header %}
+{% endblock %}
+{% block content %}
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-10">
+        <h1 class="m-0 text-dark">Страница блокировок:</h1>
+      </div><!-- /.col -->
+        <div class="col-sm-2">
+            <form method="post" role="form" action="{% url 'obr_view' %}" id="searchform">
+                <div class="input-group input-group-sm">
+                  <input name="search" type="search" class="form-control">
+                  <span class="input-group-append">
+                    <button type="submit" class="btn btn-info btn-flat">Поиск!</button>
+                  </span>
+                </div>
+            </form>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<section class="content">
+    <div class="row">
+        <div class="col">
+            <div class="card ">
+              <div class="card-header">
+                  <div class="row">
+                      <div class="col-2">
+                          {% csrf_token %}
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-offset="25" aria-expanded="false">
+                              Выбор таблицы</button>
+                            <div class="dropdown-menu" role="menu">
+                                <button class="buttable dropdown-item active" id='table-0' style="color: #212529;">В работе</button>
+                                <button class="buttable dropdown-item" id='table-1' style="color: #212529;">На блокировке</button>
+                                <button class="buttable dropdown-item" id='table-2' style="color: #212529;">Заблокированы</button>
+                                <button class="buttable dropdown-item" id='table-3' style="color: #212529;">Отказы</button>
+                            </div>
+                          </div>
+                      </div>
+                        {% if perms.block.executor %}
+                      <div class="col-2">
+                          <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#modal-addatte">Добавить на блокировку</button>
+                      </div>
+                      <div class="col-2">
+                          {% webpush_button with_class="btn btn-outline-info" %}
+                      </div>
+                      {% endif %}
+                  </div>
+              </div>
+              <div class="card-body">
+                <div id="jsGrid" class="jsgrid">
+                </div>
+              </div>
+              <!-- /.card -->
+            </div>
+        </div>
+    </div>
+<div class="modal fade" id="modal-addatte">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Добавление обращения на блокировку</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'blockindex' %}" method="post" id="atteform"  enctype="multipart/form-data">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col">
+                {{ addform.nomdobr|as_crispy_field }}
+              </div>
+            </div>
+            {{ addform.text|as_crispy_field }}
+            {{ addform.image|as_crispy_field }}
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal-attes">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Обращение №</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <div id="div_id_text" class="form-group">
+                    <label for="id_text" class=" requiredField">
+                        Комментарий
+                    </label>
+                    <div class="">
+                        <textarea name="text" cols="40" rows="10" class="textarea form-control" id="id_text" readonly></textarea>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div id="div_id_datecre" class="form-group">
+                        <label for="id_datecre" class=" requiredField">
+                            Дата создания
+                        </label>
+                        <div class="">
+                            <input type="text" name="datecre" class="textinput textInput form-control" required="" id="id_datecre" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div id="div_id_datebzm" class="form-group">
+                        <label for="id_datebzm" class=" requiredField">
+                            Дата изменения
+                        </label>
+                        <div class="">
+                            <input type="text" name="datebzm" class="textinput textInput form-control" required="" id="id_datebzm" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div id="div_id_user" class="form-group">
+                        <label for="id_user" class=" requiredField">
+                            Пользователь
+                        </label>
+                        <div class="">
+                            <input type="text" name="user" class="textinput textInput form-control" required="" id="id_user" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div id="div_id_status" class="form-group">
+                        <label for="id_status" class=" requiredField">
+                            Статус обращения
+                        </label>
+                        <div class="">
+                            <input type="text" name="status" class="textinput textInput form-control" required="" id="id_status" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn btn-default dowimage" name="dowimage" id="">Скачать изображения</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+            {% if perms.block.moderator %}
+            <button type="button" class="btn btn-default change_status" name="change_status" id="">Сменить статус</button>
+            {% endif %}
+        </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal-result">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Обновление статуса обращению №</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form role="form" action="{% url 'addresult' %}" method="post" id="resultform">
+            <div class="modal-body">
+                <div class="row">
+                  <div class="col">
+                    <div id="div_id_text" class="form-group">
+                        <label for="id_text" class=" requiredField">
+                            Комментарий
+                        </label>
+                        <div class="">
+                            <textarea name="text" cols="40" rows="10" class="textarea form-control" id="id_text"></textarea>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Новый статус</label>
+                            <select class="form-control" id="newstatus">
+                              <option value="1">На блокировке</option>
+                              <option value="2">Заблокировано</option>
+                              <option value="3">Отказано</option>
+                            </select>
+                          </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary" name="submi" id="">Добавить</button>
+                </div>
+            </div>
+        </form>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+</section>
+{% endblock %}
+
+{% block ends %}
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/jsgrid/jsgrid.min.css' %}">
+    <link rel="stylesheet" href="{% static 'adminlte/plugins/jsgrid/jsgrid-theme.min.css' %}">
+    <script src="{% static 'adminlte/plugins/jsgrid/jsgrid.min.js' %}"></script>
+<script>
+$(document).ready(function () {
+    var a = {{ table|safe }},
+        table1 = $('#jsGrid');
+    TableCre(table1, a);
+});
+
+$('.buttable').click(function () {
+    var old = $('.buttable.dropdown-item.active');
+    old.removeClass('active');
+    var but = $( this ),
+        url = '{% url "block_table" %}',
+        CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, status: but.attr('id')}, onAjaxSuccess);
+    but.addClass('active');
+});
+
+$('#searchform').submit(function (event) {
+    event.preventDefault();
+    var form = $( this ),
+        url = form.attr('action'),
+        CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+        pk = form.find('input[name="search"]').val(),
+        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk});
+    posting.done(ShowModal);
+});
+
+$('.change_status').click(function () {
+    var but = $( this ),
+        modal1 = $('#modal-attes'),
+        modal2 = $('#modal-result');
+    modal1.modal('hide');
+    modal2.find('.modal-title').text('Обновление статуса обращению № ' + but.attr('id'));
+    modal2.find('button[name="submi"]').attr('id', but.attr('id'));
+    modal2.modal('show');
+});
+
+$('#resultform').submit(function (event) {
+    event.preventDefault();
+    var form = $( this ),
+        url = form.attr('action'),
+        CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+        pk = form.find('button[name="submi"]').attr('id'),
+        status = form.find('select[id="newstatus"]').val(),
+        text = form.find('textarea[name="text"]').val(),
+        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk, status:status, text:text});
+    setTimeout(location.reload(), 1500);
+});
+
+$('.dowimage').click(function () {
+    var but = $( this );
+    if (but.hasClass('disabled') === false) {
+        var url = '{% url 'downimage' %}',
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+            pk = but.attr('id'),
+            posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk});
+        posting.done(function (data) {
+            const dummy = document.createElement('a');
+            dummy.href = data['url'];
+            document.body.appendChild(dummy);
+            dummy.click();
+            dummy.remove();
+        })
+    }
+
+});
+
+function onAjaxSuccess(data)
+{
+    var table1 = $('#jsGrid');
+    TableCre(table1, data['appe']);
+}
+
+function TableCre(table, data)
+{
+    table.jsGrid({
+        height: "100%",
+        width: "100%",
+        rowClick: function(item) {
+            var pk = item['item']['nomd'],
+                CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+                data = $.post('{% url 'obr_view' %}', {csrfmiddlewaretoken: CSRFtoken, pk:pk});
+            data.done(ShowModal);
+        },
+        data: data,
+        fields: [
+            {name: "pk", type: "text", title: "ID"},
+            {name: "nomd", type: "text", title: "Номер"},
+            {name: 'datecre', type: "text", title: 'Дата создания'},
+            {name: 'status', type: "text", title: 'Статус'},
+            {name: 'user', type: "text", title: 'Пользователь'}
+        ]
+    });
+}
+
+function ShowModal(datas) {
+    var modal = $('#modal-attes');
+    modal.find('.modal-title').text('Обращение № ' + datas['app']['nomd']);
+    modal.find('input[name="user"]').val(datas['app']['user']);
+    modal.find('input[name="datecre"]').val(datas['app']['datecre']);
+    modal.find('input[name="datebzm"]').val(datas['app']['datebzm']);
+    modal.find('input[name="status"]').val(datas['app']['status']);
+    modal.find('textarea[name="text"]').val(datas['app']['text']);
+    console.log(datas);
+    if (datas['app']['image'] === false) modal.find('button[name="dowimage"]').addClass('disabled');
+    modal.find('button[name="dowimage"]').attr('id', datas['app']['nomd']);
+    modal.find('button[name="change_status"]').attr('id', datas['app']['nomd']);
+    modal.modal('show')
+}
+</script>
+{% endblock %}

@@ -168,7 +168,7 @@ class Problem(models.Model):
         ('1', 'В работе'),
         ('2', 'На модерации'),
     }
-    nomdobr = models.CharField(max_length=20, help_text='Номер проблемы', verbose_name='Номер', unique=True)
+    nomdobr = models.CharField(max_length=20, help_text='Номер обращения', verbose_name='Номер', unique=True)
     temat = models.ForeignKey(Category, on_delete=models.PROTECT, help_text='Тематика проблемы',
                               verbose_name='Тематика', blank=True, null=True, related_name='problems')
     podcat = models.ForeignKey(Podcategory, on_delete=models.PROTECT, help_text='Подкатегория проблемы',

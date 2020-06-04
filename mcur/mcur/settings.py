@@ -59,9 +59,11 @@ INSTALLED_APPS = [
     'problem.apps.ProblemConfig',
     'parsers.apps.ParsersConfig',
     'chat.apps.ChatConfig',
+    'block.apps.BlockConfig',
     'crispy_forms',
     'tinymce',
     'django_filters',
+    'webpush',
 ]
 
 MIDDLEWARE = [
@@ -289,6 +291,14 @@ CELERY_ROUTES = {
     'myapp.tasks.close_session': {'queue': 'low'},
 }
 
+# WEBPUSH
+WEBPUSH_SETTINGS = {
+   "VAPID_PUBLIC_KEY": "BPelT85m1o6-0dMF0x-htr5gE85g3IOmKxoJrvZ7z481h5cpiE1uzeAtTHZA67lqSrpl-c7vlho6_qV_uPJC-pU",
+   "VAPID_PRIVATE_KEY": "z9TXbbTvgbiu5KOqj209zj94KTZl51Okros6RA7m0G4",
+   "VAPID_ADMIN_EMAIL": "vvk@istra-adm.ru"
+}
+
 NO_VISIBLE_1 = [5, 6, 7]
 NO_VISIBLE_2 = [10, 1, 4, 11, 12, 3, 13]
 NO_VISIBLE = [NO_VISIBLE_1, NO_VISIBLE_2]
+

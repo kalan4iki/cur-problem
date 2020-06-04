@@ -12,6 +12,9 @@ django-tables2
 django-tinymce
 django-grappelli
 djangorestframework
+django-webpush
+django-jinja
+arrow
 lxml
 matplotlib
 numpy

@@ -90,3 +90,5 @@
     3. Модератор - problem.user_moderator
     4. Супермодератор - problem.user_supermoderator
     5. Тер. управление - problem.user_ty
+    6. Управление блокировками - block.moderator
+    7. Направление на блокировку - block.executor
