@@ -492,6 +492,21 @@ class Command(BaseCommand):
                             i.note = f'Обращений {len(prob)}'
                             i.save()
                             parsProblem(browser, prob)
+                        elif i.act.nact == '11':  # Парсинг авторов
+                            prob = Problem.objects.filter(visible='0', status__pk=6)
+                            als = len(prob)
+                            ke = 1
+                            for j in prob:
+                                i.note = f'Проблем {ke} их {als}'
+                                pars(browser, j.nomdobr)
+                                source = browser.page_source
+                                temp = parsTable(source, card)
+                                i.save()
+                                ke += 1
+                                if temp == 'non':
+                                    j.visible = '0'
+                                    j.note = 'Жалоба не найдена на сайте vmeste.mosreg.ru'
+                                    j.save()
                         i.status = '1'
                         i.save()
                         card.close()

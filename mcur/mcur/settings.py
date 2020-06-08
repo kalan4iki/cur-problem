@@ -298,7 +298,7 @@ WEBPUSH_SETTINGS = {
    "VAPID_ADMIN_EMAIL": "vvk@istra-adm.ru"
 }
 
-NO_VISIBLE_1 = [5, 6, 7]
-NO_VISIBLE_2 = [10, 1, 4, 11, 12, 3, 13]
+NO_VISIBLE_1 = [5, 7]
+NO_VISIBLE_2 = [10, 6, 1, 4, 11, 12, 3, 13]
 NO_VISIBLE = [NO_VISIBLE_1, NO_VISIBLE_2]
 
