@@ -25,6 +25,20 @@ class AppealForm(Form):
             self.widgets['text'].template_name = "widgets/textarea.html"
 
 
+def view_message(request):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
+        if request.method == 'POST':
+            content = {}
+            app = Appeal.objects.get(nomdobr=request.POST['pk'])
+            result = Result.objects.filter(block=app)
+            content['message'] = []
+            for i in result:
+                content['message'].append({'text': i.text, 'status': i.get_chstatus_display(),
+                                           'user': f'{i.user.first_name} {i.user.last_name}',
+                                           'datecre': i.datecre.strftime('%d.%m.%Y')})
+            return JsonResponse(content)
+
+
 def addresult(request):
     if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
         if request.method == 'POST':
@@ -64,11 +78,14 @@ def obr_view(request):
         if Appeal.objects.filter(nomdobr=request.POST['pk']).exists():
             app = Appeal.objects.get(nomdobr=request.POST['pk'])
             image = False
+            message = False
             if Image.objects.filter(otv=app).exists():
                 image = True
+            if Result.objects.filter(block=app).exists():
+                message = True
             temp = {'pk': app.pk, 'nomd': app.nomdobr, 'datecre': app.datecre.strftime('%d.%m.%Y'),'status': app.get_status_display(),
                     'user': f'{app.user.first_name} {app.user.last_name}', 'text': app.text,
-                    'datebzm': app.datebzm.strftime('%d.%m.%Y'), 'image': image}
+                    'datebzm': app.datebzm.strftime('%d.%m.%Y'), 'image': image, 'message': message}
             content = {'app': temp}
             return JsonResponse(content)
 

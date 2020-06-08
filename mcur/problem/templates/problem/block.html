@@ -167,10 +167,14 @@
                 <div class="col">
                     <button type="button" class="btn btn-default dowimage" name="dowimage" id="">Скачать изображения</button>
                 </div>
+                <div class="col">
+                    <button type="button" class="btn btn-default viewmessage" name="message" id="">Сообщения</button>
+                </div>
             </div>
         </div>
         <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+            <a type="button" href="https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id=" name="dobrodel" class="btn btn-default" target="_blank">Перейти на дорбодел</a>
             {% if perms.block.moderator %}
             <button type="button" class="btn btn-default change_status" name="change_status" id="">Сменить статус</button>
             {% endif %}
@@ -222,6 +226,79 @@
                 </div>
             </div>
         </form>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal-message">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Сообщения по обращению №</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+            <div class="modal-body">
+                    <div class="card message-app" name="message">
+                        <div class="card-header">
+                            Изменение статуса
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div id="div_id_text" class="form-group">
+                                        <label for="id_text" class=" requiredField">
+                                            Комментарий
+                                        </label>
+                                        <div class="">
+                                            <textarea name="text" cols="40" rows="2" class="textarea form-control" id="id_text" readonly></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div id="div_id_status" class="form-group">
+                                        <label for="id_status" class=" requiredField">
+                                            Новый статус
+                                        </label>
+                                        <div class="">
+                                            <input type="text" name="status" class="textinput textInput form-control" required="" id="id_status" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div id="div_id_datescre" class="form-group">
+                                        <label for="id_datescre" class=" requiredField">
+                                            Дата сообщения
+                                        </label>
+                                        <div class="">
+                                            <input type="text" name="datescre" class="textinput textInput form-control" required="" id="id_datescre" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div id="div_id_fio" class="form-group">
+                                        <label for="id_fio" class=" requiredField">
+                                            Автор сообщения
+                                        </label>
+                                        <div class="">
+                                            <input type="text" name="fio" class="textinput textInput form-control" required="" id="id_fio" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                </div>
+
+        </div>
     <!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog -->
@@ -283,6 +360,37 @@ $('#resultform').submit(function (event) {
     setTimeout(location.reload(), 1500);
 });
 
+
+$('.viewmessage').click(function () {
+    var but = $( this );
+    if (but.hasClass('disabled') === false) {
+        var url = '{% url "view_message" %}',
+            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+            pk = but.attr('id'),
+            posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk});
+        posting.done(function (data) {
+            var modal1 = $('#modal-attes'),
+                modal2 = $('#modal-message');
+            modal1.modal('hide');
+            modal2.find('.modal-title').text('Сообщения по обращению № ' + but.attr('id'));
+            var a = $('.message-app'),
+                rod = a.parent('.modal-body');
+            rod.empty();
+            data['message'].forEach(function (item, i, arr) {
+                var temp = a.clone();
+                temp.find('textarea[name="text"]').val(item['text']);
+                temp.find('input[name="status"]').val(item['status']);
+                temp.find('input[name="datescre"]').val(item['datecre']);
+                temp.find('input[name="fio"]').val(item['user']);
+                rod.append(temp);
+            });
+            a.remove();
+            modal2.modal('show');
+        })
+    }
+});
+
+
 $('.dowimage').click(function () {
     var but = $( this );
     if (but.hasClass('disabled') === false) {
@@ -337,8 +445,10 @@ function ShowModal(datas) {
     modal.find('input[name="datebzm"]').val(datas['app']['datebzm']);
     modal.find('input[name="status"]').val(datas['app']['status']);
     modal.find('textarea[name="text"]').val(datas['app']['text']);
-    console.log(datas);
+    modal.find('a[name="dobrodel"]').attr('href', 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='+datas['app']['nomd']);
     if (datas['app']['image'] === false) modal.find('button[name="dowimage"]').addClass('disabled');
+    if (datas['app']['message'] === false) modal.find('button[name="message"]').addClass('disabled');
+    modal.find('button[name="message"]').attr('id', datas['app']['nomd']);
     modal.find('button[name="dowimage"]').attr('id', datas['app']['nomd']);
     modal.find('button[name="change_status"]').attr('id', datas['app']['nomd']);
     modal.modal('show')

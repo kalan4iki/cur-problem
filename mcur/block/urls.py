@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import main, table, obr_view, addresult, downimage
+from .views import main, table, obr_view, addresult, downimage, view_message
 
 urlpatterns = [
     path('', main, name='blockindex'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('addresult/', addresult, name='addresult'),
     path('downimage/', downimage, name='downimage'),
     path('webpush/', include('webpush.urls')),
+    path('view_message/', view_message, name='view_message')
 ]

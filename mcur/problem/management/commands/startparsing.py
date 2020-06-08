@@ -493,7 +493,7 @@ class Command(BaseCommand):
                             i.save()
                             parsProblem(browser, prob)
                         elif i.act.nact == '11':  # Парсинг авторов
-                            prob = Problem.objects.filter(visible='0', status__pk=6)
+                            prob = Problem.objects.filter(visible='0', status__pk=6).order_by('-datecre')
                             als = len(prob)
                             ke = 1
                             for j in prob:
