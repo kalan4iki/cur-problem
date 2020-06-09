@@ -421,6 +421,7 @@ function TableCre(table, data)
         height: "100%",
         width: "100%",
         rowClick: function(item) {
+            navigator.clipboard.writeText(item['item']['nomd']);
             var pk = item['item']['nomd'],
                 CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
                 data = $.post('{% url 'obr_view' %}', {csrfmiddlewaretoken: CSRFtoken, pk:pk});
