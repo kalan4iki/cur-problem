@@ -25,6 +25,15 @@ class AppealForm(Form):
             self.widgets['text'].template_name = "widgets/textarea.html"
 
 
+def del_message(request):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
+        if request.method == 'POST':
+            content = {}
+            result = Result.objects.filter(pk=int(request.POST['pk'])
+            result.delete()
+            return JsonResponse(content)
+
+
 def view_message(request):
     if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
         if request.method == 'POST':
@@ -40,7 +49,7 @@ def view_message(request):
 
 
 def addresult(request):
-    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
+    if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
             di = request.POST
             blo = Appeal.objects.get(nomdobr=di['pk'])
