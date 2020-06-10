@@ -30,7 +30,15 @@ def del_message(request):
         if request.method == 'POST':
             content = {}
             result = Result.objects.get(pk=int(request.POST['pk']))
+            app = result.block
             result.delete()
+            if Result.objects.filter(block=app).exists():
+                a = Result.objects.filter(block=app)
+                stat = a[-1].chstatus
+                app.status = stat
+            else:
+                app.status = '0'
+            app.save()
             return JsonResponse(content)
 
 

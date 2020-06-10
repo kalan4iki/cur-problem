@@ -44,6 +44,14 @@ class Result(models.Model):
                                    blank=True, null=True)
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто направил на блокировку')
 
+    class Meta:
+        ordering = ['datecre']
+        verbose_name = 'сообщение'
+        verbose_name_plural = 'сообщения'
+
+    def __str__(self):
+        return f'{self.block.nomdobr} {self.get_chstatus_display()}'
+
 
 class Image(models.Model):
     otv = models.ForeignKey(Appeal, on_delete=models.CASCADE, null=True, default=None, related_name='imgs', blank=True,
