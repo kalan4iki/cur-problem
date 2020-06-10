@@ -43,8 +43,8 @@
                             <div class="dropdown-menu" role="menu">
                                 <button class="buttable dropdown-item active" id='table-0' style="color: #212529;">В работе</button>
                                 <button class="buttable dropdown-item" id='table-1' style="color: #212529;">На блокировке</button>
-                                <button class="buttable dropdown-item" id='table-2' style="color: #212529;">Заблокированы</button>
-                                <button class="buttable dropdown-item" id='table-3' style="color: #212529;">Отказы</button>
+                                <button class="buttable dropdown-item" id='table-2' style="color: #212529;">Закрытые</button>
+                                <button class="buttable dropdown-item" id='table-3' style="color: #212529;">Отклоненные</button>
                             </div>
                           </div>
                       </div>
@@ -177,6 +177,8 @@
             <a type="button" href="https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id=" name="dobrodel" class="btn btn-default" target="_blank">Перейти на дорбодел</a>
             {% if perms.block.moderator %}
             <button type="button" class="btn btn-default change_status" name="change_status" id="">Сменить статус</button>
+            {% elif perms.block.executor %}
+            <button type="button" class="btn btn-default change_status" name="change_status_back" id="">Вернуть на блокировку</button>
             {% endif %}
         </div>
     </div>
@@ -185,7 +187,8 @@
   <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-<div class="modal fade" id="modal-result">
+{% if perms.block.moderator %}
+<div class="modal fade" id="modal-change_status">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -244,6 +247,53 @@
 </div>
 </div>
 <!-- /.modal -->
+{% elif perms.block.executor %}
+<div class="modal fade" id="modal-change_status_back">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Обновление статуса обращению №</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form role="form" action="{% url 'addresult' %}" method="post" id="resultformback">
+            <div class="modal-body">
+                <div class="row">
+                  <div class="col">
+                    <div id="div_id_text" class="form-group">
+                        <label for="id_text" class=" requiredField">
+                            Комментарий
+                        </label>
+                        <div class="">
+                            <textarea name="text" cols="40" rows="10" class="textarea form-control" id="id_text"></textarea>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Новый статус</label>
+                            <select class="form-control" id="newstatus">
+                              <option value="0">На блокировку</option>
+                            </select>
+                          </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary" name="submi" id="">Добавить</button>
+                </div>
+            </div>
+        </form>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+</div>
+<!-- /.modal -->
+{% endif %}
 <div class="modal fade" id="modal-message">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -256,7 +306,10 @@
             <div class="modal-body">
                     <div class="card message-app" name="message">
                         <div class="card-header">
-                            Изменение статуса
+                            <h3 class="card-title">Изменение статуса</h3>
+                            <div class="card-tools">
+
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -353,7 +406,7 @@ $('#searchform').submit(function (event) {
 $('.change_status').click(function () {
     var but = $( this ),
         modal1 = $('#modal-attes'),
-        modal2 = $('#modal-result');
+        modal2 = $('#modal-'+but.attr('name'));
     modal1.modal('hide');
     modal2.find('.modal-title').text('Обновление статуса обращению № ' + but.attr('id'));
     modal2.find('button[name="submi"]').attr('id', but.attr('id'));
@@ -373,6 +426,18 @@ $('#resultform').submit(function (event) {
     setTimeout(location.reload(), 1500);
 });
 
+$('#resultformback').submit(function (event) {
+    event.preventDefault();
+    var form = $( this ),
+        url = form.attr('action'),
+        CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+        pk = form.find('button[name="submi"]').attr('id'),
+        status = form.find('select[id="newstatus"]').val(),
+        text = form.find('textarea[name="text"]').val(),
+        nomkom = '',
+        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk, status:status, text:text, nomkom:nomkom});
+    setTimeout(location.reload(), 1500);
+});
 
 $('.viewmessage').click(function () {
     var but = $( this );
@@ -392,8 +457,9 @@ $('.viewmessage').click(function () {
             data['message'].forEach(function (item, i, arr) {
                 var temp = a.clone();
                 if (item['nomkom']) {
-                    temp.find('div[class="card-header"]').text('Изменение статуса. Номер комиссии ' + item['nomkom'])
+                    temp.find('h3[class="card-title"]').text('Изменение статуса. Номер комиссии ' + item['nomkom'])
                 }
+                temp.find('div[class="card-tools"]').text(item['pk']);
                 temp.find('textarea[name="text"]').val(item['text']);
                 temp.find('input[name="status"]').val(item['status']);
                 temp.find('input[name="datescre"]').val(item['datecre']);

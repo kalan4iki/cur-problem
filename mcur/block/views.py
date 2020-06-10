@@ -33,7 +33,7 @@ def view_message(request):
             result = Result.objects.filter(block=app)
             content['message'] = []
             for i in result:
-                content['message'].append({'text': i.text, 'status': i.get_chstatus_display(),
+                content['message'].append({'text': i.text, 'status': i.get_chstatus_display(), 'pk': i.pk,
                                            'user': f'{i.user.first_name} {i.user.last_name}',
                                            'datecre': i.datecre.strftime('%d.%m.%Y'), 'nomkom': i.nomkom})
             return JsonResponse(content)
