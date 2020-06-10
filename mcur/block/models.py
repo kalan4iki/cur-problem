@@ -39,6 +39,7 @@ class Result(models.Model):
     text = models.TextField(verbose_name='Текст', null=True, blank=True)
     chstatus = models.CharField(max_length=50, help_text='Статус блокировки', verbose_name='Статус', default='1',
                               choices=stats)
+    nomkom = models.CharField(max_length=50, verbose_name='Номер комиссии', default=None, null=True, blank=True)
     datecre = models.DateTimeField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания',
                                    blank=True, null=True)
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто направил на блокировку')

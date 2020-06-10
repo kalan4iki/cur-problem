@@ -35,7 +35,7 @@ def view_message(request):
             for i in result:
                 content['message'].append({'text': i.text, 'status': i.get_chstatus_display(),
                                            'user': f'{i.user.first_name} {i.user.last_name}',
-                                           'datecre': i.datecre.strftime('%d.%m.%Y')})
+                                           'datecre': i.datecre.strftime('%d.%m.%Y'), 'nomkom': i.nomkom})
             return JsonResponse(content)
 
 
@@ -44,7 +44,8 @@ def addresult(request):
         if request.method == 'POST':
             di = request.POST
             blo = Appeal.objects.get(nomdobr=di['pk'])
-            res = Result.objects.create(block=blo, chstatus=di['status'], text=di['text'], user=request.user)
+            res = Result.objects.create(block=blo, chstatus=di['status'], text=di['text'], nomkom=di['nomkom'],
+                                        user=request.user)
             res.save()
             blo.status = di['status']
             payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {di['status']}"}

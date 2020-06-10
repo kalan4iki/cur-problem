@@ -210,6 +210,18 @@
                 </div>
                 <div class="row">
                     <div class="col">
+                        <div id="div_id_nomkom" class="form-group">
+                            <label for="id_nomkom" class=" requiredField">
+                                Номер комиссии
+                            </label>
+                            <div class="">
+                                <input type="text" name="nomkom" class="textinput textInput form-control" required="" id="id_nomkom">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         <div class="form-group">
                             <label>Новый статус</label>
                             <select class="form-control" id="newstatus">
@@ -356,7 +368,8 @@ $('#resultform').submit(function (event) {
         pk = form.find('button[name="submi"]').attr('id'),
         status = form.find('select[id="newstatus"]').val(),
         text = form.find('textarea[name="text"]').val(),
-        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk, status:status, text:text});
+        nomkom = form.find('input[name="nomkom"]').val(),
+        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk, status:status, text:text, nomkom:nomkom});
     setTimeout(location.reload(), 1500);
 });
 
@@ -378,6 +391,9 @@ $('.viewmessage').click(function () {
             rod.empty();
             data['message'].forEach(function (item, i, arr) {
                 var temp = a.clone();
+                if (item['nomkom']) {
+                    temp.find('div[class="card-header"]').text('Изменение статуса. Номер комиссии ' + item['nomkom'])
+                }
                 temp.find('textarea[name="text"]').val(item['text']);
                 temp.find('input[name="status"]').val(item['status']);
                 temp.find('input[name="datescre"]').val(item['datecre']);
