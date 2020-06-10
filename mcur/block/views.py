@@ -29,7 +29,7 @@ def del_message(request):
     if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator'):
         if request.method == 'POST':
             content = {}
-            result = Result.objects.filter(pk=int(request.POST['pk'])
+            result = Result.objects.get(pk=int(request.POST['pk']))
             result.delete()
             return JsonResponse(content)
 
