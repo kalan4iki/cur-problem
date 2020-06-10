@@ -57,8 +57,15 @@ def addresult(request):
                                         user=request.user)
             res.save()
             blo.status = di['status']
-            payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {di['status']}"}
-            send_user_notification(user=blo.user, payload=payload, ttl=1000)
+            if blo.status == '0':
+                group = Group.objects.get(pk=6)
+                users = Person.objects.filter(groups=group)
+                for i in users:
+                    payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
+                    send_user_notification(user=i, payload=payload, ttl=1000)
+            else:
+                payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
+                send_user_notification(user=blo.user, payload=payload, ttl=1000)
             blo.save()
             content = {}
             return JsonResponse(content)
