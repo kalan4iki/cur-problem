@@ -7,8 +7,8 @@ class Appeal(models.Model):
     stats = {
         ('0', 'В работе'),
         ('1', 'На блокировке'),
-        ('2', 'Заблокировано'),
-        ('3', 'Отказано')
+        ('2', 'Закрыто'),
+        ('3', 'Отклоненно')
     }
     nomdobr = models.CharField(max_length=20, help_text='Номер обращения', verbose_name='Номер')
     text = models.TextField(help_text='Комментарий', verbose_name='Текст', null=True, blank=True)
@@ -31,9 +31,10 @@ class Appeal(models.Model):
 
 class Result(models.Model):
     stats = {
+        ('0', 'В работе'),
         ('1', 'На блокировке'),
-        ('2', 'Заблокировано'),
-        ('3', 'Отказано')
+        ('2', 'Закрыто'),
+        ('3', 'Отклоненно')
     }
     block = models.ForeignKey(Appeal, on_delete=models.CASCADE, null=True, verbose_name='Обращение на блокировку')
     text = models.TextField(verbose_name='Текст', null=True, blank=True)

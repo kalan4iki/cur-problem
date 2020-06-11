@@ -471,11 +471,12 @@ function TableCre(table, data)
         },
         data: data,
         fields: [
-            {name: "pk", type: "text", title: "ID"},
-            {name: "nomd", type: "text", title: "Номер"},
-            {name: 'datecre', type: "text", title: 'Дата создания'},
-            {name: 'status', type: "text", title: 'Статус'},
-            {name: 'user', type: "text", title: 'Пользователь'}
+            {name: "pk", width: 20, type: "text", title: "ID"},
+            {name: "nomd", width: 25, type: "text", title: "Номер"},
+            {name: 'datecre', width: 25, type: "text", title: 'Дата создания'},
+            {name: 'status', width: 25, type: "text", title: 'Статус'},
+            {name: 'user', width: 25, type: "text", title: 'Пользователь'},
+            {name: 'text', type: 'text', title: 'Комментарий'}
         ]
     });
 }
@@ -490,11 +491,14 @@ function ShowModal(datas) {
     modal.find('textarea[name="text"]').val(datas['app']['text']);
     modal.find('a[name="dobrodel"]').attr('href', 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='+datas['app']['nomd']);
     if (datas['app']['image'] === false) modal.find('button[name="dowimage"]').addClass('disabled');
-    console.log(datas['app']['message']);
     if (datas['app']['message'] === false) modal.find('button[name="message"]').addClass('disabled');
     modal.find('button[name="message"]').attr('id', datas['app']['nomd']);
     modal.find('button[name="dowimage"]').attr('id', datas['app']['nomd']);
+    {% if perms.block.moderator %}
     modal.find('button[name="change_status"]').attr('id', datas['app']['nomd']);
+    {% elif perms.block.executor %}
+    modal.find('button[name="change_status_back"]').attr('id', datas['app']['nomd']);
+    {% endif %}
     modal.modal('show')
 }
 </script>

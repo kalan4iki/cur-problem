@@ -33,8 +33,8 @@ def del_message(request):
             app = result.block
             result.delete()
             if Result.objects.filter(block=app).exists():
-                a = Result.objects.filter(block=app)
-                stat = a[-1].chstatus
+                a = Result.objects.filter(block=app).order_by('-datecre')
+                stat = a[0].chstatus
                 app.status = stat
             else:
                 app.status = '0'
@@ -65,6 +65,7 @@ def addresult(request):
                                         user=request.user)
             res.save()
             blo.status = di['status']
+            print(1)
             if blo.status == '0':
                 group = Group.objects.get(pk=6)
                 users = Person.objects.filter(groups=group)
@@ -75,6 +76,7 @@ def addresult(request):
                 payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                 send_user_notification(user=blo.user, payload=payload, ttl=1000)
             blo.save()
+            print(f'Обращение: {blo.nomdobr}, новый статус: {blo.get_status_display()}')
             content = {}
             return JsonResponse(content)
 
@@ -82,7 +84,7 @@ def addresult(request):
 def QStolist(queryset):
     temp = []
     for j in queryset:
-        temp.append({'pk': j.pk, 'nomd': j.nomdobr, 'datecre': j.datecre.strftime('%d.%m.%Y'),
+        temp.append({'pk': j.pk, 'nomd': j.nomdobr, 'datecre': j.datecre.strftime('%d.%m.%Y'), 'text': j.text,
                       'status': j.get_status_display(), 'user': f'{j.user.first_name} {j.user.last_name}'})
     return temp
 
