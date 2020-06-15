@@ -1,4 +1,6 @@
+{% if not perms.problem.user_ty or user.is_superuser %}
   <div class="row">
+    {% if perms.problem.user_moderator %}
     <div class="col-12 col-sm-6 col-md-3">
       <div class="small-box bg-secondary" id="box1">
         <div class="inner">
@@ -42,6 +44,23 @@
         </div>
     </div>
      <div class="col-12 col-sm-6 col-md-3">
+     {% else %}
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-success" id="box8">
+            <div class="inner">
+              <h3></h3>
+              <p>Моих обращения</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <a href="{% url 'meproblem' %}" class="small-box-footer">
+              Подробнее <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+     <div class="col-12 col-sm-6 col-md-9">
+     {% endif %}
       <div class="small-box bg-info" id="box3">
         <div class="inner">
           <h3>{{ kolvo.kolall }}</h3>
@@ -57,6 +76,7 @@
     </div>
   </div>
     <div class="row">
+    {% if perms.problem.user_moderator %}
     <div class="col-12 col-sm-6 col-md-3">
     <div class="small-box bg-success" id="box4">
         <div class="inner">
@@ -71,6 +91,22 @@
         </a>
       </div>
     </div>
+    {% else %}
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="small-box bg-secondary" id="box1">
+        <div class="inner">
+          <h3>{{ kolvo.kolclose }}</h3>
+          <p>Ответов</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-check"></i>
+        </div>
+        <a href="{% url 'closed' %}" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    </div>
+    {% endif %}
     <div class="col-12 col-sm-6 col-md-3">
         <div class="small-box bg-primary" id="box5">
         <div class="inner">
@@ -114,6 +150,21 @@
       </div>
     </div>
 </div>
+    {% else %}
+      <div class="small-box bg-info" id="box3">
+        <div class="inner">
+          <h3>{{ kolvo.kolall }}</h3>
+          <p>Всего не закрытых обращений</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-info"></i>
+        </div>
+        <a href="{% url 'allproblem' %}" class="small-box-footer">
+          Подробнее <i class="fas fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    {% endif %}
+    {% if perms.problem.user_moderator %}
     <div class="row">
         <div class="col ">
           <div class="small-box bg-info" id="box9">
@@ -130,3 +181,4 @@
           </div>
         </div>
     </div>
+    {% endif %}
