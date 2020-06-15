@@ -58,7 +58,7 @@ class ActionHistory(models.Model):
     note = models.CharField(max_length=100, verbose_name='Примечание', default=None, null=True, blank=True)
 
     class Meta:
-        ordering = ['-lastaction']
+        ordering = ['lastaction']
         verbose_name = 'история действия'
         verbose_name_plural = 'истории действий'
 

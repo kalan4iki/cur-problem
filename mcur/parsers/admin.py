@@ -22,6 +22,7 @@ class ActionHistoryAdmin(admin.ModelAdmin):
     list_display = ('act', 'arg', 'status', 'lastaction', 'note')
     list_display_links = ('act', 'status', 'arg', 'lastaction', )
     actions = ('action',)
+    list_filter = ('status',)
 
     def action(self, request, queryset):
         for prob in queryset:

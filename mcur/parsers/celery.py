@@ -13,9 +13,12 @@ app.config_from_object('django.conf:settings')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'run-every-single-minute': {
-        'task': 'problem.tasks.hello_world',
-        'schedule': crontab(minute='*/1'),
-        'args': (5),
+    'run-everyday-restart': {
+        'task': 'parsers.tasks.Everyday_restart',
+        'schedule': crontab(minute=0, hour=8),
+    },
+    'run-everyday': {
+        'task': 'parsers.tasks.Everyday',
+        'schedule': crontab(minute=0, hour='12,17'),
     },
 }
