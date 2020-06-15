@@ -328,7 +328,7 @@ class Command(BaseCommand):
                                     time.sleep(2)
                         elif i.act.nact == '2':#Посмотреть не закрытые жалобы
                             if i.arg == 'all':
-                                prob = Problem.objects.filter(Q(visible='1') | Q(visible='2'))
+                                prob = Problem.objects.filter(Q(visible='1') | Q(visible='2')).order_by('-datecre')
                                 als = len(prob)
                                 ke = 1
                                 for j in prob:
