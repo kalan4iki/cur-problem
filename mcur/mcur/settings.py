@@ -302,3 +302,9 @@ NO_VISIBLE_1 = [5, 6, 7]
 NO_VISIBLE_2 = [10, 1, 4, 11, 12, 3, 13]
 NO_VISIBLE = [NO_VISIBLE_1, NO_VISIBLE_2]
 
+# REDIS related settings
+REDIS_HOST = 'localhost'
+REDIS_PORT = '6379'
+BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'

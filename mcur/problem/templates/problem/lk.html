@@ -67,7 +67,21 @@
     </div>
      <div class="col-12 col-sm-6 col-md-3">
      {% else %}
-     <div class="col-12 col-sm-6 col-md-12">
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="small-box bg-success" id="box8">
+            <div class="inner">
+              <h3></h3>
+              <p>Моих обращения</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <a href="{% url 'meproblem' %}" class="small-box-footer">
+              Подробнее <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+     <div class="col-12 col-sm-6 col-md-9">
      {% endif %}
       <div class="small-box bg-info" id="box3">
         <div class="inner">

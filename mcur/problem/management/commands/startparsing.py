@@ -5,7 +5,6 @@ from django.db.models import Q
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 from sys import platform
 from problem.models import Problem, Category, Podcategory, Status, Image, Author
@@ -13,11 +12,9 @@ from parsers.models import Parser, ActionHistory, Loggings
 from parsers.models import Status as StatusPars
 from mcur.settings import MEDIA_ROOT, MEDIA_URL, NO_VISIBLE
 from datetime import date, datetime
-from django.db import transaction
 import xml.etree.ElementTree as xml
 import time
 import traceback
-import codecs
 import logging
 
 
@@ -154,7 +151,6 @@ def parsingall(browser, date, dopos):
     browser.find_element_by_id('id').click()
     browser.find_element_by_id('LoadRecordsButton').click()
     time.sleep(7)
-    #browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/table/thead/tr/th[10]').click()
     a = Select(browser.find_element_by_xpath('/html/body/div[2]/div[3]/div/div[2]/div/div[4]/div[1]/span[3]/select'))
     a.select_by_value('25')
     time.sleep(5)
@@ -202,17 +198,13 @@ class CardParse(object):
             prob = Problem(nomdobr=data['nomdobr'], temat=data['temat'], podcat=data['podcat'], text=data['text'],
                            adres=data['adres'], datecre=data['datecre'], status=data['status'], parsing=data['parsing'],
                            dateotv=data['dateotv'], visible=data['visible'])
-        # print(f'######### - {prob.nomdobr}')
-        # print(f'(last -{temp}) - (new - {prob.status.name})')
         prob.save()
         prob = Problem.objects.get(nomdobr=data['nomdobr'])
         if prob.status == data['status']:
             success.text = 'Successfully'
         else:
             success.text = 'Unsuccessfully'
-        # time.sleep(2)
-        # print(f'Проверка - {prob.status.name}')
-        # print('#########')
+
 
     def close(self, **kwargs):
         if 'error' in kwargs:
@@ -274,23 +266,6 @@ def parsTable(source, card):
                 data['parsing'] = '1'
                 data['visible'] = visi
                 card.update(data=data)
-                # if not Problem.objects.filter(nomdobr=temp2[0]).exists():
-                #     prob = Problem(nomdobr=temp2[0], temat=Category.objects.get(name=temp2[5]),
-                #                    podcat=Podcategory.objects.get(name=temp2[6]), text=temp2[3], adres=temp2[2],
-                #                    datecre=f'{date[2]}-{date[1]}-{date[0]}', status=stat, parsing='1',
-                #                    dateotv=f'{date2[2]}-{date2[1]}-{date2[0]}', visible=visi)
-                # else:
-                #     prob = Problem.objects.get(nomdobr=temp2[0])
-                #     prob.temat = Category.objects.get(name=temp2[5])
-                #     prob.podcat = Podcategory.objects.get(name=temp2[6])
-                #     prob.text = temp2[3]
-                #     prob.adres = temp2[2]
-                #     prob.datecre = f'{date[2]}-{date[1]}-{date[0]}'
-                #     prob.dateotv = f'{date2[2]}-{date2[1]}-{date2[0]}'
-                #     prob.status = stat
-                #     prob.parsing = '1'
-                #     prob.visible = visi
-                # prob.save()
         else:
             return 'non'
     except:

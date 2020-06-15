@@ -674,14 +674,16 @@ class ProblemMeListView(SingleTableMixin, FilterView):
             userlk = User.objects.get(username=self.request.user.username)
             if userlk.has_perm('problem.user_moderator'):
                 prob = lk_moderator.b4(request=self.request, act=2)
-                filterme = ProblemFilter(self.request.GET, queryset=prob)
-                table = ProblemTable(filterme.qs)
-                RequestConfig(self.request, ).configure(table )
-                context['filter'] = filterme
-                context['table'] = table
-                context['name'] = 'Мои обращения'
-                context['dop'] = f'Всего: {len(filterme.qs)}.'
-                context['title'] = 'Мои обращения'
+            elif userlk.has_perm('problem.user_executor'):
+                prob = lk_executor.b6(request=self.request, act=2)
+            filterme = ProblemFilter(self.request.GET, queryset=prob)
+            table = ProblemTable(filterme.qs)
+            RequestConfig(self.request, ).configure(table)
+            context['filter'] = filterme
+            context['table'] = table
+            context['name'] = 'Мои обращения'
+            context['dop'] = f'Всего: {len(filterme.qs)}.'
+            context['title'] = 'Мои обращения'
         return context
 
 
@@ -1019,9 +1021,7 @@ def lk(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        #userlk = User.objects.get(username=request.user.username)
         nowdatetime = datetime.now()
-        #nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
         if request.method == 'POST':
             if request.user.has_perm('problem.user_moderator'):
                 if request.POST['box'] == 'box1':# Ответы
@@ -1084,6 +1084,9 @@ def lk(request):
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
                 elif request.POST['box'] == 'box7':  # Просроченные
                     kolvo = lk_executor.b5(request=request, act=1)
+                    return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
+                elif request.POST['box'] == 'box8':  # Просроченные
+                    kolvo = lk_executor.b6(request=request, act=1)
                     return JsonResponse({'boxn': request.POST['box'], 'kolvo': kolvo, 'mes': 'succes'})
                 else:
                     return JsonResponse({'mes': 'error'})

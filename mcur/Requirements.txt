@@ -26,4 +26,5 @@ urllib3
 xlwt
 reportlab
 celery
+redis
 flower

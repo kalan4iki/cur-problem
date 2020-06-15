@@ -67,10 +67,10 @@ class lk_executor:
         else:
             q1 = Q(curat=userlk.userprofile.dep) | Q(curatuser=userlk)
             termas = Termhistory.objects.filter(q1)
-            q1 = Q(org=userlk.userprofile.org) | Q(curatuser=userlk)
-        q2 = (Q(status='0') | Q(status='1')) & Q(date=nowdate)
+        q2 = (Q(status='0') | Q(status='1')) & Q(date__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
         termas1 = Term.objects.filter(q1 & q2 | Q(resolutions__in=termas))
-        q2 = Q(visible='1') & Q(statussys='1')
+        q2 = Q(visible='1')
+        #q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
         q21 = Q(dateotv=nowdate)
         prob = Problem.objects.filter((Q(terms__in=termas1) & q21) & q2)
         if act == 1:
@@ -96,6 +96,17 @@ class lk_executor:
         q2 = Q(visible='1') & Q(statussys='1')
         q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
         prob = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
+        if act == 1:
+            kolvo = len(prob)
+            return kolvo
+        elif act == 2:
+            return prob
+
+    def b6(request, act): # Мои обращения
+        userlk = request.user
+        q1 = Q(curatuser=userlk)
+        termas = Term.objects.filter(q1)
+        prob = Problem.objects.filter(Q(terms__in=termas) & Q(visible='1'))
         if act == 1:
             kolvo = len(prob)
             return kolvo
