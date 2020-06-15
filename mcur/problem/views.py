@@ -842,8 +842,12 @@ def prob(request, pk):
                     dep = Department.objects.filter(org=userr.userprofile.org)
                     userorg = Person.objects.filter(userprofile__org=userr.userprofile.org)
                 elif userr.has_perm('problem.user_executor'):
-                    dep = Department.objects.filter(name=userr.userprofile.dep.name)
-                    userorg = Person.objects.filter(userprofile__dep__in=dep)
+                    if userr.userprofile.dep != None:
+                        dep = Department.objects.filter(name=userr.userprofile.dep.name)
+                        userorg = Person.objects.filter(userprofile__dep__in=dep)
+                    else:
+                        dep = []
+                        userorg = Person.objects.filter(userprofile__org=userr.userprofile.org)
                 elif userr.has_perm('problem.user_ty'):
                     dep = None
                     userorg = None

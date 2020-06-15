@@ -10,7 +10,7 @@
       <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="input-group mb-3">
-          <input name="username" type="text" class="form-control" placeholder="Логин">
+          <input name="username" type="text" class="form-control" placeholder="Логин" autofocus>
           <div class="input-group-append">
             <div class="input-group-text">
               <i class="fa fa-user"></i>
