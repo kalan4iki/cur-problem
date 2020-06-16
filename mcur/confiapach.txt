@@ -47,3 +47,7 @@ sudo lnav /home/media/info.log
 cd /var/www/cur-problem & sudo git pull & sudo service apache2 restart
 
 pscp.exe vadim@192.168.10.25:/home/vadim/skiog.ru.pem .
+
+[Запуск Celery]
+sudo celery -A parsers beat
+sudo celery worker -A parsers

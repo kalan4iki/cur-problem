@@ -490,6 +490,7 @@ function ShowModal(datas) {
     modal.find('input[name="status"]').val(datas['app']['status']);
     modal.find('textarea[name="text"]').val(datas['app']['text']);
     modal.find('a[name="dobrodel"]').attr('href', 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='+datas['app']['nomd']);
+    modal.find('button[name="message"]').removeClass('disabled');
     if (datas['app']['image'] === false) modal.find('button[name="dowimage"]').addClass('disabled');
     if (datas['app']['message'] === false) modal.find('button[name="message"]').addClass('disabled');
     modal.find('button[name="message"]').attr('id', datas['app']['nomd']);
