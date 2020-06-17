@@ -279,7 +279,7 @@
             <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Развернуть/свернуть"><i class="fas fa-plus"></i>
             </button>
               {% if perms.problem.user_moderator %}
-            <button type="button" class="btn btn-tool" id="" title="Редактировать"><i class="fa fa-pencil"></i>
+            <button type="button" class="btn btn-tool btneditdate" id="{{ i.pk }}" title="Изменить дату"><i class="fa fa-pencil"></i>
             </button>
             <button type="button" class="btn btn-tool" id="approve-{{ i.pk }}" title="Утвердить назначение"><i class="fa fa-check"></i>
             </button>
@@ -471,6 +471,42 @@
       </div>
     </div>
   </div>
+<!-- Modal -->
+<div class="modal fade" id="modal-changedate">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Изменение даты</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form role="form" action="{% url 'changeterm' %}" method="post" id="changedate">
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <div id="div_id_date_new" class="form-group">
+                  <label for="id_date_new" class="">Срок исполнения<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_new" required value="">
+                    <small id="hint_id_date_new"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Изменить</button>
+        </div>
+        </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 {% include 'chat/chatproblem.html' with nd=np.nomdobr %}
 </section>
 {% endblock %}
@@ -523,6 +559,37 @@ $('#del-{{ i.pk }}').click(function () {
     });
 {% endif %}
 {% endfor %}
+
+$('.btneditdate').click(function () {
+    var but = $( this ),
+        url = '{% url 'changeterm' %}',
+        pk = but.attr('id'),
+        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val(),
+        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, view: true, pk:pk});
+        posting.done(function (datas) {
+            var modalka = $('#modal-changedate'),
+                a = modalka.find('input[id="id_date_new"]'),
+                but = modalka.find('button[type="submit"]');
+            but.attr('id', pk);
+            a.attr('value', datas['date']);
+            modalka.modal('show')
+        })
+});
+
+$('#changedate').submit(function (event) {
+    event.preventDefault();
+    var $form = $( this ),
+        pk = $form.find('button[type="submit"]').attr('id'),
+        date = $form.find('input[id="id_date_new"]').val(),
+        url = $form.attr( 'action' ),
+        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk, date:date, change: true});
+    posting.done(function (datas) {
+        var modalka = $('#modal-changedate');
+        modalka.modal('hide');
+        onAjaxSuccess(datas);
+    })
+});
 
 $(document).ready(function () {
     var fd = $('#id_furtherdate');

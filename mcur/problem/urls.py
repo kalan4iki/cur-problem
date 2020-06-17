@@ -5,7 +5,7 @@ from .views import (api_problem, api_problem_detail, api_answer_detail, prob, ad
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd, zapros,
                     createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action,
                     listuser, term_approve, api_report, addty, ProblemTyListView, apis, dopaction, ProblemOrgView,
-                    ProblemFuListView, delty)
+                    ProblemFuListView, delty, changeterm)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -54,6 +54,7 @@ urlpatterns = [
     path('addty/', addty, name='addty'),
     path('api/dopaction', dopaction, name='dopaction'),
     path('zapros/', zapros, name='zapros'),
+    path('changeterm/', changeterm, name='changeterm'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1270,6 +1270,7 @@ def addparsing(request, pk):
         title = 'Обновление проблемы'
         if request.user.has_perm('problem.user_moderator'):
             if request.method == 'POST':
+
                 hist = ActionHistory(act=Action.objects.get(nact='2'), arg=pk, status='0')
                 hist.save()
                 mes = 'Проблема отправлена на обновление.'
@@ -1636,3 +1637,38 @@ def zapros(request):
                 return render(request, 'problem/zapros.html', {'content': content})
         else:
             return redirect('index')
+
+
+def changeterm(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        title = 'Изменение даты назначения'
+        if request.user.has_perm('problem.user_moderator'):
+            if request.method == 'POST':
+                if 'view' in request.POST:
+                    term = Term.objects.get(pk=request.POST['pk'])
+                    content = {'date': term.date.strftime('%Y-%m-%d')}
+                    return JsonResponse(content)
+                elif 'change' in request.POST:
+                    term = Term.objects.get(pk=request.POST['pk'])
+                    ndate = request.POST['date'].split('-')
+                    term.date = date(int(ndate[0]), int(ndate[1]), int(ndate[2]))
+                    term.save()
+                    mes = 'Изменение успешно.'
+                    nom = 0
+                    a = ActionObject(title=title, nom=nom, message=mes)
+                    serializer = ActionSerializer(a)
+                    return JsonResponse(serializer.data, safe=False)
+            else:
+                mes = 'Ошибка, не правильный запрос.'
+                nom = 1
+                a = ActionObject(title=title, nom=nom, message=mes)
+                serializer = ActionSerializer(a)
+                return JsonResponse(serializer.data, safe=False)
+        else:
+            mes = 'Ошибка, не достаточно прав на создание назначения.'
+            nom = 1
+            a = ActionObject(title=title, nom=nom, message=mes)
+            serializer = ActionSerializer(a)
+            return JsonResponse(serializer.data, safe=False)
