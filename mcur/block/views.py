@@ -69,11 +69,12 @@ def addresult(request):
             if blo.status == '0':
                 group = Group.objects.get(pk=6)
                 users = Person.objects.filter(groups=group)
+                blo.text = di['text']
                 for i in users:
-                    payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
+                    payload = {"head": "Изменен статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                     send_user_notification(user=i, payload=payload, ttl=1000)
             else:
-                payload = {"head": "Изменент статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
+                payload = {"head": "Изменен статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                 send_user_notification(user=blo.user, payload=payload, ttl=1000)
             blo.save()
             print(f'Обращение: {blo.nomdobr}, новый статус: {blo.get_status_display()}')

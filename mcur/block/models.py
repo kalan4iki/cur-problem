@@ -21,7 +21,7 @@ class Appeal(models.Model):
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто направил на блокировку')
 
     class Meta:
-        ordering = ['pk']
+        ordering = ['-datecre']
         verbose_name = 'блокировка'
         verbose_name_plural = 'блокировки'
 

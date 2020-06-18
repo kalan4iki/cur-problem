@@ -462,6 +462,8 @@ function TableCre(table, data)
     table.jsGrid({
         height: "100%",
         width: "100%",
+        sorting: true,
+        paging: false,
         rowClick: function(item) {
             navigator.clipboard.writeText(item['item']['nomd']);
             var pk = item['item']['nomd'],
