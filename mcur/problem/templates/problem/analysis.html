@@ -1,0 +1,139 @@
+{% extends "layout/basic.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% block title %}Анализ обращений{% endblock %}
+{% block nav2 %}active{% endblock %}
+{% block content %}
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark"><b>Страница анализа обращений</b></h1>
+      </div><!-- /.col -->
+        <div class="col-sm-6">
+            <button class="btn btn-app float-sm-right" data-toggle="modal" data-target="#modal-analysis">
+              <i class="fas fa-download"></i> Провести анализ
+            </button>
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+<section class="content">
+
+    <div class="row">
+        <div class="col">
+            <div class="card" id="main-card" hidden>
+                <div class="card-header">
+                    <h5 class="card-title"></h5>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <i class="fas fa-wrench"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="">
+                          <a href="" class="dropdown-item" id="extend-term">Продлить назначения</a>
+                          <a class="dropdown-divider"></a>
+                        </div>
+                      </div>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+<div class="modal fade" id="modal-analysis">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Проведение анализа</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form role="form" action="{% url 'analysis' %}" method="post" id="form-analysis">
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Категория</label>
+                <select class="form-control" id="cate">
+                  <option value="1">На сегодня</option>
+                  <option value="2">Просроченные</option>
+                </select>
+              </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Запросить</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<div class="modal fade" id="modal-problem" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Обращения</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col">
+                    <div id="jsGrid" class="jsgrid">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+        </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+{% endblock %}
+
+{% block ends %}
+<script>
+$('#form-analysis').submit(function (event) {
+    event.preventDefault();
+    var form = $( this ),
+        CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+        url = form.attr('action'),
+        cat = form.find('select[id="cate"]').val();
+    var data = $.post(url, {csrfmiddlewaretoken: CSRFtoken, cate:cat}, testfunct);
+});
+
+function testfunct(dates) {
+
+    console.log(dates);
+    var modal = $('#modal-analysis'),
+        card = $('#main-card');
+    modal.modal('hide');
+    card.find('h5[class="card-title"]').text(dates['type']['text']);
+    card.find('div[class="card-body"]').empty();
+    var a = $(dates['kolvo']['all'] + dates['kolvo']['naz'] + dates['kolvo']['prob']);
+    card.find('div[class="card-body"]').append(a);
+    card.find('a[id="extend-term"]').attr('name', dates['type']['id']);
+    card.removeAttr('hidden')
+}
+</script>
+{% endblock %}

@@ -1672,3 +1672,35 @@ def changeterm(request):
             a = ActionObject(title=title, nom=nom, message=mes)
             serializer = ActionSerializer(a)
             return JsonResponse(serializer.data, safe=False)
+
+
+def analysis(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.method == 'POST':
+            content = {}
+            if 'cate' in request.POST:
+                kolvo = {}
+                a = ''
+                b = ''
+                nowdatetime = datetime.now()
+                nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+                if request.POST['cate'] == '1':
+                    a = lk_moderator.b6(request, 2)
+                    b = Term.objects.filter(problem__in=a, date=nowdate)
+                    content['type'] = {'id': 1, 'text': 'Анализ сегоднящних обращений'}
+                elif request.POST['cate'] == '2':
+                    a = lk_moderator.b7(request, 2)
+                    b = Term.objects.filter(problem__in=a,
+                                            date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
+                    content['type'] = {'id': 2, 'text': 'Анализ просроченных обращений'}
+                kolvo['all'] = f'<h4>Всего обращений: <b>{len(a)}</b></h4>'
+                kolvo['naz'] = f'<h4>По дате назначений: <b>{len(b)}</b></h4>'
+                kolvo['prob'] = f'<h4>По дате обращений: <b>{len(a) - len(b)}</b></h4>'
+                content['kolvo'] = kolvo
+                return JsonResponse(content)
+            else:
+                return JsonResponse(content)
+        else:
+            return render(request, 'problem/analysis.html')
