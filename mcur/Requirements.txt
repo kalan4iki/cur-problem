@@ -28,3 +28,5 @@ reportlab
 celery
 redis
 flower
+gevent
+gunicorn

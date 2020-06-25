@@ -305,3 +305,56 @@ class Image(models.Model):
     class Meta:
         verbose_name = 'фотография'
         verbose_name_plural = 'фотографии'
+
+
+class EditProblem(models.Model):
+    datecre = models.DateTimeField(auto_now_add=True, verbose_name='Дата изменения')
+    prob = models.ForeignKey(Problem, verbose_name='Обращение', on_delete=models.CASCADE, null=True, default=None,
+                             related_name='editprob')
+
+    def __str__(self):
+        return f'Изменение от {self.datecre} обращение №{self.prob.nomdobr}'
+
+    class Meta:
+        ordering = ['-datecre']
+        verbose_name = 'изменение обращения'
+        verbose_name_plural = 'изменения обращений'
+
+
+class Editable(models.Model):
+    name = models.CharField(max_length=255, verbose_name='Название', null=True, default=None)
+    lastval = models.TextField(verbose_name='Старое значение', null=True, default=None)
+    newval = models.TextField(verbose_name='Новое значение', null=True, default=None)
+    operation = models.ForeignKey(EditProblem, verbose_name='Операция изменения', on_delete=models.CASCADE, null=True,
+                                  default=None, related_name='editable')
+
+    class Meta:
+        ordering = ['-pk']
+
+
+class DecisionProblem(models.Model):
+    prob = models.ForeignKey(Problem, verbose_name='Обращение', on_delete=models.CASCADE)
+    date = models.DateTimeField(verbose_name='Дата создания')
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    text = models.TextField(verbose_name='Текст', null=True, default=None)
+
+    def __str__(self):
+        return f'Решине от {self.name} обращения {self.prob.nomdobr}'
+
+    class Meta:
+        ordering = ['-date']
+        verbose_name = 'ход решения'
+        verbose_name_plural = 'ходы решения'
+
+
+class Images(models.Model):
+    prob = models.ForeignKey(Problem, verbose_name='Обращение', on_delete=models.CASCADE, null=True, default=None,
+                             blank=True)
+    decis = models.ForeignKey(DecisionProblem, verbose_name='Ход решения', on_delete=models.CASCADE, null=True,
+                              default=None, blank=True)
+    url = models.CharField(max_length=300, verbose_name='URL изображения')
+
+    class Meta:
+        ordering = ['-pk']
+        verbose_name = 'изображение'
+        verbose_name_plural = 'изображения'

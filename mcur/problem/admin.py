@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (Curator, Minis, Problem, Term, Access, Answer, UserProfile, Image, Category, Podcategory, Status,
-                     Termhistory, Department, Author)
+                     Termhistory, Department, Author, DecisionProblem)
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Permission
 from django.contrib.admin.models import LogEntry
@@ -27,6 +27,14 @@ class TermInline(admin.TabularInline):
     verbose_name_plural = 'Назначения'
     fields = ('pk', 'date', 'org', 'curat', 'curatuser')
     readonly_fields = ('pk', 'date', 'org', 'curat', 'curatuser')
+
+
+class DecisionProblemAdmin(admin.TabularInline):
+    model = DecisionProblem
+    can_delete = False
+    verbose_name_plural = 'Ход решения'
+    fields = ('date', 'name', 'text')
+    readonly_fields = ('date', 'name', 'text')
 
 
 @admin.register(Author)
@@ -106,7 +114,7 @@ class ProblemAdmin(admin.ModelAdmin):
     search_fields = ('nomdobr',)
     list_filter = ('visible', 'dateotv', 'status__name', 'note', 'temat', 'ciogv__name',)
     actions = ('pars', 'novisib', 'termnovisib', 'visib')
-    inlines = (TermInline,)
+    inlines = (DecisionProblemAdmin, TermInline,)
 
     def pars(self, request, queryset):
         for prob in queryset:

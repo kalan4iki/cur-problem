@@ -1,0 +1,55 @@
+version: '3'
+
+# хранилища
+volumes:
+    pgdata:
+        driver: local
+services:
+    nginx:
+# при падении будет стараться подняться
+        restart: always
+# только свежий nginx
+        image: nginx:latest
+# слушает порт 8080
+        expose:
+          - 8080
+# мапаем порт 80 на его 8080. Тогда сайт будет доступен по адресу localhost. Убедись, что порт у тебя не занят.
+        ports:
+          - "80:8080"
+# монтируем только те директории, в которых лежит статика, т.к. nginx с динамикой не будет работать. Также директорию с логами и файл настройки, который мы подготовили.
+        volumes:
+            - ./mcur/static:/srv/www/mcur/static
+            - ./mcur/media:/srv/www/mcur/media
+            - ./mcur/logs:/srv/www/mcur/logs
+            - ./docker/nginx:/etc/nginx/conf.d
+# и nginx зависит от контейнера python. Т.е. python должен быть запущен первым
+        depends_on:
+            - python
+    python:
+        restart: always
+# указываем откуда собирать образ
+        build:
+            context: .
+            dockerfile: docker/python/Dockerfile
+# монтируем директорию проекта
+        volumes:
+            - ./mcur:/srv/www/mcur
+        expose:
+          - 8000
+        ports:
+            - 8000:8000
+# запускаем gunicorn
+        command: "gunicorn -c gunicorn.py mcur.wsgi"
+    db:
+        image: mysql:5.7
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        ports:
+          - "3306:3306"
+        environment:
+          MYSQL_ROOT_PASSWORD: 211563
+          MYSQL_DATABASE: mcur
+          MYSQL_USER: django
+          MYSQL_PASSWORD: 211563
+        volumes:
+          - ./mysql:/var/lib/mysql
+          - ./sql:/docker-entrypoint-initdb.d

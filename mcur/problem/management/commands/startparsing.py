@@ -220,6 +220,7 @@ class CardParse(object):
 def parsTable(source, card):
     try:
         bs = BeautifulSoup(source, 'lxml')
+        bs.find()
         table = bs.find_all('tr', class_='jtable-data-row')
         if len(table) > 0:
             for i in table:
@@ -328,7 +329,7 @@ class Command(BaseCommand):
                                     time.sleep(2)
                         elif i.act.nact == '2':#Посмотреть не закрытые жалобы
                             if i.arg == 'all':
-                                prob = Problem.objects.filter(Q(visible='1') | Q(visible='2')).order_by('-datecre')
+                                prob = Problem.objects.filter(Q(visible='1') | Q(visible='2')).order_by('-dateotv')
                                 als = len(prob)
                                 ke = 1
                                 for j in prob:
