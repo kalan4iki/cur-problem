@@ -14,7 +14,6 @@ from .models import Message
 @api_view(['POST'])
 def ChatProblem(request):
     zapr = request.POST
-    print(zapr)
     if Problem.objects.filter(nomdobr=zapr['nd']).exists():
         prob = Problem.objects.get(nomdobr=zapr['nd'])
         if zapr['action'] == '1':

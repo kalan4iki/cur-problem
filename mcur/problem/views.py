@@ -40,7 +40,7 @@ from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser, TyFo
 from .filter import ProblemListView, ProblemFilter
 from .logick import lk_dispatcher, lk_executor, lk_moderator, lk_ty
 from mcur import settings
-
+from .api import api_func
 
 # other
 from datetime import date, timedelta, datetime
@@ -231,170 +231,6 @@ def api_action(request):
         return JsonResponse(serializer.data, safe=False)
 
 
-@api_view(['POST'])
-def api_report(request):
-    if request.user.has_perm('problem.user_moderator'):
-        if request.method == 'POST':
-            nowdatetime = datetime.now()
-            if request.POST['report'] == '1':
-                if 'linux' in platform.lower():
-                    temp = request.POST['datefrom'].split('-')
-                    datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
-                    temp = request.POST['datebefore'].split('-')
-                    datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
-                else:
-                    datefrom = date.fromisoformat(request.POST['datefrom'])
-                    datebefore = date.fromisoformat(request.POST['datebefore'])
-                wb = xlwt.Workbook(encoding='utf-8')
-                ws = wb.add_sheet('problems')
-                row_num = 0
-                font_style = xlwt.XFStyle()
-                font_style.font.bold = True
-                columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
-                           'Дата жалобы',
-                           'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
-                for col_num in range(len(columns)):
-                    ws.write(row_num, col_num, columns[col_num], font_style)
-                font_style = xlwt.XFStyle()
-                rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr',
-                                                        'temat__name', 'podcat__name', 'text', 'adres', 'datecre',
-                                                         'dateotv', 'status__name', 'statussys')
-                for row in rows:
-                    row_num += 1
-                    for col_num in range(len(row)):
-                        if col_num == 6 or col_num == 7:
-                            ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
-                                     font_style)
-                        else:
-                            ws.write(row_num, col_num, row[col_num], font_style)
-                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
-                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
-                if 'linux' in platform.lower():
-                    url = f'https://skiog.ru/media/xls/{name}'
-                else:
-                    url = f'http://127.0.0.1:8000/media/xls/{name}'
-                title = 'Успешно'
-                mes = 'Отчет подготовлен!'
-                nom = 0
-                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
-                return JsonResponse(cont)
-            if request.POST['report'] == '2':
-                wb = xlwt.Workbook(encoding='utf-8')
-                ws = wb.add_sheet('problems')
-                row_num = 0
-                font_style = xlwt.XFStyle()
-                font_style.font.bold = True
-                columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
-                           'Дата жалобы',
-                           'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе']
-                for col_num in range(len(columns)):
-                    ws.write(row_num, col_num, columns[col_num], font_style)
-                font_style = xlwt.XFStyle()
-                rows = Problem.objects.filter(visible='1').values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
-                                                         'text', 'adres', 'datecre',
-                                                         'dateotv', 'status__name', 'statussys')
-                for row in rows:
-                    row_num += 1
-                    for col_num in range(len(row)):
-                        if col_num == 6 or col_num == 7:
-                            ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
-                                     font_style)
-                        else:
-                            ws.write(row_num, col_num, row[col_num], font_style)
-                name = f'{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
-                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
-                if 'linux' in platform.lower():
-                    url = f'https://skiog.ru/media/xls/{name}'
-                else:
-                    url = f'http://127.0.0.1:8000/media/xls/{name}'
-                title = 'Успешно'
-                mes = 'Отчет подготовлен!'
-                nom = 0
-                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
-                return JsonResponse(cont)
-            if request.POST['report'] == '3':
-                if 'linux' in platform.lower():
-                    temp = request.POST['datefrom'].split('-')
-                    datefrom = date(int(temp[0]), int(temp[1]), int(temp[2]))
-                    temp = request.POST['datebefore'].split('-')
-                    datebefore = date(int(temp[0]), int(temp[1]), int(temp[2]))
-                else:
-                    datefrom = date.fromisoformat(request.POST['datefrom'])
-                    datebefore = date.fromisoformat(request.POST['datebefore'])
-                wb = xlwt.Workbook(encoding='utf-8')
-                ws = wb.add_sheet('problems')
-                row_num = 0
-                font_style = xlwt.XFStyle()
-                font_style.font.bold = True
-                font_style.alignment.horz = 0x02
-                cats = Category.objects.all()
-                tempdate = []
-                notes = []
-                days = datebefore - datefrom
-                tempdate.append(datefrom)
-                notes.append('Наименование')
-                notes.append(datefrom.strftime('%d.%m.%Y'))
-                first_col = ws.col(0)
-                first_col.width = 256 * 20
-                for i in range(days.days):
-                    td = tempdate[-1] + timedelta(1)
-                    tempdate.append(td)
-                    notes.append(td.strftime('%d.%m.%Y'))
-                    col = ws.col(i+1)
-                    col.width = 256 * 10
-                col = ws.col(days.days+1)
-                col.width = 256 * 10
-                col = ws.col(days.days + 2)
-                col.width = 256 * 10
-                notes.append('Итого')
-                temp = []
-                for i in cats:
-                    c = []
-                    d = 0
-                    c.append(i.name)
-                    for j in tempdate:
-                        ea = len(Problem.objects.filter(temat=i, datecre=j))
-                        d += ea
-                        c.append(ea)
-                    c.append(d)
-                    temp.append(c)
-                columns = notes
-                for col_num in range(len(columns)):
-                    ws.write(row_num, col_num, columns[col_num], font_style)
-                font_style = xlwt.XFStyle()
-                temp = sorted(temp, key=itemgetter(days.days+2), reverse=True)
-                rows = temp
-                for row in rows:
-                    row_num += 1
-                    for col_num in range(len(row)):
-                        ws.write(row_num, col_num, row[col_num], font_style)
-                name = f'cats-{nowdatetime.day}{nowdatetime.month}{nowdatetime.year}{nowdatetime.hour}{nowdatetime.minute}.xls'
-                wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
-                if 'linux' in platform.lower():
-                    url = f'https://skiog.ru/media/xls/{name}'
-                else:
-                    url = f'http://127.0.0.1:8000/media/xls/{name}'
-                title = 'Успешно'
-                mes = 'Отчет подготовлен!'
-                nom = 0
-                cont = {'url': url, 'title': title, 'message': mes, 'nom': nom}
-                return JsonResponse(cont)
-            else:
-                title = 'Ошибка'
-                mes = 'Ошибка при выполнении!'
-                nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
-    else:
-        title = 'Ошибка'
-        mes = 'Нет прав на выполнение данной операции!'
-        nom = 1
-        a = ActionObject(title=title, nom=nom, message=mes)
-        serializer = ActionSerializer(a)
-        return JsonResponse(serializer.data, safe=False)
-
-
 class AnswerSerializer(serializers.Serializer):
     kolvosogl = serializers.IntegerField()
     kollno = serializers.IntegerField()
@@ -408,7 +244,7 @@ class AnswerObject(object):
 
 @csrf_exempt
 def api_answer_detail(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         answ = Answer.objects.filter(status='0')
         prob = len(Problem.objects.filter(visible='1', statussys='2'))
         a = AnswerObject(kollno=prob, kolvosogl=len(answ))
@@ -420,8 +256,8 @@ def Mailsend(email, date, nomd):
     data = f'''
 <p>Вам направлена задача сроком до {date}. На обращение <a href='https://skiog.ru/problem/{nomd}'>№{nomd}</a></p>
 <p></p>
-<p>______________<p> 
-<p>Администрация информационной системы skiog.ru </p>          
+<p>______________<p>
+<p>Администрация информационной системы skiog.ru </p>
 '''
     emai = email
     send_mail('SKIOG', None, 'noreply@skiog.ru', [emai], fail_silently=False, html_message=data)
@@ -806,62 +642,67 @@ def prob(request, pk):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
-        if Problem.objects.filter(nomdobr=pk).exists():
-            c = False
-            terms = []
-            prob = Problem.objects.get(nomdobr=pk)
-            if request.user.has_perm('problem.user_moderator'):
-                c = True
-                terms = prob.terms.all()
-            nowdatetime = datetime.now()
-            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-            userr = User.objects.get(username=request.user.username)
-            tyform = TyForm()
-            if userr.userprofile.ty == prob.ciogv and userr.userprofile.ty != None:
-                c = True
-                temp = prob.terms.all()
-                if len(temp) > 0:
-                    for i in temp:
-                        terms.append(i)
-            else:
-                if not c:
-                    temp = prob.terms.filter(Q(org=userr.userprofile.org) | Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+        if request.method == 'POST':
+            api = api_func('problem')()
+            api(request=request)
+            return JsonResponse(api.context)
+        else:
+            if Problem.objects.filter(nomdobr=pk).exists():
+                c = False
+                terms = []
+                prob = Problem.objects.get(nomdobr=pk)
+                if request.user.has_perm('problem.user_moderator'):
+                    c = True
+                    terms = prob.terms.all()
+                nowdatetime = datetime.now()
+                nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
+                userr = User.objects.get(username=request.user.username)
+                tyform = TyForm()
+                if userr.userprofile.ty == prob.ciogv and userr.userprofile.ty != None:
+                    c = True
+                    temp = prob.terms.all()
                     if len(temp) > 0:
                         for i in temp:
                             terms.append(i)
-                    resol = Termhistory.objects.filter(Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
-                    if len(resol) > 0:
-                        for i in resol:
-                            if not i.term in terms:
-                                terms.append(i.term)
-            if c or len(terms) > 0:
-                termadd = TermForm()
-                answeradd = AnswerForm()
-                if userr.has_perm('problem.user_moderator'):
-                    dep = Department.objects.all()
-                    userorg = Person.objects.all()
-                elif userr.has_perm('problem.user_dispatcher'):
-                    dep = Department.objects.filter(org=userr.userprofile.org)
-                    userorg = Person.objects.filter(userprofile__org=userr.userprofile.org)
-                elif userr.has_perm('problem.user_executor'):
-                    if userr.userprofile.dep != None:
-                        dep = Department.objects.filter(name=userr.userprofile.dep.name)
-                        userorg = Person.objects.filter(userprofile__dep__in=dep)
-                    else:
-                        dep = []
+                else:
+                    if not c:
+                        temp = prob.terms.filter(Q(org=userr.userprofile.org) | Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+                        if len(temp) > 0:
+                            for i in temp:
+                                terms.append(i)
+                        resol = Termhistory.objects.filter(Q(curat=userr.userprofile.dep) | Q(curatuser=userr))
+                        if len(resol) > 0:
+                            for i in resol:
+                                if not i.term in terms:
+                                    terms.append(i.term)
+                if c or len(terms) > 0:
+                    termadd = TermForm()
+                    answeradd = AnswerForm()
+                    if userr.has_perm('problem.user_moderator'):
+                        dep = Department.objects.all()
+                        userorg = Person.objects.all()
+                    elif userr.has_perm('problem.user_dispatcher'):
+                        dep = Department.objects.filter(org=userr.userprofile.org)
                         userorg = Person.objects.filter(userprofile__org=userr.userprofile.org)
-                elif userr.has_perm('problem.user_ty'):
-                    dep = None
-                    userorg = None
-                resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
-                return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd,
-                                                                'formadd': termadd, 'np': prob, 'terms': terms,
-                                                                'resform': resform, 'back': back})
+                    elif userr.has_perm('problem.user_executor'):
+                        if userr.userprofile.dep != None:
+                            dep = Department.objects.filter(name=userr.userprofile.dep.name)
+                            userorg = Person.objects.filter(userprofile__dep__in=dep)
+                        else:
+                            dep = []
+                            userorg = Person.objects.filter(userprofile__org=userr.userprofile.org)
+                    elif userr.has_perm('problem.user_ty'):
+                        dep = None
+                        userorg = None
+                    resform = ResolutionForm(curat_qs=dep, curatuser_qs=userorg)
+                    return render(request, 'problem/problem.html', {'tyform': tyform, 'answeradd': answeradd,
+                                                                    'formadd': termadd, 'np': prob, 'terms': terms,
+                                                                    'resform': resform, 'back': back})
+                else:
+                    messages.error(request, 'Нет доступа к обращению.')
+                    return redirect('index')
             else:
-                messages.error(request, 'Нет доступа к обращению.')
                 return redirect('index')
-        else:
-            return redirect('index')
 
 
 def zaptable(request):
@@ -900,121 +741,6 @@ def add(request):
                     return redirect("index")
             else:
                 return redirect("problem", pk=Problem.objects.get(nomdobr=request.POST['nomdobr']).pk)
-
-
-def termadd(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        prob = Problem.objects.get(pk=pk)
-        title = 'Добавление назначения'
-        if request.user.has_perm('problem.user_moderator'):
-            if request.method == 'POST':
-                formadd = TermForm(request.POST)
-                if formadd.is_valid():
-                    a = formadd.save()
-                    nd = Problem.objects.get(pk=pk)
-                    a.problem = nd
-                    a.user = request.user
-                    if a.further == False:
-                        a.furtherdate = None
-                    a.save()
-                    nd.statussys = '1'
-                    nd.save()
-                    if a.curatuser:
-                        temp = f'{a.date.day}.{a.date.month}.{a.date.year}'
-                        #Mailsend(a.curatuser.email, temp, a.problem.nomdobr)
-                    mes = 'Назначение успешно добавлено.'
-                    nom = 0
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка, форма не прошла валидацию.'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-            #return render(request, 'problem/termadd.html', {'auth': True, 'formadd': formadd, 'np': prob, 'prob': prob})
-        else:
-            mes = 'Ошибка, не достаточно прав на создание назначения.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
-
-
-def delterm(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        title = 'Удаление назначения'
-        if request.user.has_perm('problem.user_moderator'):
-            if Term.objects.filter(pk=pk).exists():
-                if request.method == 'POST':
-                    b = Term.objects.get(pk=pk)
-                    nd = b.problem
-                    b.delete()
-                    if len(nd.terms.all()) == 0:
-                        nd.statussys = '2'
-                        nd.save()
-                    mes = 'Назначение удалено'
-                    nom = 0
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-                else:
-                    mes = 'Ошибка, неправильный запрос.'
-                    nom = 1
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка, данного назначения не найдено.'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-        else:
-            mes = 'Ошибка, не достаточно прав на удаление назначения.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
-
-
-def delty(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        title = 'Удаление ТУ обращения'
-        if request.user.has_perm('problem.user_moderator'):
-            if Term.objects.filter(pk=pk).exists():
-                if request.method == 'POST':
-
-                    mes = 'Удалено'
-                    nom = 0
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-                else:
-                    mes = 'Ошибка, неправильный запрос.'
-                    nom = 1
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-        else:
-            mes = 'Ошибка, не достаточно прав на удаление.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
 
 
 def lk(request):
@@ -1263,138 +989,17 @@ def createuser(request):
             return JsonResponse(serializer.data, safe=False)
 
 
-def addparsing(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        title = 'Обновление проблемы'
-        if request.user.has_perm('problem.user_moderator'):
-            if request.method == 'POST':
-
-                hist = ActionHistory(act=Action.objects.get(nact='2'), arg=pk, status='0')
-                hist.save()
-                mes = 'Проблема отправлена на обновление.'
-                nom = 0
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка, неправильный запрос.'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-        else:
-            mes = 'Ошибка, не достаточно прав на обновление проблемы.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
-
-
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     else:
         if request.user.has_perm('problem.user_moderator'):
-            nowdatetime = datetime.now()
-            nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
-            dates = {}
-            notes = []
             if request.method == 'POST':
-                if request.POST['chart'] == 'chart1':
-                    tempdate = []
-                    for i in range(6, 0, -1):
-                        tempdate.append(nowdate-timedelta(i))
-                    tempdate.append(nowdate)
-                    kolvo = []
-                    for i in tempdate:
-                        kolvo.append(len(Term.objects.filter(datecre=i)))
-                elif request.POST['chart'] == 'chart2':
-                    tempdate = []
-                    for i in range(0, 7):
-                        tempdate.append(nowdate + timedelta(i))
-                    kolvo = []
-                    for i in tempdate:
-                        q1 = Q(status='0') & Q(date=i)
-                        q21 = Q(dateotv=i)
-                        q22 = Q(visible='1') & (Q(status__in=Status.objects.filter(name='В работе')) | Q(
-                            status__in=Status.objects.filter(name='Указан срок')))
-                        termas = Term.objects.filter(q1)
-                        termas2 = Problem.objects.filter((Q(terms__in=termas) | q21) & q22)
-                        kolvo.append(len(termas2))
-                elif request.POST['chart'] == 'chart3':
-                    temporg = Curator.objects.all().exclude(name='Территориальное управление')
-                    tempdate = []
-                    kolvo = []
-                    for i in temporg:
-                        tempdate.append(i.name)
-                        kolvo.append(len(Term.objects.filter((Q(org=i) | Q(curat__org=i)) & Q(problem__visible='1'))))
-                elif request.POST['chart'] == 'chart4':
-                    tempty = Minis.objects.all()
-                    tempdate = []
-                    kolvo = []
-                    for i in tempty:
-                        tempdate.append(i.name)
-                        te = len(Problem.objects.filter(Q(ciogv=i) & Q(visible='1')))
-                        kolvo.append(te)
-                    prob = Problem.objects.filter(Q(visible='1'))
-                elif request.POST['chart'] == 'chart5':
-                    tempdate = ''
-                    author = Author.objects.all()
-                    temp = {}
-                    kolvo = []
-                    for i in author:
-                        temp[i.pk] = len(i.problems.all())
-                    temp = sorted(temp.items(), key=itemgetter(1), reverse=True)
-                    for i in range(25):
-                        nom = temp[i][0]
-                        autho = Author.objects.get(pk=nom)
-                        a = {}
-                        a['fio'] = autho.fio
-                        a['email'] = autho.email
-                        a['tel'] = autho.tel
-                        a['kolvo'] = temp[i][1]
-                        kolvo.append(a)
-                elif request.POST['chart'] == 'chart6':
-                    tempdate = []
-                    for i in range(6, 0, -1):
-                        tempdate.append(nowdate-timedelta(i))
-                    tempdate.append(nowdate)
-                    kolvo = []
-                    for i in tempdate:
-                        kolvo.append(len(Problem.objects.filter(datecre=i)))
-                elif request.POST['chart'] == 'chart7':
-                    cats = Category.objects.all()
-                    kolvo = []
-                    tempdate = []
-                    notes = []
-                    for i in range(4, 0, -1):
-                        temp = nowdate - timedelta(i)
-                        tempdate.append(temp)
-                        notes.append(temp.strftime('%d.%m.%Y'))
-                    tempdate.append(nowdate)
-                    notes.append(nowdate.strftime('%d.%m.%Y'))
-                    temp = {}
-                    for j in cats:
-                        temp[j.pk] = len(Problem.objects.filter(temat=j, datecre__range=[tempdate[0], tempdate[-1]]))
-                    temp = sorted(temp.items(), key=itemgetter(1), reverse=True)
-                    for i in range(5):
-                        nom = temp[i][0]
-                        cat = Category.objects.get(pk=nom)
-                        a = {'nam': cat.name}
-                        c = 1
-                        for j in tempdate:
-                            a[f'd{c}'] = len(Problem.objects.filter(temat=cat, datecre=j))
-                            c += 1
-                        kolvo.append(a)
-                else:
-                    return JsonResponse({'chart': 'error'})
-                otv = {'label': tempdate, 'data': kolvo, 'chart': request.POST['chart'], 'notes': notes}
-                return JsonResponse(otv)
-            return render(request, 'problem/dashboard.html')
-        else:
-            redirect('index')
+                api = api_func('dashboard')()
+                api(request=request)
+                return JsonResponse(api.context)
+            else:
+                return render(request, 'problem/dashboard.html')
 
 
 def export_pdf(request, pk):
@@ -1433,8 +1038,8 @@ def export_pdf(request, pk):
         p = Paragraph(barcode_string, style=style["Normal"])
         p.wrapOn(c, width, height)
         p.drawOn(c, 20, row-100, mm)
-        barcode_string = f'''<font name="Times" size="16">Текс обращения: 
-    </font> <font name="Times" size="14"> 
+        barcode_string = f'''<font name="Times" size="16">Текс обращения:
+    </font> <font name="Times" size="14">
     <p>{prob.text}</p>
     </font>'''
         p = Paragraph(barcode_string, style=style["Normal"])
@@ -1493,78 +1098,6 @@ def listuser(request):
             return render(request, 'problem/listuser.html', {'table': table, 'formcreate': formcreate})
         else:
             return redirect('index')
-
-
-def term_approve(request, pk):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        title = 'Утверждение назначения'
-        if request.user.has_perm('problem.user_moderator'):
-            if Term.objects.filter(pk=pk).exists():
-                if request.method == 'POST':
-                    term = Term.objects.get(pk=pk)
-                    term.status = '2'
-                    term.save()
-                    mes = 'Назначение утверждено.'
-                    nom = 0
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-                else:
-                    mes = 'Ошибка, неправильный запрос.'
-                    nom = 1
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка, данного назначения не существует.'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-        else:
-            mes = 'Ошибка, недостаточно прав.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
-
-
-def addty(request):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        title = 'Добавление ТУ'
-        if request.user.has_perm('problem.user_moderator'):
-            if request.method == 'POST':
-                if Problem.objects.filter(nomdobr=request.POST['prob']).exists():
-                    proble = Problem.objects.get(nomdobr=request.POST['prob'])
-                    proble.ciogv = Minis.objects.get(pk=request.POST['name'])
-                    proble.save()
-                    mes = 'Успешно, территориальное управление добавлено.'
-                    nom = 0
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-                else:
-                    mes = 'Ошибка, данного обращения не существует.'
-                    nom = 1
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка, неправильный запрос.'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-        else:
-            mes = 'Ошибка, недостаточно прав.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
 
 
 def zapros(request):
@@ -1637,41 +1170,6 @@ def zapros(request):
                 return render(request, 'problem/zapros.html', {'content': content})
         else:
             return redirect('index')
-
-
-def changeterm(request):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    else:
-        title = 'Изменение даты назначения'
-        if request.user.has_perm('problem.user_moderator'):
-            if request.method == 'POST':
-                if 'view' in request.POST:
-                    term = Term.objects.get(pk=request.POST['pk'])
-                    content = {'date': term.date.strftime('%Y-%m-%d')}
-                    return JsonResponse(content)
-                elif 'change' in request.POST:
-                    term = Term.objects.get(pk=request.POST['pk'])
-                    ndate = request.POST['date'].split('-')
-                    term.date = date(int(ndate[0]), int(ndate[1]), int(ndate[2]))
-                    term.save()
-                    mes = 'Изменение успешно.'
-                    nom = 0
-                    a = ActionObject(title=title, nom=nom, message=mes)
-                    serializer = ActionSerializer(a)
-                    return JsonResponse(serializer.data, safe=False)
-            else:
-                mes = 'Ошибка, не правильный запрос.'
-                nom = 1
-                a = ActionObject(title=title, nom=nom, message=mes)
-                serializer = ActionSerializer(a)
-                return JsonResponse(serializer.data, safe=False)
-        else:
-            mes = 'Ошибка, не достаточно прав на создание назначения.'
-            nom = 1
-            a = ActionObject(title=title, nom=nom, message=mes)
-            serializer = ActionSerializer(a)
-            return JsonResponse(serializer.data, safe=False)
 
 
 def analysis(request):

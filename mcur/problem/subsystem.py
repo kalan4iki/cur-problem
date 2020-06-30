@@ -7,6 +7,7 @@ from .models import Problem
 class Access:
     user = None
     request = None
+
     def __init__(self, **kwargs):
         if 'request' in kwargs:
             self.request = kwargs['request']

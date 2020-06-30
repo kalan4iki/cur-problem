@@ -34,7 +34,7 @@
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" data-toggle="modal" data-target="#modal-report1">Определенный период</button>
                             </div>
                              <div class="col-md-2">
-                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2">Не закрытые обращения</button>
+                                <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport2" action="9">Не закрытые обращения</button>
                             </div>
                              <div class="col-md-2">
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport3" data-toggle="modal" data-target="#modal-report3">Статистика по категориям</button>
@@ -52,7 +52,7 @@
                     <h3 class="card-title">Назначения</h3>
 
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart1"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='1'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -68,7 +68,7 @@
                   <div class="card-header">
                     <h3 class="card-title">Обращения</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart2"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='2'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -85,7 +85,7 @@
                   <div class="card-header">
                     <h3 class="card-title">Статистика организаций</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart3"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='3'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -100,7 +100,7 @@
                   <div class="card-header">
                     <h3 class="card-title">Статистика ТУ</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart4"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='4'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -118,7 +118,7 @@
                   <div class="card-header">
                     <h3 class="card-title">Топ 25 авторов</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart5"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='5'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -137,7 +137,7 @@
                   <div class="card-header">
                     <h3 class="card-title">Новые обращения</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart6"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='6'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -153,7 +153,7 @@
                   <div class="card-header">
                     <h3 class="card-title">Топ 5 категорий за период</h3>
                     <div class="card-tools">
-                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" id="chart7"><i class="fas fa-plus"></i>
+                      <button type="button" class="btn btn-tool addchart" data-card-widget="collapse" action='7'><i class="fas fa-plus"></i>
                       </button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
                     </div>
@@ -181,7 +181,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-        <form role="form" action="{% url 'api_report' %}" method="post" id="report1">
+        <form role="form" action="8" method="post" id="report1">
         {% csrf_token %}
         <div class="modal-body">
             <div class="row">
@@ -226,7 +226,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-        <form role="form" action="{% url 'api_report' %}" method="post" id="report3">
+        <form role="form" action="10" method="post" id="report3">
         {% csrf_token %}
         <div class="modal-body">
             <div class="row">
@@ -266,314 +266,5 @@
     <link rel="stylesheet" href="{% static 'adminlte/plugins/jsgrid/jsgrid.min.css' %}">
     <link rel="stylesheet" href="{% static 'adminlte/plugins/jsgrid/jsgrid-theme.min.css' %}">
     <script src="{% static 'adminlte/plugins/jsgrid/jsgrid.min.js' %}"></script>
-    <script>
-$('.addchart').click(function (eventObject) {
-    var but1 = $( this);
-    if (but1.attr('data-card-widget') === 'collapse') {
-        var rod1 = but1.closest('.collapsed-card');
-        rod1.append('<div class="overlay dark syncchart' + but1.attr('id') + '">\n' +
-            '  <i class="fas fa-2x fa-sync-alt fa-spin"></i>\n' +
-            '</div>');
-        rod1.removeClass('collapsed-card');
-        if (but1.attr('id') === 'chart5') {
-        } else {
-            appendchart1(rod1.find('.card-body'), but1.attr('id'));
-        }
-        but1.find('i').removeClass('fas fa-plus').addClass('fa fa-refresh');
-        var url = '{% url 'dashboard' %}',
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-        var posting = $.ajax({
-            url: url,
-            type: 'POST',
-            data: {csrfmiddlewaretoken: CSRFtoken, chart: but1.attr('id')},
-            success: Collapsef1
-        });
-        but1.removeAttr('data-card-widget');
-    }
-});
-
-var randomColorGenerator = function () {
-    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
-};
-
-function appendchart1(obj, chart) {
-    obj.append('<div class="chart">\n' +
-    '        <div class="chartjs-size-monitor">\n' +
-    '            <div class="chartjs-size-monitor-expand">\n' +
-    '                <div class="">\n' +
-    '\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '            <div class="chartjs-size-monitor-shrink">\n' +
-    '                <div class="">\n' +
-    '\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '        </div>\n' +
-    '      <canvas id="bar'+ chart +'" ></canvas>\n' +
-    '    </div>');
-}
-
-function Collapsef1(data)
-{
-    if (data['chart'] === 'chart1') {
-        var areaChartData = {
-          labels  : data['label'],
-          datasets: [
-            {
-              label               : 'Количетсво созданных назначений',
-              backgroundColor     : 'rgba(60,141,188,0.9)',
-              borderColor         : 'rgba(60,141,188,0.8)',
-              pointRadius          : false,
-              pointColor          : '#3b8bba',
-              pointStrokeColor    : 'rgba(60,141,188,1)',
-              pointHighlightFill  : '#fff',
-              pointHighlightStroke: 'rgba(60,141,188,1)',
-              data                : data['data']
-            }
-          ]
-        };
-
-        var areaChartOptions = {
-          maintainAspectRatio : false,
-          responsive : true
-        };
-
-        var barChartCanvas = $('#barchart1').get(0).getContext('2d');
-        var barChartData = jQuery.extend(true, {}, areaChartData);
-        var temp0 = areaChartData.datasets[0];
-        barChartData.datasets[0] = temp0;
-
-        var barChartOptions = {
-          responsive              : true,
-          maintainAspectRatio     : false,
-          datasetFill             : false
-        };
-
-        var barChart = new Chart(barChartCanvas, {
-          type: 'bar',
-          data: barChartData,
-          options: areaChartOptions
-        });
-    } else if (data['chart'] === 'chart2') {
-        var areaChartData2 = {
-            labels  : data['label'],
-            datasets: [
-                {
-                  label               : 'Количество обращений подходящий срок ответа',
-                  backgroundColor     : 'rgba(60,141,188,0.9)',
-                  borderColor         : 'rgba(60,141,188,0.8)',
-                  pointRadius          : false,
-                  pointColor          : '#3b8bba',
-                  pointStrokeColor    : 'rgba(60,141,188,1)',
-                  pointHighlightFill  : '#fff',
-                  pointHighlightStroke: 'rgba(60,141,188,1)',
-                  data                : data['data']
-                }
-            ]
-        };
-
-        var areaChartOptions = {
-          maintainAspectRatio : false,
-          responsive : true
-        };
-
-        var barChartCanvas2 = $('#barchart2').get(0).getContext('2d');
-        var barChartData2 = jQuery.extend(true, {}, areaChartData2);
-        var temp1 = areaChartData2.datasets[0];
-        barChartData2.datasets[0] = temp1;
-
-        var barChart2 = new Chart(barChartCanvas2, {
-          type: 'bar',
-          data: barChartData2,
-          options: areaChartOptions
-        })
-    } else if (data['chart'] === 'chart3') {
-
-        var donutData        = {
-      labels: data['label'],
-      datasets: [
-            {
-              data: data['data'],
-              backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
-            }
-          ]
-        };
-
-        var pieChartCanvas = $('#barchart3').get(0).getContext('2d')
-        var pieData        = donutData;
-        var pieOptions     = {
-          maintainAspectRatio : false,
-          responsive : true,
-        };
-        //Create pie or douhnut chart
-        // You can switch between pie and douhnut using the method below.
-        var pieChart = new Chart(pieChartCanvas, {
-          type: 'pie',
-          data: pieData,
-          options: pieOptions
-        });
-    } else if (data['chart'] === 'chart4') {
-        var areaChartData = {
-            labels: data['label'],
-            datasets: [
-                {
-                    label: 'Статистика обращение в ТУ',
-                    backgroundColor: 'rgba(60,141,188,0.9)',
-                    borderColor: 'rgba(60,141,188,0.8)',
-                    pointRadius: false,
-                    pointColor: '#3b8bba',
-                    pointStrokeColor: 'rgba(60,141,188,1)',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data: data['data']
-                }
-            ]
-        };
-        var areaChartOptions = {
-            maintainAspectRatio: false,
-            responsive: true
-        };
-
-        var barChartCanvas = $('#barchart4').get(0).getContext('2d');
-        var barChartData = jQuery.extend(true, {}, areaChartData);
-        var temp0 = areaChartData.datasets[0];
-        barChartData.datasets[0] = temp0;
-
-        var barChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            datasetFill: false
-        };
-        var barChart = new Chart(barChartCanvas, {
-            type: 'bar',
-            data: barChartData,
-            options: areaChartOptions
-        });
-
-    } else if (data['chart'] === 'chart5') {
-        $(function () {
-            $("#jsGrid1").jsGrid({
-                height: "100%",
-                width: "100%",
-
-                data: data['data'],
-
-                fields: [
-                    {name: "fio", type: "text", title: "ФИО", width: 190},
-                    {name: "email", type: "text", title: "Почта", width: 130},
-                    {name: "tel", type: "text", title: "Телефон", width: 80},
-                    {name: "kolvo", type: "text", title: "Количество обращений"}
-                ]
-            });
-        });
-    } else if(data['chart'] === 'chart6'){
-        var areaChartData = {
-          labels  : data['label'],
-          datasets: [
-            {
-              label               : 'Количетсво новых обращений',
-              backgroundColor     : 'rgba(60,141,188,0.9)',
-              borderColor         : 'rgba(60,141,188,0.8)',
-              pointRadius          : false,
-              pointColor          : '#3b8bba',
-              pointStrokeColor    : 'rgba(60,141,188,1)',
-              pointHighlightFill  : '#fff',
-              pointHighlightStroke: 'rgba(60,141,188,1)',
-              data                : data['data']
-            }
-          ]
-        };
-
-        var areaChartOptions = {
-          maintainAspectRatio : false,
-          responsive : true
-        };
-
-        var barChartCanvas = $('#barchart6').get(0).getContext('2d');
-        var barChartData = jQuery.extend(true, {}, areaChartData);
-        var temp0 = areaChartData.datasets[0];
-        barChartData.datasets[0] = temp0;
-
-        var barChartOptions = {
-          responsive              : true,
-          maintainAspectRatio     : false,
-          datasetFill             : false
-        };
-
-        var barChart = new Chart(barChartCanvas, {
-          type: 'bar',
-          data: barChartData,
-          options: areaChartOptions
-        });
-    } else if (data['chart'] === 'chart7') {
-        $(function () {
-            $("#jsGrid2").jsGrid({
-                height: "100%",
-                width: "100%",
-
-                data: data['data'],
-
-                fields: [
-                    {name: "nam", type: "text", title: "Категория", width: 190},
-                    {name: 'd1', type: "text", title: data['notes'][0]},
-                    {name: 'd2', type: "text", title: data['notes'][1]},
-                    {name: 'd3', type: "text", title: data['notes'][2]},
-                    {name: 'd4', type: "text", title: data['notes'][3]},
-                    {name: 'd5', type: "text", title: data['notes'][4]}
-                ]
-            });
-        });
-    } else if (data['chart'] === 'error') {
-        toastr["error"]('Ошибка выполнения')
-    }
-    var te = '.syncchart' + data['chart']
-    $(te).remove()
-}
-
-
-$('#report1').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            datefrom = $form.find('input[id="id_date_from"]').val(),
-            datebefore = $form.find('input[id="id_date_before"]').val(),
-            url = $form.attr( 'action' ),
-            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, datefrom: datefrom, datebefore: datebefore, report: '1'}, onAjaxSuccess);
-        $('#modal-report1').modal('hide');
-    });
-
-$('#butreport2').click(function () {
-    var url = "{% url 'api_report' %}",
-        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, report: '2'}, onAjaxSuccess);
-});
-
-$('#report3').submit(function (event) {
-        event.preventDefault();
-        var $form = $( this ),
-            datefrom = $form.find('input[id="id_date_from"]').val(),
-            datebefore = $form.find('input[id="id_date_before"]').val(),
-            url = $form.attr( 'action' ),
-            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, datefrom: datefrom, datebefore: datebefore, report: '3'}, onAjaxSuccess);
-        $('#modal-report1').modal('hide');
-    });
-
-function onAjaxSuccess(data)
-{
-    const dummy = document.createElement('a');
-    dummy.href = data['url'];
-    {#dummy.download = 'my-filename.ext';#}
-
-    document.body.appendChild(dummy);
-    dummy.click();
-    dummy.remove();
-    if (data['nom'] == 0) {
-        toastr["success"](data['message'], data['title'])
-    } else {
-        toastr["error"](data['message'], data['title'])
-    }
-}
-    </script>
+    <script src="{% static 'problem/pages/dashboard.js' %}"></script>
 {% endblock %}

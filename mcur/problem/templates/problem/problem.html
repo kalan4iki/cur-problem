@@ -39,12 +39,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Добавление срока для обращения №{{ np.nomdobr }}</h4>
+        <h4 class="modal-title">Добавление назначения для обращения №{{ np.nomdobr }}</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form role="form" action="{% url 'termadd' np.pk %}" method="post" id="termform">
+      <form role="form" action="8" nomdobr="{{ np.nomdobr }}" method="post" id="termform">
         <div class="modal-body">
             {% csrf_token %}
             <div class="row">
@@ -121,7 +121,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form role="form" action="{% url 'addty' %}" method="post" id="tyform">
+      <form role="form" action="6" nomdobr="{{ np.nomdobr }}" method="post" id="tyform">
         <div class="modal-body">
             {% csrf_token %}
             <div class="row">
@@ -279,11 +279,11 @@
             <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Развернуть/свернуть"><i class="fas fa-plus"></i>
             </button>
               {% if perms.problem.user_moderator %}
-            <button type="button" class="btn btn-tool btneditdate" id="{{ i.pk }}" title="Изменить дату"><i class="fa fa-pencil"></i>
+            <button type="button" class="btn btn-tool btneditdate" action="5" nomdobr="{{ np.nomdobr }}" id="{{ i.pk }}" title="Изменить дату"><i class="fa fa-pencil"></i>
             </button>
-            <button type="button" class="btn btn-tool" id="approve-{{ i.pk }}" title="Утвердить назначение"><i class="fa fa-check"></i>
+            <button type="button" class="btn btn-tool termapprove" action="4" pkterm="{{ i.pk }}" nomdobr="{{ np.nomdobr }}" title="Утвердить назначение"><i class="fa fa-check"></i>
             </button>
-            <button type="button" class="btn btn-tool" id="del-{{ i.pk }}" title="Удалить"><i class="fas fa-times"></i>
+            <button type="button" class="btn btn-tool delterm" action="3" pkterm="{{ i.pk }}" nomdobr="{{ np.nomdobr }}" title="Удалить"><i class="fas fa-times"></i>
             </button>
               {% endif %}
           </div>
@@ -405,7 +405,7 @@
               </a>
               {% endif %}
               {% if perms.problem.user_moderator %}
-              <button type="button" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="На обновление" id="naobn">
+              <button type="button" class="btn btn-tool" data-toggle="tooltip" data-placement="top" title="На обновление" action="1" nomdobr="{{ np.nomdobr }}" id="naobn">
                 <i class="fa fa-arrow-up"></i>
               </button>
               {% endif %}
@@ -481,7 +481,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-        <form role="form" action="{% url 'changeterm' %}" method="post" id="changedate">
+        <form role="form" action="5" nomdobr="{{ np.nomdobr }}" pk="" method="post" id="changedate">
         {% csrf_token %}
         <div class="modal-body">
             <div class="row">
@@ -512,124 +512,5 @@
 {% endblock %}
 
 {% block ends %}
-<script>
-$('#termform').submit(function (event) {
-    event.preventDefault();
-    var $form = $( this ),
-        date = $form.find('input[name="date"]').val(),
-        sele1 = $form.find('select[name="org"]').val(),
-        sele2 = $form.find('select[name="curat"]').val(),
-        sele3 = $form.find('select[name="curatuser"]').val(),
-        text = $form.find('textarea[name="desck"]').val(),
-        further = $form.find('input[name="further"]').prop('checked'),
-        furtherdate = $form.find('input[name="furtherdate"]').val(),
-        url = $form.attr( 'action' ),
-        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, date: date, org: sele1, curat:sele2, curatuser:sele3, desck:text, further:further, furtherdate:furtherdate}, onAjaxSuccess);
-    $('#modal-addterm').modal('hide');
-});
-
-$('#tyform').submit(function (event) {
-    event.preventDefault();
-    var $form = $( this ),
-        name = $form.find('select[name="name"]').val(),
-        url = $form.attr( 'action' ),
-        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, name: name, prob: {{ np.nomdobr }}}, onAjaxSuccess);
-    $('#modal-ty').modal('hide');
-});
-
-$('#naobn').click(function () {
-        var url = '{% url 'addparsing' np.nomdobr %}',
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken}, onAjaxSuccess);
-    });
-{% for i in terms %}
-{% if perms.problem.user_moderator %}
-$('#approve-{{ i.pk }}').click(function () {
-        var url = '{% url 'term_approve' i.pk %}',
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken}, onAjaxSuccess);
-    });
-
-$('#del-{{ i.pk }}').click(function () {
-        var url = '{% url "termdel" i.pk %}',
-            CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val();
-        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken}, onAjaxSuccess);
-    });
-{% endif %}
-{% endfor %}
-
-$('.btneditdate').click(function () {
-    var but = $( this ),
-        url = '{% url 'changeterm' %}',
-        pk = but.attr('id'),
-        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val(),
-        posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, view: true, pk:pk});
-        posting.done(function (datas) {
-            var modalka = $('#modal-changedate'),
-                a = modalka.find('input[id="id_date_new"]'),
-                but = modalka.find('button[type="submit"]');
-            but.attr('id', pk);
-            a.attr('value', datas['date']);
-            modalka.modal('show')
-        })
-});
-
-$('#changedate').submit(function (event) {
-    event.preventDefault();
-    var $form = $( this ),
-        pk = $form.find('button[type="submit"]').attr('id'),
-        date = $form.find('input[id="id_date_new"]').val(),
-        url = $form.attr( 'action' ),
-        CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
-    var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk:pk, date:date, change: true});
-    posting.done(function (datas) {
-        var modalka = $('#modal-changedate');
-        modalka.modal('hide');
-        onAjaxSuccess(datas);
-    })
-});
-
-$(document).ready(function () {
-    var fd = $('#id_furtherdate');
-    fd.attr('readonly', true);
-    fd.attr('type', 'date');
-});
-
-$('#id_further').change(function () {
-    var cb = $( this );
-    if(this.checked) {
-       cb.parents("div[class='row']").find('#id_furtherdate').attr('readonly', false)
-    } else {
-       cb.parents("div[class='row']").find('#id_furtherdate').attr('readonly', true)
-    }
-});
-
-function onAjaxSuccess(data)
-{
-
-    if (data['nom'] === 0) {
-        Swal.fire({
-            title: data['title'],
-            text: data['message'],
-            icon: 'success',
-            onClose: reloadModal
-        })
-
-    } else {
-        Swal.fire(
-            data['title'],
-            data['message'],
-            'error'
-        )
-    }
-}
-
-function reloadModal() {
-    location.reload()
-}
-
-
-</script>
+  <script src="{% static 'problem/pages/problem.js' %}"></script>
 {% endblock %}
