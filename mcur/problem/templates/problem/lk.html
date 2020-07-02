@@ -90,6 +90,7 @@ function onAjaxSuccess(data) {
         var box = $('#'+data['boxn']);
         box.find('.inner').find('h3').empty();
         box.find('.inner').find('h3').text(data['kolvo']);
+        box.find('div[class="overlay"]').remove();
     }
 }
 
