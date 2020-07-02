@@ -130,7 +130,8 @@ class lk_dispatcher(lk_objects):
             'closed': self.b2,
             'podxproblem': self.b3,
             'todayproblem': self.b4,
-            'prosrproblem': self.b5
+            'prosrproblem': self.b5,
+            'meproblem': self.b6
         }
 
     def b1(self): #Все обращения
@@ -190,6 +191,13 @@ class lk_dispatcher(lk_objects):
         q2 = Q(visible='1') & Q(statussys='1')
         q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
         self.prob = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
+
+    def b6(self): # Мои обращения
+        userlk = self.request.user
+        q1 = Q(curatuser=userlk)
+        termas = Term.objects.filter(q1)
+        self.prob = Problem.objects.filter(Q(terms__in=termas) & Q(visible='1'))
+
 
 # Область модератора
 class lk_moderator(lk_objects):
