@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.db.models import Q
 from datetime import date, timedelta, datetime
 import logging
+import traceback
 
 logger_error = logging.getLogger('file_error')
 
