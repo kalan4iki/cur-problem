@@ -2,6 +2,7 @@ from .models import (Problem, Term, Answer, Status, Termhistory)
 from django.contrib import messages
 from django.db.models import Q
 from datetime import date, timedelta, datetime
+import logging
 
 logger_error = logging.getLogger('file_error')
 
