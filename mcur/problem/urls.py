@@ -1,11 +1,10 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer, ProblemNoListView,
-                    zaptable, add, lk, closedproblem, search, ProblemListView, ProblemPodxListView,
-                    ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd, zapros,
-                    createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action,
-                    listuser, ProblemTyListView, apis, dopaction, ProblemOrgView,
-                    ProblemFuListView, analysis, lk2, problems)
+from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer,
+                    zaptable, add, lk, search, Answer_approve,
+                    Answer_modify, development, resolutionadd, zapros,
+                    createuser, dashboard, export_pdf, statandact, api_action,
+                    listuser, apis, dopaction, analysis, problems)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -25,21 +24,10 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name = 'problem/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('resolution/<int:pk>', resolutionadd, name='resolutionadd'),
-    path('index/', lk2, name='index'),
+    path('index/', lk, name='index'),
     path('problems/<str:action>', problems, name='problems'),
     path('search/', search, name='search'),
     path('addanswer/<int:pk>', addanswer, name='addanswer'),
-    path('closed/', closedproblem, name='closed'),
-    url(r'allproblem/', ProblemListView.as_view(), name='allproblem'),
-    url(r'noproblem/', ProblemNoListView.as_view(), name='noproblem'),
-    url(r'podxproblem/', ProblemPodxListView.as_view(), name='podxproblem'),
-    url(r'prosrproblem/', ProblemProsrListView.as_view(), name='prosrproblem'),
-    url(r'todayproblem/', ProblemTodayListView.as_view(), name='todayproblem'),
-    url(r'meproblem/', ProblemMeListView.as_view(), name='meproblem'),
-    url(r'typroblem/', ProblemTyListView.as_view(), name='typroblem'),
-    url(r'orgproblem/', ProblemOrgView, name='orgproblem'),
-    url(r'^export/xls/$', exportxls, name='exportxls'),
-    url(r'fuproblem/', ProblemFuListView.as_view(), name='fuproblem'),
     path('answer/action/aprrove/<int:pk>', Answer_approve, name='answer_approve'),
     path('answer/action/modify/<int:pk>', Answer_modify, name='answer_modify'),
     path('calendary/', development, name='calendary'),
