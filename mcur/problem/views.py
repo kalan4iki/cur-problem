@@ -55,6 +55,7 @@ import logging
 
 logger = logging.getLogger('django.server')
 logger_mail = logging.getLogger('django.request')
+logger_error = logging.getLogger('file_error')
 chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
 
@@ -877,9 +878,12 @@ def problems(request, action):
         filterall = ProblemFilter(request.GET, queryset=prob)
         table = ProblemTable(filterall.qs)
         export_format = request.GET.get("_export", None)
-        if TableExport.is_valid_format(export_format):
-            exporter = TableExport(export_format, table)
-            return exporter.response(f"table-{action}.{export_format}")
+        try:
+            if TableExport.is_valid_format(export_format):
+                exporter = TableExport(export_format, table)
+                return exporter.response(f"table-{action}.{export_format}")
+        except:
+            logger_error.error(traceback.format_exc())
         RequestConfig(request, ).configure(table)
         context['filter'] = filterall
         context['table'] = table

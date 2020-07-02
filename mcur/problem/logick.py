@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.db.models import Q
 from datetime import date, timedelta, datetime
 
+logger_error = logging.getLogger('file_error')
 
 class lk_objects(object):
     def __init__(self, *args, **kwargs):
