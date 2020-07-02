@@ -222,7 +222,7 @@ class dashboard(Messages):
         font_style = xlwt.XFStyle()
         rows = Problem.objects.filter(datecre__range=(datefrom, datebefore)).values_list('pk', 'nomdobr',
                                                 'temat__name', 'podcat__name', 'text', 'adres', 'datecre',
-                                                 'dateotv', 'status__name', 'statussys', 'ciogv')
+                                                 'dateotv', 'status__name', 'statussys', 'ciogv__name')
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
@@ -256,7 +256,7 @@ class dashboard(Messages):
         font_style = xlwt.XFStyle()
         rows = Problem.objects.filter(visible='1').values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
                                                  'text', 'adres', 'datecre',
-                                                 'dateotv', 'status__name', 'statussys', 'ciogv')
+                                                 'dateotv', 'status__name', 'statussys', 'ciogv__name')
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
