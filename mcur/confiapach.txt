@@ -44,6 +44,10 @@ sudo lnav /var/log/apache2/error.log
 sudo lnav /home/media/error.log
 sudo lnav /home/media/info.log
 
+Права:
+find /home/media/ -type d -exec chmod 777 {} \;
+find /home/media/ -type f -exec chmod 777 {} \;
+
 cd /var/www/cur-problem & sudo git pull & sudo service apache2 restart
 
 pscp.exe vadim@192.168.10.25:/home/vadim/skiog.ru.pem .
@@ -51,3 +55,14 @@ pscp.exe vadim@192.168.10.25:/home/vadim/skiog.ru.pem .
 [Запуск Celery]
 sudo celery -A parsers beat
 sudo celery worker -A parsers
+
+[Обновление mysql]
+
+sudo cp -avt /home/backup/mysql /var/lib/mysql /etc/mysql/my.cnf
+sudo rm -rv /etc/mysql
+sudo apt purge mysql-server mysql-server-5.7 mysql-server-core-5.7 mysql-client-5.7 mysql-client-core-5.7
+sudo mkdir -p /etc/mysql/conf.d
+sudo apt install mysql-server
+sudo service mysql stop
+sudo cp -a /home/backup/mysql/mysql /var/lib   
+sudo cp /home/backup/mysql/my.cnf /etc/mysql
