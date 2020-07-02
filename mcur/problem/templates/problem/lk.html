@@ -79,7 +79,7 @@ $(document).ready(function () {
         var posting = $.ajax({
             url: url,
             type: 'POST',
-            data: {csrfmiddlewaretoken: CSRFtoken, box: box.attr('id')},
+            data: {csrfmiddlewaretoken: CSRFtoken, action: box.attr('id')},
             success: onAjaxSuccess
         });
     });
@@ -88,6 +88,7 @@ $(document).ready(function () {
 function onAjaxSuccess(data) {
     if (data['mes'] === 'succes') {
         var box = $('#'+data['boxn']);
+        box.find('.inner').find('h3').empty();
         box.find('.inner').find('h3').text(data['kolvo']);
     }
 }

@@ -13,6 +13,7 @@ django-tinymce
 django-grappelli
 djangorestframework
 django-webpush
+tablib
 lxml
 matplotlib
 numpy
@@ -21,7 +22,6 @@ pytz
 PyYAML
 requests
 selenium
-tablib
 urllib3
 xlwt
 reportlab

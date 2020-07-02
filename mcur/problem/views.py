@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django_tables2 import RequestConfig
 from django_tables2.views import SingleTableMixin
 from django_tables2.paginators import LazyPaginator
+from django_tables2.export.views import ExportMixin, TableExport
 
 # django_filters
 from django_filters.views import FilterView
@@ -38,7 +39,7 @@ from parsers.models import ActionHistory, Action, Parser
 from .tables import ProblemTable, ParsTable, UserTable, HistTable
 from .forms import (PrAdd, TermForm, AnswerForm,ResolutionForm, CreateUser, TyForm)
 from .filter import ProblemListView, ProblemFilter
-from .logick import lk_dispatcher, lk_executor, lk_moderator, lk_ty
+from .logick import lk_dispatcher, lk_executor, lk_moderator, lk_ty, prob_func
 from mcur import settings
 from .api import api_func
 
@@ -823,6 +824,102 @@ def lk(request):
                 else:
                     return JsonResponse({'mes': 'error'})
         return render(request, 'problem/lk.html')
+
+
+def lk2(request):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        if request.method == 'POST':
+            if request.user.has_perm('problem.user_moderator'):
+                a = prob_func('moderator')()
+            elif request.user.has_perm('problem.user_dispatcher'):
+                a = prob_func('dispatcher')()
+            elif request.user.has_perm('problem.user_executor'):
+                a = prob_func('executor')()
+            elif request.user.has_perm('problem.user_ty'):
+                a = prob_func('ty')()
+            a(request=request)
+            return JsonResponse({'boxn': a.box, 'kolvo': len(a.prob), 'mes': 'succes'})
+        else:
+            return render(request, 'problem/lk.html')
+
+
+opic = {
+    'closed': 'Закрытые обращения',
+    'noproblem': 'Не распределенные обращения',
+    'allproblem': 'Все обращения',
+    'meproblem': 'Мои обращения',
+    'podxproblem': 'Подходит срок обращения',
+    'todayproblem': 'Обращения на сегодня',
+    'prosrproblem': 'Просроченные обращения',
+    'typroblem': 'Обращения без ТУ',
+    'fuproblem': 'Обещанные обращения'
+}
+
+
+def problems(request, action):
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    else:
+        context = dict()
+        userlk = User.objects.get(username=request.user.username)
+        if userlk.has_perm('problem.user_moderator'):
+            a = prob_func('moderator')()
+        elif userlk.has_perm('problem.user_dispatcher'):
+            a = prob_func('dispatcher')()
+        elif userlk.has_perm('problem.user_executor'):
+            a = prob_func('executor')()
+        elif userlk.has_perm('problem.user_ty'):
+            a = prob_func('ty')()
+        a(request=request, action=action)
+        prob = a.prob
+        filterall = ProblemFilter(request.GET, queryset=prob)
+        table = ProblemTable(filterall.qs)
+        export_format = request.GET.get("_export", None)
+        if TableExport.is_valid_format(export_format):
+            exporter = TableExport(export_format, table)
+            return exporter.response(f"table-{action}.{export_format}")
+        RequestConfig(request, ).configure(table)
+        context['filter'] = filterall
+        context['table'] = table
+        context['name'] = opic[action]
+        context['dop'] = f'Всего: {len(filterall.qs)}.'
+        context['title'] = opic[action]
+        return render(request, "problem/allproblem.html", context)
+
+
+class problems2(SingleTableMixin, FilterView):
+    table_class = ProblemTable
+    model = Problem
+    template_name = "problem/allproblem.html"
+    filterset_class = ProblemFilter
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ProblemListView, self).get_context_data(*args, **kwargs)
+        if not self.request.user.is_authenticated:
+            return redirect('%s?next=%s' % (settings.LOGIN_URL, self.request.path))
+        else:
+            userlk = User.objects.get(username=self.request.user.username)
+            if userlk.has_perm('problem.user_moderator'):
+                a = prob_func('moderator')()
+            elif userlk.has_perm('problem.user_dispatcher'):
+                a = prob_func('dispatcher')()
+            elif userlk.has_perm('problem.user_executor'):
+                a = prob_func('executor')()
+            elif userlk.has_perm('problem.user_ty'):
+                a = prob_func('ty')()
+            a(request=request)
+            prob = a.prob
+            filterall = ProblemFilter(self.request.GET, queryset=prob)
+            table = ProblemTable(filterall.qs)
+            RequestConfig(self.request, ).configure(table)
+            context['filter'] = filterall
+            context['table'] = table
+            context['name'] = opic[request.GET['action']]
+            context['dop'] = f'Всего: {len(filterall.qs)}.'
+            context['title'] = opic[request.GET['action']]
+        return context
 
 
 def closedproblem(request):

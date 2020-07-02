@@ -1,56 +1,56 @@
   <div class="row">
     <div class="col-12 col-sm-6 col-md-3">
-      <div class="small-box bg-secondary" id="box1">
+      <div class="small-box bg-secondary" id="closed">
         <div class="inner">
-          <h3>{{ kolvo.kolclose }}</h3>
+          <h3>0</h3>
           <p>Ответов</p>
         </div>
         <div class="icon">
           <i class="fas fa-check"></i>
         </div>
-        <a href="{% url 'closed' %}" class="small-box-footer">
+        <a href="{% url 'problems' action='closed' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
     </div>
     <div class="col-12 col-sm-6 col-md-3">
-        <div class="small-box bg-info" id="box2">
+        <div class="small-box bg-info" id="noproblem">
             <div class="inner">
-              <h3>{{ kolvo.kolno }}</h3>
+              <h3>0</h3>
               <p>Не распределенные обращения</p>
             </div>
             <div class="icon">
               <i class="fas fa-info"></i>
             </div>
-            <a href="{% url 'noproblem' %}" class="small-box-footer">
+            <a href="{% url 'problems' 'noproblem' %}" class="small-box-footer">
               Подробнее <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
     </div>
     <div class="col-12 col-sm-6 col-md-3">
-        <div class="small-box bg-info" id="box8">
+        <div class="small-box bg-info" id="typroblem">
             <div class="inner">
-              <h3></h3>
+              <h3>0</h3>
               <p>Обращения без ТУ</p>
             </div>
             <div class="icon">
               <i class="fas fa-info"></i>
             </div>
-            <a href="{% url 'typroblem' %}" class="small-box-footer">
+            <a href="{% url 'problems' 'typroblem' %}" class="small-box-footer">
               Подробнее <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
     </div>
      <div class="col-12 col-sm-6 col-md-3">
-      <div class="small-box bg-info" id="box3">
+      <div class="small-box bg-info" id="allproblem">
         <div class="inner">
-          <h3>{{ kolvo.kolall }}</h3>
+          <h3>0</h3>
           <p>Всего не закрытых обращения</p>
         </div>
         <div class="icon">
           <i class="fas fa-info"></i>
         </div>
-        <a href="{% url 'allproblem' %}" class="small-box-footer">
+        <a href="{% url 'problems' 'allproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
@@ -58,57 +58,57 @@
   </div>
     <div class="row">
     <div class="col-12 col-sm-6 col-md-3">
-    <div class="small-box bg-success" id="box4">
+    <div class="small-box bg-success" id="meproblem">
         <div class="inner">
-          <h3>{{ kolvo.me }}</h3>
+          <h3>0</h3>
           <p>Моих обращения</p>
         </div>
         <div class="icon">
           <i class="fas fa-user-plus"></i>
         </div>
-        <a href="{% url 'meproblem' %}" class="small-box-footer">
+        <a href="{% url 'problems' 'meproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
     </div>
     <div class="col-12 col-sm-6 col-md-3">
-        <div class="small-box bg-primary" id="box5">
+        <div class="small-box bg-primary" id="podxproblem">
         <div class="inner">
-          <h3>{{ kolvo.podx }}</h3>
+          <h3>0</h3>
           <p>Подходит срок обращения</p>
         </div>
         <div class="icon">
           <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <a href="{% url 'podxproblem' %}" class="small-box-footer">
+        <a href="{% url 'problems' 'podxproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
       </div>
         <div class="col-12 col-sm-6 col-md-3">
-      <div class="small-box bg-warning" id="box6">
+      <div class="small-box bg-warning" id="todayproblem">
         <div class="inner">
-          <h3>{{ kolvo.today }}</h3>
+          <h3>0</h3>
           <p>Обращения на сегодня</p>
         </div>
         <div class="icon">
           <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <a href="{% url 'todayproblem' %}" class="small-box-footer">
+        <a href="{% url 'problems' 'todayproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
     </div>
         <div class="col-12 col-sm-6 col-md-3">
-      <div class="small-box bg-danger" id="box7">
+      <div class="small-box bg-danger" id="prosrproblem">
         <div class="inner">
-          <h3>{{ kolvo.prosr }}</h3>
+          <h3>0</h3>
           <p>Просроченных обращений</p>
         </div>
         <div class="icon">
           <i class="fas fa-ban"></i>
         </div>
-        <a href="{% url 'prosrproblem' %}" class="small-box-footer">
+        <a href="{% url 'problems' 'prosrproblem' %}" class="small-box-footer">
           Подробнее <i class="fas fa-arrow-circle-right"></i>
         </a>
       </div>
@@ -116,7 +116,7 @@
 </div>
     <div class="row">
         <div class="col ">
-          <div class="small-box bg-info" id="box9">
+          <div class="small-box bg-info" id="fuproblem">
             <div class="inner">
               <h3></h3>
               <p>Обещанные обращения</p>
@@ -124,7 +124,7 @@
             <div class="icon">
               <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <a href="{% url 'fuproblem' %}" class="small-box-footer">
+            <a href="{% url 'problems' 'fuproblem' %}" class="small-box-footer">
               Подробнее <i class="fas fa-arrow-circle-right"></i>
             </a>
           </div>

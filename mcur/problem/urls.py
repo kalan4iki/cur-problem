@@ -5,7 +5,7 @@ from .views import (api_problem, api_problem_detail, api_answer_detail, prob, ad
                     ProblemProsrListView, exportxls, Answer_approve, Answer_modify, development, resolutionadd, zapros,
                     createuser, dashboard, ProblemTodayListView, ProblemMeListView, export_pdf, statandact, api_action,
                     listuser, ProblemTyListView, apis, dopaction, ProblemOrgView,
-                    ProblemFuListView, analysis)
+                    ProblemFuListView, analysis, lk2, problems)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
@@ -25,7 +25,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(template_name = 'problem/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
     path('resolution/<int:pk>', resolutionadd, name='resolutionadd'),
-    path('index/', lk, name='index'),
+    path('index/', lk2, name='index'),
+    path('problems/<str:action>', problems, name='problems'),
     path('search/', search, name='search'),
     path('addanswer/<int:pk>', addanswer, name='addanswer'),
     path('closed/', closedproblem, name='closed'),

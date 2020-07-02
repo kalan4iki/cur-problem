@@ -1,5 +1,6 @@
 {% extends "layout/basic.html" %}
 {% load render_table from django_tables2 %}
+{% load export_url from django_tables2 %}
 {% load bootstrap4 %}
 {% load crispy_forms_tags %}
 {% block title %}{{ title }}{% endblock %}
@@ -13,16 +14,9 @@
         <h1 class="m-0 text-dark">{{ name }}. {{ dop }}</h1>
       </div><!-- /.col -->
       <div class="col-sm-6 ">
-        {% if perms.problem.user_supermoderator %}
-        <a href="{% url 'exportxls' %}" class="btn btn-app float-sm-right">
-              <i class="fas fa-download"></i> Выгрузить No
-        </a>
-        {% endif %}
-        {% if perms.problem.user_supermoderator %}
-        <a class="btn btn-app float-sm-right" id="exportxls">
+        <a href="{% export_url 'xls' %}" class="btn btn-app float-sm-right">
               <i class="fas fa-download"></i> Выгрузить
         </a>
-        {% endif %}
       </div><!-- /.col -->
     </div><!-- /.row -->
   </div><!-- /.container-fluid -->
