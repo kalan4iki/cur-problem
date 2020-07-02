@@ -28,7 +28,7 @@ SKIOG_VERSION = '0.3.0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if 'linux' in platform.lower():
-    DEBUG = False
+    DEBUG = True
 else:
     DEBUG = True
 
