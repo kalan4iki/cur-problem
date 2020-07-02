@@ -19,7 +19,7 @@ sudo service apache2 restart
 ./configure --with-apxs=/usr/local/apache/bin/apxs   --with-python=/usr/local/bin/python3.6
 
 Установка пакета для python
-sudo /home/env/bin/python3 -m pip install
+sudo /home/env/bin/python3.8 -m pip install
 
 Активация виртуального окружения:
 source /home/env/bin/activate
@@ -64,5 +64,5 @@ sudo apt purge mysql-server mysql-server-5.7 mysql-server-core-5.7 mysql-client-
 sudo mkdir -p /etc/mysql/conf.d
 sudo apt install mysql-server
 sudo service mysql stop
-sudo cp -a /home/backup/mysql/mysql /var/lib   
+sudo cp -a /home/backup/mysql/mysql /var/lib
 sudo cp /home/backup/mysql/my.cnf /etc/mysql

@@ -13,7 +13,7 @@ django-tinymce
 django-grappelli
 djangorestframework
 django-webpush
-tablib
+tablib==0.13.0
 lxml
 matplotlib
 numpy
