@@ -31,6 +31,8 @@ class lk_objects(object):
 
 # Область исполнителя
 class lk_executor(lk_objects):
+    '''Класс отображения обращений для исполнителей'''
+
     def __init__(self):
         super().__init__()
         self.actionlist = {
@@ -42,14 +44,16 @@ class lk_executor(lk_objects):
             'meproblem': self.b6
         }
 
-    def b1(self): # Ответы
+    def b1(self):
+        ''' Блок отвеченных обращений '''
         userlk = self.request.user
         q1 = Q(user=userlk)
         termas = Answer.objects.filter(q1)
         termas2 = Term.objects.filter(answers__in=termas)
         self.prob = Problem.objects.filter(visible='1', terms__in=termas2)
 
-    def b2(self): # Все обращения
+    def b2(self):
+        ''' Все обращения '''
         userlk = self.request.user
         if userlk.userprofile.dep == None:
             q1 = Q(curatuser=userlk)
@@ -62,7 +66,8 @@ class lk_executor(lk_objects):
         termas2 = Term.objects.filter((q1 | Q(resolutions__in=termas)) & (Q(status='0') | Q(status='1')))
         self.prob = Problem.objects.filter((Q(visible='1') & Q(statussys='1')) & Q(terms__in=termas2))
 
-    def b3(self): # Подходит срок
+    def b3(self):
+        ''' Блок обращений которым подходит срок '''
         userlk = self.request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
@@ -79,7 +84,8 @@ class lk_executor(lk_objects):
         q21 = Q(dateotv__range=(nowdate + timedelta(1), nowdate + timedelta(4)))
         self.prob = Problem.objects.filter(Q(terms__in=termas1) & q21 & q2)
 
-    def b4(self): # Обращения на сегодня
+    def b4(self):
+        ''' Блок обращения на сегодня '''
         userlk = self.request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
@@ -96,7 +102,8 @@ class lk_executor(lk_objects):
         q21 = Q(dateotv=nowdate)
         self.prob = Problem.objects.filter((Q(terms__in=termas1) & q21) & q2)
 
-    def b5(self): # Просроченные
+    def b5(self):
+        ''' Блок просроченных обращений '''
         userlk = self.request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
@@ -114,15 +121,18 @@ class lk_executor(lk_objects):
         q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
         self.prob = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
 
-    def b6(self): # Мои обращения
+    def b6(self):
+        ''' Блок моих обращений '''
         userlk = self.request.user
         q1 = Q(curatuser=userlk)
         termas = Term.objects.filter(q1)
         self.prob = Problem.objects.filter(Q(terms__in=termas) & Q(visible='1'))
 
 
-# Область диспетчера
+
 class lk_dispatcher(lk_objects):
+    '''Класс отображения обращений для диспетчеров'''
+
     def __init__(self):
         super().__init__()
         self.actionlist = {
@@ -134,7 +144,8 @@ class lk_dispatcher(lk_objects):
             'meproblem': self.b6
         }
 
-    def b1(self): #Все обращения
+    def b1(self):
+        ''' Блок всех обращений '''
         userlk = self.request.user
         org = userlk.userprofile.org
         q1 = Q(curatuser=userlk)
@@ -144,14 +155,16 @@ class lk_dispatcher(lk_objects):
         self.prob = Problem.objects.filter(Q(visible='1') & Q(terms__in=termas2))
 
 
-    def b2(self): #Ответы
+    def b2(self):
+        ''' Блок отвеченных обращений '''
         userlk = self.request.user
         q1 = Q(user=userlk)
         termas = Answer.objects.filter(q1)
         termas2 = Term.objects.filter(answers__in=termas)
         self.prob = Problem.objects.filter(visible='1', terms__in=termas2)
 
-    def b3(self): #Подходит срок
+    def b3(self):
+        ''' Блок обращений котоым подходит срок '''
         userlk = self.request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
@@ -165,7 +178,8 @@ class lk_dispatcher(lk_objects):
         q5 = Q(visible='1') & Q(statussys='1')
         self.prob = Problem.objects.filter((q1 | (q2 & q3) | q4) & q5)
 
-    def b4(self): #Обращения на сегодня
+    def b4(self):
+        ''' Блок обращений на сегодня '''
         userlk = self.request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
@@ -179,7 +193,8 @@ class lk_dispatcher(lk_objects):
         q5 = Q(visible='1') & Q(statussys='1')
         self.prob = Problem.objects.filter((q1 | (q2 & q3) | q4) & q5)
 
-    def b5(self): #Просроченные
+    def b5(self):
+        ''' Блок просроченных обращений '''
         userlk = self.request.user
         nowdatetime = datetime.now()
         nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
@@ -192,7 +207,8 @@ class lk_dispatcher(lk_objects):
         q21 = Q(dateotv__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
         self.prob = Problem.objects.filter((Q(terms__in=termas1) | q21) & q2)
 
-    def b6(self): # Мои обращения
+    def b6(self):
+        ''' Блок моих обращений '''
         userlk = self.request.user
         q1 = Q(curatuser=userlk)
         termas = Term.objects.filter(q1)
