@@ -60,8 +60,12 @@ def addresult(request):
     if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
             di = request.POST
+            print(di)
             blo = Appeal.objects.get(nomdobr=di['pk'])
-            res = Result.objects.create(block=blo, chstatus=di['status'], text=di['text'], nomkom=di['nomkom'],
+            nomkom = None
+            if 'nomkom' in di:
+                nomkom = di['nomkom']
+            res = Result.objects.create(block=blo, chstatus=di['status'], text=di['text'], nomkom=nomkom,
                                         user=request.user)
             res.save()
             blo.status = di['status']

@@ -511,7 +511,7 @@ function ShowModal(datas) {
     if (datas['app']['message'] === false) modal.find('button[name="message"]').addClass('disabled');
     modal.find('button[name="message"]').attr('id', datas['app']['nomd']);
     modal.find('button[name="dowimage"]').attr('id', datas['app']['nomd']);
-    {% if perms.block.moderator %}
+    {% if perms.block.moderator or perms.block.dispatcher %}
     modal.find('button[name="change_status"]').attr('id', datas['app']['nomd']);
     {% elif perms.block.executor %}
     modal.find('button[name="change_status_back"]').attr('id', datas['app']['nomd']);
