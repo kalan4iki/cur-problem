@@ -825,6 +825,12 @@ def analysis(request):
                 kolvo['prob'] = f'<h4>По дате обращений: <b>{len(a) - len(b)}</b></h4>'
                 content['kolvo'] = kolvo
                 return JsonResponse(content)
+            elif 'dates[]' in request.POST:
+                pks = dict(request.POST)
+                print(pks)
+                # terms = Term.objects.get(pk__in=pks)
+                # print(terms)
+                return JsonResponse(content)
             else:
                 return JsonResponse(content)
         else:

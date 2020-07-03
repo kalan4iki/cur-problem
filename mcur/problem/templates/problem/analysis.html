@@ -31,15 +31,6 @@
                       <button type="button" class="btn btn-tool" data-card-widget="collapse">
                         <i class="fas fa-minus"></i>
                       </button>
-                      <div class="btn-group">
-                        <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          <i class="fas fa-wrench"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="">
-                          <a href="" class="dropdown-item" id="extend-term">Продлить назначения</a>
-                          <a class="dropdown-divider"></a>
-                        </div>
-                      </div>
                       <button type="button" class="btn btn-tool" data-card-widget="remove">
                         <i class="fas fa-times"></i>
                       </button>
@@ -54,10 +45,9 @@
 
     <div class="row">
         <div class="col">
-            <div class="card" id="main-card">
+            <div class="card" id="table-card" hidden>
                 <div class="card-header">
                     <h5 class="card-title"></h5>
-
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool" data-card-widget="collapse">
                         <i class="fas fa-minus"></i>
@@ -67,7 +57,7 @@
                           <i class="fas fa-wrench"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" role="menu" style="">
-                          <a href="" class="dropdown-item" id="extend-term">Продлить назначения</a>
+                          <button href="" class="dropdown-item" id="extend-term">Продлить выделенные назначения</button>
                           <a class="dropdown-divider"></a>
                         </div>
                       </div>
@@ -88,20 +78,6 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                          <td>Tiger Nixon</td>
-                          <td>System Architect</td>
-                          <td>Edinburgh</td>
-                          <td>61</td>
-                          <td>2011/04/25</td>
-                      </tr>
-                      <tr>
-                        <td>Garrett Winters</td>
-                        <td>Accountant</td>
-                        <td>Tokyo</td>
-                        <td>63</td>
-                        <td>2011/07/25</td>
-                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -229,19 +205,34 @@ $(document).ready(function() {
 });
 
 function testfunct(dates) {
-    table.clear();
-    table.rows.add(dates['data']);
-    table.draw();
-    console.log(dates);
-    var modal = $('#modal-analysis'),
-        card = $('#main-card');
-    modal.modal('hide');
-    card.find('h5[class="card-title"]').text(dates['type']['text']);
-    card.find('div[class="card-body"]').empty();
-    var a = $(dates['kolvo']['all'] + dates['kolvo']['naz'] + dates['kolvo']['prob']);
-    card.find('div[class="card-body"]').append(a);
-    card.find('a[id="extend-term"]').attr('name', dates['type']['id']);
-    card.removeAttr('hidden')
+  table.clear();
+  table.rows.add(dates['data']);
+  table.draw();
+  console.log(dates);
+  var modal = $('#modal-analysis'),
+      card = $('#main-card'),
+      tcard = $('#table-card');
+  modal.modal('hide');
+  card.find('h5[class="card-title"]').text(dates['type']['text']);
+  card.find('div[class="card-body"]').empty();
+  var a = $(dates['kolvo']['all'] + dates['kolvo']['naz'] + dates['kolvo']['prob']);
+  card.find('div[class="card-body"]').append(a);
+  card.removeAttr('hidden')
+  tcard.removeAttr('hidden')
 }
+
+$('#extend-term').click(function(){
+  console.log(table.rows( { selected: true } ).data());
+  var date = table.rows( { selected: true } ).data(),
+      dates = Array(),
+      index;
+  for (index = 0; index < date.length; ++index) {
+    dates.push(date[index]['pk'])
+  };
+  console.log(dates);
+  var url = '{% url 'analysis' %}',
+      CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
+      post = $.post(url, {csrfmiddlewaretoken: CSRFtoken, dates: dates});
+})
 </script>
 {% endblock %}

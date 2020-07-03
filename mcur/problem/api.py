@@ -439,10 +439,24 @@ class problem(Messages):
                 #Mailsend(a.curatuser.email, temp, a.problem.nomdobr)
 
 
+class analysis(Messages):
+    '''Страница "Проблема"'''
+    def __init__(self):
+        super().__init__()
+        self.status = 0
+        self.actionlist = {
+            'action_1': self.action_1,
+        }
+
+    def action_1(self):
+        pass
+
+
 ns = {
     'message': Messages,
     'dashboard': dashboard,
     'problem': problem,
+    'analysis': analysis,
 }
 
 
