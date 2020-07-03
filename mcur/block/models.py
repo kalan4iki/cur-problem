@@ -8,7 +8,8 @@ class Appeal(models.Model):
         ('0', 'В работе'),
         ('1', 'На блокировке'),
         ('2', 'Закрыто'),
-        ('3', 'Отклонено')
+        ('3', 'Отклонено'),
+        ('4', 'На согласовании')
     }
     nomdobr = models.CharField(max_length=20, help_text='Номер обращения', verbose_name='Номер')
     text = models.TextField(help_text='Комментарий', verbose_name='Текст', null=True, blank=True)
@@ -16,7 +17,7 @@ class Appeal(models.Model):
                                null=True)
     datebzm = models.DateField(auto_now=True, help_text='Дата изменения', verbose_name='Дата изменения', blank=True,
                                null=True)
-    status = models.CharField(max_length=50, help_text='Статус блокировки', verbose_name='Статус', default='0',
+    status = models.CharField(max_length=50, help_text='Статус блокировки', verbose_name='Статус', default='4',
                               choices=stats)
     user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто направил на блокировку')
 
@@ -34,7 +35,8 @@ class Result(models.Model):
         ('0', 'В работе'),
         ('1', 'На блокировке'),
         ('2', 'Закрыто'),
-        ('3', 'Отклонено')
+        ('3', 'Отклонено'),
+        ('4', 'На согласовании')
     }
     block = models.ForeignKey(Appeal, on_delete=models.CASCADE, null=True, verbose_name='Обращение на блокировку')
     text = models.TextField(verbose_name='Текст', null=True, blank=True)

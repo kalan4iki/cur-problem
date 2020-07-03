@@ -34,29 +34,30 @@
         <div class="col">
             <div class="card ">
               <div class="card-header">
-                  <div class="row">
-                      <div class="col-2">
-                          {% csrf_token %}
-                          <div class="btn-group">
-                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-offset="25" aria-expanded="false">
-                              Выбор таблицы</button>
-                            <div class="dropdown-menu" role="menu">
-                                <button class="buttable dropdown-item active" id='table-0' style="color: #212529;">В работе</button>
-                                <button class="buttable dropdown-item" id='table-1' style="color: #212529;">На блокировке</button>
-                                <button class="buttable dropdown-item" id='table-2' style="color: #212529;">Закрытые</button>
-                                <button class="buttable dropdown-item" id='table-3' style="color: #212529;">Отклоненные</button>
-                            </div>
-                          </div>
-                      </div>
-                        {% if perms.block.executor %}
-                      <div class="col-2">
-                          <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#modal-addatte">Добавить на блокировку</button>
-                      </div>
-                      <div class="col-2">
-                          {% webpush_button with_class="btn btn-outline-info" %}
-                      </div>
-                      {% endif %}
+                <div class="row">
+                <div class="col-2">
+                  {% csrf_token %}
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-offset="25" aria-expanded="false">
+                      Выбор таблицы</button>
+                    <div class="dropdown-menu" role="menu">
+                        <button class="buttable dropdown-item active" id='table-4' style="color: #212529;">На согласовании</button>
+                        <button class="buttable dropdown-item" id='table-0' style="color: #212529;">В работе</button>
+                        <button class="buttable dropdown-item" id='table-1' style="color: #212529;">На блокировке</button>
+                        <button class="buttable dropdown-item" id='table-2' style="color: #212529;">Закрытые</button>
+                        <button class="buttable dropdown-item" id='table-3' style="color: #212529;">Отклоненные</button>
+                    </div>
                   </div>
+                </div>
+                {% if perms.block.executor %}
+                <div class="col">
+                    <button type="button" class="btn btn-block btn-secondary" data-toggle="modal" data-target="#modal-addatte">Добавить на блокировку</button>
+                </div>
+                <div class="col">
+                    {% webpush_button with_class="btn btn-outline-info" %}
+                </div>
+                {% endif %}
+              </div>
               </div>
               <div class="card-body">
                 <div id="jsGrid" class="jsgrid">
@@ -211,6 +212,7 @@
                     </div>
                   </div>
                 </div>
+                {% if perms.block.moderator %}
                 <div class="row">
                     <div class="col">
                         <div id="div_id_nomkom" class="form-group">
@@ -223,14 +225,26 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="row">
                     <div class="col">
                         <div class="form-group">
                             <label>Новый статус</label>
                             <select class="form-control" id="newstatus">
+                              {% if perms.problem.user_supermoderator %}
+                              <option value="0">В работе</option>
                               <option value="1">На блокировке</option>
                               <option value="2">Закрыто</option>
                               <option value="3">Отклонено</option>
+                              <option value="4">На согласовании</option>
+                              {% elif perms.block.moderator %}
+                              <option value="1">На блокировке</option>
+                              <option value="2">Закрыто</option>
+                              <option value="3">Отклонено</option>
+                              {% elif perms.block.dispatcher %}
+                              <option value="0">В работе</option>
+                              <option value="3">Отклонено</option>
+                              {% endif %}
                             </select>
                           </div>
                     </div>

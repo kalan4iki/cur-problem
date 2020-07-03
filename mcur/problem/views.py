@@ -805,14 +805,21 @@ def analysis(request):
                 nowdatetime = datetime.now()
                 nowdate = date(nowdatetime.year, nowdatetime.month, nowdatetime.day)
                 if request.POST['cate'] == '1':
-                    a = lk_moderator.b6(request, 2)
+                    temp = prob_func('moderator')()
+                    temp(request=request, action='todayproblem')
+                    a = temp.prob
                     b = Term.objects.filter(problem__in=a, date=nowdate)
                     content['type'] = {'id': 1, 'text': 'Анализ сегоднящних обращений'}
                 elif request.POST['cate'] == '2':
-                    a = lk_moderator.b7(request, 2)
+                    temp = prob_func('moderator')()
+                    temp(request=request, action='prosrproblem')
+                    a = temp.prob
                     b = Term.objects.filter(problem__in=a,
                                             date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
                     content['type'] = {'id': 2, 'text': 'Анализ просроченных обращений'}
+                content['data'] = []
+                for i in b:
+                    content['data'].append({'nomdobr': i.problem.nomdobr, 'dateotv': i.problem.dateotv.strftime('%d.%m.%Y'), 'status': i.problem.status.name, 'pk': i.pk, 'date': i.date.strftime('%d.%m.%Y')})
                 kolvo['all'] = f'<h4>Всего обращений: <b>{len(a)}</b></h4>'
                 kolvo['naz'] = f'<h4>По дате назначений: <b>{len(b)}</b></h4>'
                 kolvo['prob'] = f'<h4>По дате обращений: <b>{len(a) - len(b)}</b></h4>'

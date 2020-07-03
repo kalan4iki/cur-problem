@@ -65,7 +65,6 @@ def addresult(request):
                                         user=request.user)
             res.save()
             blo.status = di['status']
-            print(1)
             if blo.status == '0':
                 group = Group.objects.get(pk=6)
                 users = Person.objects.filter(groups=group)
@@ -95,7 +94,10 @@ def table(request):
         if request.method == 'POST':
             di = request.POST
             status = di['status'].split('-')[1]
-            appe = Appeal.objects.filter(status=status)
+            if request.user.has_perm('block.moderator') or request.user.has_perm('block.dispatcher'):
+                appe = Appeal.objects.filter(status=status)
+            elif request.user.has_perm('block.executor'):
+                appe = Appeal.objects.filter(status=status, user=request.user)
             tables = QStolist(appe)
             cont = {'appe': tables}
             return JsonResponse(cont)
@@ -139,6 +141,10 @@ def downimage(request):
                 return redirect('blockindex')
 
 
+def block_approve(request):
+    pass
+
+
 def main(request):
     if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
@@ -153,16 +159,16 @@ def main(request):
                         photo.file.save(f.name, ContentFile(data))
                         photo.save()
                     appe.save()
-                    group = Group.objects.get(pk=6)
+                    group = Group.objects.get(pk=8)
                     users = Person.objects.filter(groups=group)
                     for i in users:
-                        payload = {"head": "На блокировку", "body": f"Обращение №{appe.nomdobr}"}
+                        payload = {"head": "На согласование", "body": f"Обращение №{appe.nomdobr}"}
                         send_user_notification(user=i, payload=payload, ttl=1000)
             return redirect('blockindex')
         else:
             addform = AppealForm
             content = {}
-            a = Appeal.objects.filter(status='0')
+            a = Appeal.objects.filter(status='4')
             table = QStolist(a)
             notkey = WEBPUSH_SETTINGS['VAPID_PUBLIC_KEY']
             content['table'] = table

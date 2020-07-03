@@ -19,14 +19,21 @@ class lk_objects(object):
         if "request" in kwargs:
             self.request = kwargs['request']
             if self.request.method == 'POST':
-                self.box = self.request.POST['action']
-                self.actionlist[self.request.POST['action'].lower()]()
+                if 'action' in self.request.POST:
+                    self.box = self.request.POST['action']
+                    self.actionlist[self.request.POST['action'].lower()]()
+                elif 'action' in kwargs:
+                    self.action = kwargs['action'].lower()
+                    self.actionlist[self.action]()
+                else:
+                    return 'Error 2'
             elif self.request.method == 'GET':
                 self.action = kwargs['action']
                 self.actionlist[self.action.lower()]()
         else:
-            messages.error(self.request, 'Неправильный запрос.')
-            return redirect('index')
+            # messages.error(self.request, 'Неправильный запрос.')
+            return 'Error 1'
+        return 'succes'
 
 
 # Область исполнителя

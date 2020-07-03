@@ -52,6 +52,63 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col">
+            <div class="card" id="main-card">
+                <div class="card-header">
+                    <h5 class="card-title"></h5>
+
+                    <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                      </button>
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <i class="fas fa-wrench"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu" style="">
+                          <a href="" class="dropdown-item" id="extend-term">Продлить назначения</a>
+                          <a class="dropdown-divider"></a>
+                        </div>
+                      </div>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                  <table id="example" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th>Номер добродела</th>
+                        <th>Дата ответа по доброделу</th>
+                        <th>Статус в доброделе</th>
+                        <th>Номер назначения</th>
+                        <th>Дата ответа по назначению</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                          <td>Tiger Nixon</td>
+                          <td>System Architect</td>
+                          <td>Edinburgh</td>
+                          <td>61</td>
+                          <td>2011/04/25</td>
+                      </tr>
+                      <tr>
+                        <td>Garrett Winters</td>
+                        <td>Accountant</td>
+                        <td>Tokyo</td>
+                        <td>63</td>
+                        <td>2011/07/25</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 <div class="modal fade" id="modal-analysis">
   <div class="modal-dialog">
@@ -122,8 +179,59 @@ $('#form-analysis').submit(function (event) {
     var data = $.post(url, {csrfmiddlewaretoken: CSRFtoken, cate:cat}, testfunct);
 });
 
-function testfunct(dates) {
+$(document).ready(function() {
+  table = $('#example').DataTable({
+    responsive: true,
+    select: true,
+    language: {
+      "processing": "Подождите...",
+      "search": "Поиск:",
+      "lengthMenu": "Показать _MENU_ записей",
+      "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+      "infoEmpty": "Записи с 0 до 0 из 0 записей",
+      "infoFiltered": "(отфильтровано из _MAX_ записей)",
+      "infoPostFix": "",
+      "loadingRecords": "Загрузка записей...",
+      "zeroRecords": "Записи отсутствуют.",
+      "emptyTable": "В таблице отсутствуют данные",
+      "paginate": {
+        "first": "Первая",
+        "previous": "Предыдущая",
+        "next": "Следующая",
+        "last": "Последняя"
+      },
+      "aria": {
+        "sortAscending": ": активировать для сортировки столбца по возрастанию",
+        "sortDescending": ": активировать для сортировки столбца по убыванию"
+      },
+      "select": {
+        "rows": {
+          "_": "Выбрано записей: %d",
+          "0": "Кликните по записи для выбора",
+          "1": "Выбрана одна запись"
+        }
+      }
+    },
+    dom: 'Blfrtip',
+    buttons: [
+      'print', 'csv', 'excelHtml5', 'selectAll', 'selectNone'
+    ],
+    columns: [
+      { "data": "nomdobr" },
+      { "data": "dateotv" },
+      { "data": "status" },
+      { "data": "pk" },
+      { "data": "date" }
+    ],
+    order: [[1, 'asc']],
+  });
+  //console.log(table.buttons)
+});
 
+function testfunct(dates) {
+    table.clear();
+    table.rows.add(dates['data']);
+    table.draw();
     console.log(dates);
     var modal = $('#modal-analysis'),
         card = $('#main-card');
