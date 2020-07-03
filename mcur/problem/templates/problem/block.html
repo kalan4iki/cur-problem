@@ -188,7 +188,7 @@
   <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-{% if perms.block.moderator %}
+{% if perms.block.moderator or perms.block.dispatcher %}
 <div class="modal fade" id="modal-change_status">
   <div class="modal-dialog">
     <div class="modal-content">
