@@ -176,7 +176,7 @@
         <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
             <a type="button" href="https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id=" name="dobrodel" class="btn btn-default" target="_blank">Перейти на дорбодел</a>
-            {% if perms.block.moderator %}
+            {% if perms.block.moderator or perms.block.dispatcher %}
             <button type="button" class="btn btn-default change_status" name="change_status" id="">Сменить статус</button>
             {% elif perms.block.executor %}
             <button type="button" class="btn btn-default change_status" name="change_status_back" id="">Вернуть на блокировку</button>
