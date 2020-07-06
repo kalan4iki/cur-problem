@@ -826,10 +826,21 @@ def analysis(request):
                 content['kolvo'] = kolvo
                 return JsonResponse(content)
             elif 'dates[]' in request.POST:
+                kolvo = dict()
                 pks = dict(request.POST)
-                print(pks)
-                # terms = Term.objects.get(pk__in=pks)
-                # print(terms)
+                nom = pks['dates[]']
+                terms = Term.objects.filter(pk__in=nom)
+                kolvo['all'] = len(terms)
+                kolvo['succes'] = 0
+                for i in terms:
+                    a = i.problem.dateotv - i.date
+                    if a.days > 2:
+                        i.date = i.problem.dateotv - timedelta(2)
+                        kolvo['succes'] += 1
+                        i.save()
+                        #print(f'{a} - {i.problem.dateotv - timedelta(2)}')
+                kolvo['no'] = kolvo['all'] - kolvo['succes']
+                content['kolvo'] = kolvo
                 return JsonResponse(content)
             else:
                 return JsonResponse(content)

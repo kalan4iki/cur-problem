@@ -233,6 +233,13 @@ $('#extend-term').click(function(){
   var url = '{% url 'analysis' %}',
       CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
       post = $.post(url, {csrfmiddlewaretoken: CSRFtoken, dates: dates});
+  post.done(function(dates) {
+      Swal.fire({
+          title: 'Обновление назначений',
+          text: 'Количество обработанных обращений ' + dates['kolvo']['succes'] + 'из ' + dates['kolvo']['all'] + ' обращений',
+          icon: 'success'
+      })
+  })
 })
 </script>
 {% endblock %}
