@@ -90,7 +90,7 @@ class Logpars(models.Model):
                                null=True)
 
     class Meta:
-        ordering = ['datecre']
+        ordering = ['-datecre']
         verbose_name = 'история парсера'
         verbose_name_plural = 'истории парсера'
 

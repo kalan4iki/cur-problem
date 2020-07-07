@@ -155,10 +155,10 @@ class MinisAdmin(admin.ModelAdmin):
 
 @admin.register(Term)
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('nomobr', 'date', 'curat', 'desck',)
-    list_display_links = ('date', 'curat', 'desck',)
+    list_display = ('nomobr', 'date', 'datecre', 'org', 'curat', 'desck', 'user',)
+    list_display_links = ('date', 'datecre', 'curat', 'desck',)
     search_fields = ('pk',)
-    list_filter = ('org__name', 'status', 'curat__name', 'date',)
+    list_filter = ('org__name', 'status', 'curat__name', 'date', 'datecre', 'user',)
 
     def nomobr(self, srok):
         if srok.problem == None:

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Parser, Status, Action, ActionHistory, Loggings, Messages)
+from .models import (Parser, Status, Action, ActionHistory, Loggings, Messages, Logpars, Logspars)
 # Register your models here.
 @admin.register(Parser)
 class ParserAdmin(admin.ModelAdmin):
@@ -43,3 +43,25 @@ class MessagesAdmin(admin.ModelAdmin):
     list_display = ('note', 'datecre',)
     list_display_links = ('note', 'datecre',)
     list_filter = ('note', 'datecre',)
+
+
+class LogsparsInline(admin.TabularInline):
+    model = Logspars
+    can_delete = False
+    verbose_name_plural = 'Истории операции'
+    fields = ('name', 'lastval', 'newval',)
+    readonly_fields = ('name', 'lastval', 'newval',)
+
+@admin.register(Logpars)
+class LogparsAdmin(admin.ModelAdmin):
+    list_display = ('nomobr', 'datecre',)
+    list_display_links = ('nomobr', 'datecre',)
+    #search_fields = ('nomobr',)
+    list_filter = ('datecre',)
+    inlines = (LogsparsInline,)
+
+    def nomobr(self, srok):
+        if srok.problem == None:
+            return 'Нет'
+        else:
+            return srok.problem.nomdobr
