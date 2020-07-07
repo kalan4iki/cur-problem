@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.min.css' %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'adminlte/plugins/toastr/toastr.min.css' %}">
 </head>
 <body class="hold-transition login-page">
 {% include "problem/formlogin.html" %}
@@ -25,5 +26,11 @@
 <script src="{% static 'adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <!-- AdminLTE App -->
 <script src="{% static 'adminlte/dist/js/adminlte.min.js' %}"></script>
+<script src="{% static 'adminlte/plugins/toastr/toastr.min.js' %}"></script>
 </body>
+{% if form.errors %}
+<script type="text/javascript">
+  toastr["error"]('Ваше имя пользователя и пароль не совпадают. Пожалуйста, попробуйте еще раз.', 'Уведомление')
+</script>
+{% endif %}
 </html>
