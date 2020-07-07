@@ -190,7 +190,26 @@ $(document).ready(function() {
     },
     dom: 'Blfrtip',
     buttons: [
-      'print', 'csv', 'excelHtml5', 'selectAll', 'selectNone'
+      {
+        extend: 'print',
+        text: 'Распечатать'
+      },
+      {
+        extend: 'csv',
+        text: 'CSV'
+      },
+      {
+        extend: 'excelHtml5',
+        text: 'EXCEL'
+      },
+      {
+        extend: 'selectAll',
+        text: 'Выбрать всё'
+      },
+      {
+        extend: 'selectNone',
+        text: 'Снять выделение'
+      }
     ],
     columns: [
       { "data": "nomdobr" },
@@ -201,14 +220,12 @@ $(document).ready(function() {
     ],
     order: [[1, 'asc']],
   });
-  //console.log(table.buttons)
 });
 
 function testfunct(dates) {
   table.clear();
   table.rows.add(dates['data']);
   table.draw();
-  console.log(dates);
   var modal = $('#modal-analysis'),
       card = $('#main-card'),
       tcard = $('#table-card');
@@ -222,14 +239,12 @@ function testfunct(dates) {
 }
 
 $('#extend-term').click(function(){
-  console.log(table.rows( { selected: true } ).data());
   var date = table.rows( { selected: true } ).data(),
       dates = Array(),
       index;
   for (index = 0; index < date.length; ++index) {
     dates.push(date[index]['pk'])
   };
-  console.log(dates);
   var url = '{% url 'analysis' %}',
       CSRFtoken = jQuery("[name=csrfmiddlewaretoken]").val(),
       post = $.post(url, {csrfmiddlewaretoken: CSRFtoken, dates: dates});

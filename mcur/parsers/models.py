@@ -1,4 +1,5 @@
 from django.db import models
+from problem.models import Problem
 
 
 class Status(models.Model):
@@ -62,6 +63,7 @@ class ActionHistory(models.Model):
         verbose_name = 'история действия'
         verbose_name_plural = 'истории действий'
 
+
 class Loggings(models.Model):
     stats = {
         ('0', 'Добавлено'),
@@ -81,6 +83,42 @@ class Loggings(models.Model):
     def __str__(self):
         return f'{self.note} - {self.name}'
 
+
+class Logpars(models.Model):
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, verbose_name='Проблема', related_name='logpars', blank=True, null=True)
+    datecre = models.DateTimeField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
+                               null=True)
+
+    class Meta:
+        ordering = ['datecre']
+        verbose_name = 'история парсера'
+        verbose_name_plural = 'истории парсера'
+
+    def __str__(self):
+        return f'{self.problem.nomdobr} - {self.datecre.strftime("%d.%m.%Y %H:%M:%S")}'
+
+
+class Logspars(models.Model):
+    names = {
+        ('0', 'Изменение тематики'),
+        ('1', 'Изменение подкатегории'),
+        ('2', 'Добавление автора'),
+        ('3', 'Обновление даты ответа'),
+        ('4', 'Обновление статуса'),
+    }
+    oper = models.ForeignKey(Logpars, on_delete=models.CASCADE, verbose_name='Операция', related_name='logspars', blank=True, null=True)
+    name = models.CharField(verbose_name='Название операции', max_length=255, default='0', choices=names, null=True)
+    lastval = models.CharField(verbose_name='Предыдущее значение', max_length=255, default=None, null=True)
+    newval = models.CharField(verbose_name='Новое значение', max_length=255, default=None, null=True)
+
+    class Meta:
+        ordering = ['pk']
+        verbose_name = 'история парсера'
+        verbose_name_plural = 'истории парсера'
+
+    def __str__(self):
+        return self.name
+
 class Messages(models.Model):
     note = models.TextField(verbose_name='Ошибка', default=None, blank=True)
     act = models.ForeignKey(ActionHistory, on_delete=models.CASCADE, verbose_name='Действие', default=None)
@@ -90,3 +128,35 @@ class Messages(models.Model):
         ordering = ['pk']
         verbose_name = 'сообщение'
         verbose_name_plural = 'сообщения'
+
+
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+
+@receiver(pre_save, sender=Problem)
+def logproblem(sender, instance, **kwargs):
+    new = instance
+    if Problem.objects.filter(nomdobr=new.nomdobr).exists():
+        last = Problem.objects.get(nomdobr=new.nomdobr)
+        b = Logpars(problem=last)
+        b.save()
+        a = None
+        if new.temat != last.temat:
+            a = Logspars(oper=b, name='0', lastval=last.temat.name, newval=new.temat.name)
+            a.save()
+        if new.podcat != last.podcat:
+            a = Logspars(oper=b, name='1', lastval=last.podcat.name, newval=new.podcat.name)
+            a.save()
+        if new.author != last.author:
+            if last.author == None:
+                a = Logspars(oper=b, name='2', lastval=None, newval=new.author.email)
+                a.save()
+        if new.dateotv != last.dateotv:
+            a = Logspars(oper=b, name='3', lastval=last.dateotv.strftime('%d.%m.%Y'), newval=new.dateotv.strftime('%d.%m.%Y'))
+            a.save()
+        if new.status != last.status:
+            a = Logspars(oper=b, name='4', lastval=last.status.name, newval=new.status.name)
+        if a != None:
+            a.save()
+        else:
+            b.delete()

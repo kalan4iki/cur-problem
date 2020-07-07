@@ -291,6 +291,13 @@ class error_page:
         head = 'Упс! Ошибка сервера!'
         cont = 'Просьба обратиться к администратору системы!'
         status = 'danger'
+        date = datetime.now()
+        data = f'''
+        <p>Пользователь: {request.user.username}</a></p>
+        <p>Ошибка: 500</p>
+        <p>Время ошибки: {date.strftime('%d.%m.%Y %H:%M:%S')}<p>
+        '''
+        send_mail(f'Ошибка {num}', None, 'noreply@skiog.ru', ['vvk@istra-adm.ru'], fail_silently=False, html_message=data)
         content = {"error": errors, 'num': num, 'head': head, 'cont': cont, 'status': status}
         return render(request, 'problem/errorpage.html', {'content': content})
 

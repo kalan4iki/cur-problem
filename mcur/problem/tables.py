@@ -15,7 +15,7 @@ class ProblemTable(tables.Table):
                 'thead': {
                     'class': 'thead-light'
                 }}
-        fields = ('nomdobr', 'dateotv', 'temat', 'podcat', 'status', 'statussys', 'datecre')
+        fields = ('nomdobr', 'dateotv', 'adres','temat', 'podcat', 'status', 'statussys', 'datecre')
         exclude = ("id", "text","url","parsing", "visible")
 
 class TermTable(tables.Table):

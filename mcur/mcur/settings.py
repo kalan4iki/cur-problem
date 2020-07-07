@@ -30,7 +30,7 @@ SKIOG_VERSION = '0.3.0'
 if 'linux' in platform.lower():
     DEBUG = False
 else:
-    DEBUG = True
+    DEBUG = False
 
 ALLOWED_HOSTS = [
 '127.0.0.1',
@@ -40,7 +40,7 @@ ALLOWED_HOSTS = [
 'local.skiog.ru'
 ]
 
-
+ADMINS = [('Vadim', 'vvk@istra-adm.ru')]
 # Application definition
 
 INSTALLED_APPS = [
@@ -221,7 +221,9 @@ LOGGING = {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+            'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
         },
         'file': {
             'level': 'INFO',
@@ -239,7 +241,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'mail_admins'],
-            'level': 'INFO',
+            'level': 'ERROR',
         },
         'django.server': {
             'handlers': ['django.server'],
@@ -249,7 +251,12 @@ LOGGING = {
         "django.request": {
              "handlers": ["mail_admins", "file_error"],
              "level": "ERROR",
-             "propagate": True
+             "propagate": False
+        },
+        'django.security': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
         },
         'file': {
             "handlers": ["file"],
@@ -273,6 +280,7 @@ EMAIL_HOST_USER = 'noreply@skiog.ru'
 EMAIL_HOST_PASSWORD = 'W3y71PVTGM6JR409UCie4TBNvJtUcvwZ'
 DEFAULT_FROM_EMAIL = 'noreply@skiog.ru'
 DEFAULT_TO_EMAIL = 'noreply@skiog.ru'
+SERVER_EMAIL = 'noreply@skiog.ru'
 
 # Celery
 CELERY_BROKER_URL = 'amqp://localhost'
