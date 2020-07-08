@@ -60,7 +60,6 @@ def addresult(request):
     if request.user.has_perm('problem.user_moderator') or request.user.has_perm('block.moderator') or request.user.has_perm('block.executor'):
         if request.method == 'POST':
             di = request.POST
-            print(di)
             blo = Appeal.objects.get(nomdobr=di['pk'])
             nomkom = None
             if 'nomkom' in di:
@@ -69,13 +68,29 @@ def addresult(request):
                                         user=request.user)
             res.save()
             blo.status = di['status']
-            if blo.status == '0':
+            tempss = False
+            if request.user.has_perm('block.moderator'):
+                a = ['0', '1', '2', '3', '4']
+                if di['status'] in a:
+                    tempss = True
+            elif request.user.has_perm('block.dispatcher'):
+                a = ['1', '2', '3']
+                if di['status'] in a:
+                    tempss = True
+            elif request.user.has_perm('block.executor'):
+                a = ['0',  '3']
+                if di['status'] in a:
+                    tempss = True
+            if blo.status == '0' and tempss:
                 group = Group.objects.get(pk=6)
                 users = Person.objects.filter(groups=group)
                 blo.text = di['text']
                 for i in users:
                     payload = {"head": "Изменен статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                     send_user_notification(user=i, payload=payload, ttl=1000)
+            elif tempss:
+                content = {}
+                return JsonResponse(content)
             else:
                 payload = {"head": "Изменен статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                 send_user_notification(user=blo.user, payload=payload, ttl=1000)
