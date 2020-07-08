@@ -815,14 +815,14 @@ def analysis(request):
                     temp = prob_func('moderator')()
                     temp(request=request, action='todayproblem')
                     a = temp.prob
-                    b = Term.objects.filter(problem__in=a, date=nowdate)
+                    b = Term.objects.filter(problem__in=a, date=nowdate).order_by('problem__dateotv')
                     content['type'] = {'id': 1, 'text': 'Анализ сегоднящних обращений'}
                 elif request.POST['cate'] == '2':
                     temp = prob_func('moderator')()
                     temp(request=request, action='prosrproblem')
                     a = temp.prob
                     b = Term.objects.filter(problem__in=a,
-                                            date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1)))
+                                            date__range=(date(nowdatetime.year, 1, 1), nowdate - timedelta(1))).order_by('problem__dateotv')
                     content['type'] = {'id': 2, 'text': 'Анализ просроченных обращений'}
                 content['data'] = []
                 for i in b:
@@ -853,3 +853,14 @@ def analysis(request):
                 return JsonResponse(content)
         else:
             return render(request, 'problem/analysis.html')
+
+def testrequest(request):
+    content = {}
+    if request.method == 'POST':
+        a = prob_func('moderator')()
+        a(request=request)
+        content['data'] = list(a.prob.values_list('nomdobr', 'dateotv', 'adres','temat__name', 'podcat__name', 'status__name', 'statussys', 'datecre'))
+        return JsonResponse(content)
+    else:
+        content['str'] = 'allproblem'
+        return render(request, 'problem/test.html', content)

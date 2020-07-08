@@ -1,48 +1,135 @@
 {% extends "layout/basic.html" %}
 {% load render_table from django_tables2 %}
-{% block name %}Главная{% endblock %}
+{% load bootstrap4 %}
+{% load crispy_forms_tags %}
+{% block title %}Анализ обращений{% endblock %}
+{% block nav2 %}active{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">Все жалобы</h1>
-  <div class="btn-toolbar mb-2 mb-md-0">
-    <div class="dropdown">
-      <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Кураторы
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        {% for i in curat %}
-        <a class="dropdown-item" href="{% url 'curators' i.pk %}">{{ i.name }}</a>
-        {% endfor %}
-        <a class="dropdown-item" href="{% url 'index' %}">Все</a>
-      </div>
+<div class="content-header">
+<div class="row">
+    <div class="col">
+        {% csrf_token %}
+        <div class="card" id="table-card">
+            <div class="card-header">
+                <h5 class="card-title"></h5>
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                      <i class="fas fa-wrench"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" role="menu" style="">
+                      <button href="" class="dropdown-item" id="extend-term">Продлить выделенные назначения</button>
+                      <a class="dropdown-divider"></a>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+            </div>
+            <div class="card-body">
+              <table id="example" class="table table-bordered table-striped table-head-fixed " style="width:100%">
+                <thead>
+                  <tr>
+                    <th>Номер</th>
+                    <th width="5%">Дата ответа по доброделу</th>
+                    <th width="10%">Адрес</th>
+                    <th>Тематика</th>
+                    <th>Подкатегория</th>
+                    <th>Статус в доброделе</th>
+                    <th>Статус в системе</th>
+                    <th>Дата создания</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+        </div>
     </div>
-    <div class="btn-group mr-2">
-      <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">Изменить/Добавить</button>
-    </div>
-  </div>
 </div>
+</div>
+{% endblock %}
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Сохранить</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% for table in tables %}
-  {% render_table table %}
-  {% endfor %}
+{% block ends %}
+<script>
+  $(document).ready(function() {
+    table = $('#example').DataTable({
+      autoWidth: false,
+      columnDefs: [
+        {
+          targets: ['_all'],
+          className: 'mdc-data-table__cell'
+        }
+      ],
+      scrollX: true,
+      responsive: false,
+      select: true,
+      ordering: false,
+      ajax: {
+        "url": '{% url 'testrequest' %}',
+        "data": function (d) {
+          d.action = '{{ str }}'
+          d.csrfmiddlewaretoken = getCookie('csrftoken')
+        },
+        "type": "POST"
+      },
+      language: {
+        "processing": "Подождите...",
+        "search": "Поиск:",
+        "lengthMenu": "Показать _MENU_ записей",
+        "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+        "infoEmpty": "Записи с 0 до 0 из 0 записей",
+        "infoFiltered": "(отфильтровано из _MAX_ записей)",
+        "infoPostFix": "",
+        "loadingRecords": "Загрузка записей...",
+        "zeroRecords": "Записи отсутствуют.",
+        "emptyTable": "В таблице отсутствуют данные",
+        "paginate": {
+          "first": "Первая",
+          "previous": "Предыдущая",
+          "next": "Следующая",
+          "last": "Последняя"
+        },
+        "aria": {
+          "sortAscending": ": активировать для сортировки столбца по возрастанию",
+          "sortDescending": ": активировать для сортировки столбца по убыванию"
+        },
+        "select": {
+          "rows": {
+            "_": "Выбрано записей: %d",
+            "0": "Кликните по записи для выбора",
+            "1": "Выбрана одна запись"
+          }
+        }
+      },
+      dom: 'Blfrtip',
+      buttons: [
+        {
+          extend: 'print',
+          text: 'Распечатать'
+        },
+        {
+          extend: 'csv',
+          text: 'CSV'
+        },
+        {
+          extend: 'excelHtml5',
+          text: 'EXCEL'
+        },
+        {
+          extend: 'selectAll',
+          text: 'Выбрать всё'
+        },
+        {
+          extend: 'selectNone',
+          text: 'Снять выделение'
+        }
+      ]
+    });
+  });
+</script>
 {% endblock %}

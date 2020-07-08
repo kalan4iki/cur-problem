@@ -13,7 +13,7 @@ class Appeal(models.Model):
     }
     nomdobr = models.CharField(max_length=20, help_text='Номер обращения', verbose_name='Номер')
     text = models.TextField(help_text='Комментарий', verbose_name='Текст', null=True, blank=True)
-    datecre = models.DateField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
+    datecre = models.DateTimeField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
                                null=True)
     datebzm = models.DateField(auto_now=True, help_text='Дата изменения', verbose_name='Дата изменения', blank=True,
                                null=True)

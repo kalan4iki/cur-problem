@@ -30,7 +30,7 @@ SKIOG_VERSION = '0.3.0'
 if 'linux' in platform.lower():
     DEBUG = False
 else:
-    DEBUG = False
+    DEBUG = True
 
 ALLOWED_HOSTS = [
 '127.0.0.1',
@@ -240,11 +240,11 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'mail_admins', "file_error"],
             'level': 'ERROR',
         },
         'django.server': {
-            'handlers': ['django.server'],
+            'handlers': ['django.server', "file_error"],
             'level': 'INFO',
             'propagate': False,
         },

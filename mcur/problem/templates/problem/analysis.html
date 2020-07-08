@@ -159,6 +159,7 @@ $(document).ready(function() {
   table = $('#example').DataTable({
     responsive: true,
     select: true,
+    ordering: false,
     language: {
       "processing": "Подождите...",
       "search": "Поиск:",
@@ -217,8 +218,7 @@ $(document).ready(function() {
       { "data": "status" },
       { "data": "pk" },
       { "data": "date" }
-    ],
-    order: [[1, 'asc']],
+    ]
   });
 });
 

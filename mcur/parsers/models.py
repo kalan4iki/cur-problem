@@ -130,33 +130,33 @@ class Messages(models.Model):
         verbose_name_plural = 'сообщения'
 
 
-from django.db.models.signals import post_save, pre_save
-from django.dispatch import receiver
-
-@receiver(pre_save, sender=Problem)
-def logproblem(sender, instance, **kwargs):
-    new = instance
-    if Problem.objects.filter(nomdobr=new.nomdobr).exists():
-        last = Problem.objects.get(nomdobr=new.nomdobr)
-        b = Logpars(problem=last)
-        b.save()
-        a = None
-        if new.temat != last.temat:
-            a = Logspars(oper=b, name='0', lastval=last.temat.name, newval=new.temat.name)
-            a.save()
-        if new.podcat != last.podcat:
-            a = Logspars(oper=b, name='1', lastval=last.podcat.name, newval=new.podcat.name)
-            a.save()
-        if new.author != last.author:
-            if last.author == None:
-                a = Logspars(oper=b, name='2', lastval=None, newval=new.author.email)
-                a.save()
-        if new.dateotv != last.dateotv:
-            a = Logspars(oper=b, name='3', lastval=last.dateotv.strftime('%d.%m.%Y'), newval=new.dateotv.strftime('%d.%m.%Y'))
-            a.save()
-        if new.status != last.status:
-            a = Logspars(oper=b, name='4', lastval=last.status.name, newval=new.status.name)
-        if a != None:
-            a.save()
-        else:
-            b.delete()
+# from django.db.models.signals import post_save, pre_save
+# from django.dispatch import receiver
+#
+# @receiver(pre_save, sender=Problem)
+# def logproblem(sender, instance, **kwargs):
+#     new = instance
+#     if Problem.objects.filter(nomdobr=new.nomdobr).exists():
+#         last = Problem.objects.get(nomdobr=new.nomdobr)
+#         b = Logpars(problem=last)
+#         b.save()
+#         a = None
+#         if new.temat != last.temat:
+#             a = Logspars(oper=b, name='0', lastval=last.temat.name, newval=new.temat.name)
+#             a.save()
+#         if new.podcat != last.podcat:
+#             a = Logspars(oper=b, name='1', lastval=last.podcat.name, newval=new.podcat.name)
+#             a.save()
+#         if new.author != last.author:
+#             if last.author == None:
+#                 a = Logspars(oper=b, name='2', lastval=None, newval=new.author.email)
+#                 a.save()
+#         if new.dateotv != last.dateotv:
+#             a = Logspars(oper=b, name='3', lastval=last.dateotv.strftime('%d.%m.%Y'), newval=new.dateotv.strftime('%d.%m.%Y'))
+#             a.save()
+#         if new.status != last.status:
+#             a = Logspars(oper=b, name='4', lastval=last.status.name, newval=new.status.name)
+#         if a != None:
+#             a.save()
+#         else:
+#             b.delete()

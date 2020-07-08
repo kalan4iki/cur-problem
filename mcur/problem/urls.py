@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 from .views import (api_problem, api_problem_detail, api_answer_detail, prob, addanswer,
-                    zaptable, add, lk, search, Answer_approve,
+                    zaptable, add, lk, search, Answer_approve, testrequest,
                     Answer_modify, development, resolutionadd, zapros,
                     createuser, dashboard, export_pdf, statandact, api_action,
                     listuser, apis, dopaction, analysis, problems)
@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/dopaction', dopaction, name='dopaction'),
     path('zapros/', zapros, name='zapros'),
     path('analysis/', analysis, name='analysis'),
+    path('testrequest/', testrequest, name='testrequest'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

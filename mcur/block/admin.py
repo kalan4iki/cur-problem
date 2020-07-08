@@ -10,9 +10,10 @@ class ResultInline(admin.StackedInline):
 
 @admin.register(Appeal)
 class AppealAdmin(admin.ModelAdmin):
-    list_display = ('nomdobr', 'text', 'status')
+    list_display = ('nomdobr', 'text', 'status', 'datecre')
     list_display_links = ('nomdobr', 'text', 'status')
     search_fields = ('nomdobr',)
+    list_filter = ('status', 'datecre')
     inlines = (ResultInline,)
 
 @admin.register(Image)
