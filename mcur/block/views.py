@@ -37,7 +37,7 @@ def del_message(request):
                 stat = a[0].chstatus
                 app.status = stat
             else:
-                app.status = '0'
+                app.status = '4'
             app.save()
             return JsonResponse(content)
 
@@ -81,6 +81,7 @@ def addresult(request):
                 a = ['0',  '3']
                 if di['status'] in a:
                     tempss = True
+            print(tempss)
             if blo.status == '0' and tempss:
                 group = Group.objects.get(pk=6)
                 users = Person.objects.filter(groups=group)
@@ -88,7 +89,7 @@ def addresult(request):
                 for i in users:
                     payload = {"head": "Изменен статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                     send_user_notification(user=i, payload=payload, ttl=1000)
-            elif tempss:
+            elif tempss == False:
                 content = {}
                 return JsonResponse(content)
             else:
