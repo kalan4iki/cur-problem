@@ -5,6 +5,7 @@ from django import forms
 from django.forms import (Form, ImageField, CharField)
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import Group
+from django.contrib import auth, messages
 from webpush import send_user_notification
 from problem.models import Person
 from .models import Appeal, Image, Result
@@ -133,8 +134,11 @@ def obr_view(request):
             temp = {'pk': app.pk, 'nomd': app.nomdobr, 'datecre': timezone.localtime(app.datecre).strftime('%d.%m.%Y %H:%M:%S'),'status': app.get_status_display(),
                     'user': f'{app.user.first_name} {app.user.last_name}', 'text': app.text,
                     'datebzm': timezone.localtime(app.datebzm).strftime('%d.%m.%Y %H:%M:%S'), 'image': image, 'message': message}
-            content = {'app': temp}
+            content = {'app': temp, 'status': 'suc'}
             return JsonResponse(content)
+        else:
+            messages.error(request, 'Данное обращение не существует.')
+            return JsonResponse({'status': 'error'})
 
 
 def downimage(request):
@@ -181,6 +185,9 @@ def main(request):
                     for i in users:
                         payload = {"head": "На согласование", "body": f"Обращение №{appe.nomdobr}"}
                         send_user_notification(user=i, payload=payload, ttl=1000)
+                    messages.success(request, 'Обращение отправлено.')
+                else:
+                    messages.error(request, 'Данное обращение существует. Воспользуйтесь поиском.')
             return redirect('blockindex')
         else:
             addform = AppealForm

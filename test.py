@@ -29,4 +29,3 @@ if __name__ == "__main__":
     thread1.join()
     thread2.join()
     print('Finished.')
-    return 0

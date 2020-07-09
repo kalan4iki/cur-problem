@@ -498,25 +498,35 @@ function TableCre(table, data)
 }
 
 function ShowModal(datas) {
-    var modal = $('#modal-attes');
-    modal.find('.modal-title').text('Обращение № ' + datas['app']['nomd']);
-    modal.find('input[name="user"]').val(datas['app']['user']);
-    modal.find('input[name="datecre"]').val(datas['app']['datecre']);
-    modal.find('input[name="datebzm"]').val(datas['app']['datebzm']);
-    modal.find('input[name="status"]').val(datas['app']['status']);
-    modal.find('textarea[name="text"]').val(datas['app']['text']);
-    modal.find('a[name="dobrodel"]').attr('href', 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='+datas['app']['nomd']);
-    modal.find('button[name="message"]').removeClass('disabled');
-    if (datas['app']['image'] === false) modal.find('button[name="dowimage"]').addClass('disabled');
-    if (datas['app']['message'] === false) modal.find('button[name="message"]').addClass('disabled');
-    modal.find('button[name="message"]').attr('id', datas['app']['nomd']);
-    modal.find('button[name="dowimage"]').attr('id', datas['app']['nomd']);
-    {% if perms.block.moderator or perms.block.dispatcher %}
-    modal.find('button[name="change_status"]').attr('id', datas['app']['nomd']);
-    {% elif perms.block.executor %}
-    modal.find('button[name="change_status_back"]').attr('id', datas['app']['nomd']);
-    {% endif %}
-    modal.modal('show')
+    if (datas['status'] === 'error') {
+      location.reload()
+    } else {
+      var modal = $('#modal-attes');
+      modal.find('.modal-title').text('Обращение № ' + datas['app']['nomd']);
+      modal.find('input[name="user"]').val(datas['app']['user']);
+      modal.find('input[name="datecre"]').val(datas['app']['datecre']);
+      modal.find('input[name="datebzm"]').val(datas['app']['datebzm']);
+      modal.find('input[name="status"]').val(datas['app']['status']);
+      modal.find('textarea[name="text"]').val(datas['app']['text']);
+      modal.find('a[name="dobrodel"]').attr('href', 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='+datas['app']['nomd']);
+      modal.find('button[name="image"]').removeClass('disabled');
+      modal.find('button[name="message"]').removeClass('disabled');
+      if (datas['app']['image'] === false) modal.find('button[name="dowimage"]').addClass('disabled');
+      if (datas['app']['message'] === false) modal.find('button[name="message"]').addClass('disabled');
+      modal.find('button[name="message"]').attr('id', datas['app']['nomd']);
+      modal.find('button[name="dowimage"]').attr('id', datas['app']['nomd']);
+      {% if perms.block.moderator or perms.block.dispatcher %}
+      modal.find('button[name="change_status"]').attr('id', datas['app']['nomd']);
+      {% elif perms.block.executor %}
+      modal.find('button[name="change_status_back"]').attr('id', datas['app']['nomd']);
+      {% endif %}
+      modal.modal('show')
+    }
 }
+{% if messages %}
+    {% for message in messages %}
+        toastr[{% if message.tags %}'{{ message.tags }}'{% else %}'info'{% endif %}]('{{ message }}', 'Уведомление');
+    {% endfor %}
+{% endif %}
 </script>
 {% endblock %}

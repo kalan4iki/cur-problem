@@ -316,3 +316,20 @@ REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
+# Pars settings
+FORM_FIELDS = {
+    'nomdobr': ['id'],
+    'date': ['datefrom', 'dateto'],
+    'cdate': ['cdatefrom', 'cdateto'],
+    'deadline': ['deadlineFrom', 'deadlineTo']
+}
+START_URL = 'https://vmeste.mosreg.ru/login'
+PARS_LOGIN = None
+PARS_PASS = None
+
+FULL_PARS = {
+    'form_fileds': FORM_FIELDS,
+    'start_url': START_URL,
+    'auth': [PARS_LOGIN, PARS_PASS]
+}
