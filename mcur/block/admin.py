@@ -4,8 +4,10 @@ from .models import Appeal, Image, Result
 
 class ResultInline(admin.StackedInline):
     model = Result
-    can_delete = True
+    can_delete = False
     verbose_name_plural = 'Смена статуса'
+    fields = ('text', 'chstatus', 'nomkom', 'datecre', 'user')
+    readonly_fields = ('datecre',)
 
 
 @admin.register(Appeal)

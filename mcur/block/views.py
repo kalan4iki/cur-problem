@@ -9,7 +9,7 @@ from webpush import send_user_notification
 from problem.models import Person
 from .models import Appeal, Image, Result
 from mcur.settings import MEDIA_ROOT, MEDIA_URL, WEBPUSH_SETTINGS
-
+from django.utils import timezone
 import zipfile
 
 
@@ -52,7 +52,7 @@ def view_message(request):
             for i in result:
                 content['message'].append({'text': i.text, 'status': i.get_chstatus_display(), 'pk': i.pk,
                                            'user': f'{i.user.first_name} {i.user.last_name}',
-                                           'datecre': i.datecre.strftime('%d.%m.%Y %H:%M:%S'), 'nomkom': i.nomkom})
+                                           'datecre': timezone.localtime(i.datecre).strftime('%d.%m.%Y %H:%M:%S'), 'nomkom': i.nomkom})
             return JsonResponse(content)
 
 
@@ -101,7 +101,7 @@ def addresult(request):
 def QStolist(queryset):
     temp = []
     for j in queryset:
-        temp.append({'pk': j.pk, 'nomd': j.nomdobr, 'datecre': j.datecre.strftime('%d.%m.%Y %H:%M:%S'), 'text': j.text,
+        temp.append({'pk': j.pk, 'nomd': j.nomdobr, 'datecre': timezone.localtime(j.datecre).strftime('%d.%m.%Y %H:%M:%S'), 'text': j.text,
                       'status': j.get_status_display(), 'user': f'{j.user.first_name} {j.user.last_name}'})
     return temp
 
@@ -130,7 +130,7 @@ def obr_view(request):
                 image = True
             if Result.objects.filter(block=app).exists():
                 message = True
-            temp = {'pk': app.pk, 'nomd': app.nomdobr, 'datecre': app.datecre.strftime('%d.%m.%Y %H:%M:%S'),'status': app.get_status_display(),
+            temp = {'pk': app.pk, 'nomd': app.nomdobr, 'datecre': timezone.localtime(app.datecre).strftime('%d.%m.%Y %H:%M:%S'),'status': app.get_status_display(),
                     'user': f'{app.user.first_name} {app.user.last_name}', 'text': app.text,
                     'datebzm': app.datebzm.strftime('%d.%m.%Y'), 'image': image, 'message': message}
             content = {'app': temp}

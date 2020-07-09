@@ -45,7 +45,7 @@ class Result(models.Model):
     nomkom = models.CharField(max_length=50, verbose_name='Номер комиссии', default=None, null=True, blank=True)
     datecre = models.DateTimeField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания',
                                    blank=True, null=True)
-    user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто направил на блокировку')
+    user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True, help_text='Кто направил на сообщение')
 
     class Meta:
         ordering = ['datecre']
