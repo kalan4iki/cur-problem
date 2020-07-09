@@ -15,7 +15,7 @@ class Appeal(models.Model):
     text = models.TextField(help_text='Комментарий', verbose_name='Текст', null=True, blank=True)
     datecre = models.DateTimeField(auto_now_add=True, help_text='Дата создания', verbose_name='Дата создания', blank=True,
                                null=True)
-    datebzm = models.DateField(auto_now=True, help_text='Дата изменения', verbose_name='Дата изменения', blank=True,
+    datebzm = models.DateTimeField(auto_now=True, help_text='Дата изменения', verbose_name='Дата изменения', blank=True,
                                null=True)
     status = models.CharField(max_length=50, help_text='Статус блокировки', verbose_name='Статус', default='4',
                               choices=stats)

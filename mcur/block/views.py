@@ -132,7 +132,7 @@ def obr_view(request):
                 message = True
             temp = {'pk': app.pk, 'nomd': app.nomdobr, 'datecre': timezone.localtime(app.datecre).strftime('%d.%m.%Y %H:%M:%S'),'status': app.get_status_display(),
                     'user': f'{app.user.first_name} {app.user.last_name}', 'text': app.text,
-                    'datebzm': app.datebzm.strftime('%d.%m.%Y'), 'image': image, 'message': message}
+                    'datebzm': timezone.localtime(app.datebzm).strftime('%d.%m.%Y %H:%M:%S'), 'image': image, 'message': message}
             content = {'app': temp}
             return JsonResponse(content)
 
