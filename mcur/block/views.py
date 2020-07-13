@@ -12,6 +12,8 @@ from .models import Appeal, Image, Result
 from mcur.settings import MEDIA_ROOT, MEDIA_URL, WEBPUSH_SETTINGS
 from django.utils import timezone
 import zipfile
+import traceback
+import logging
 
 
 class AppealForm(Form):
@@ -86,7 +88,6 @@ def addresult(request):
             if blo.status == '0':
                 group = Group.objects.get(pk=6)
                 users = Person.objects.filter(groups=group)
-                blo.text = di['text']
                 for i in users:
                     payload = {"head": "Изменен статус", "body": f"Обращение №{blo.nomdobr}. Изменен статус на: {blo.get_status_display()}"}
                     send_user_notification(user=i, payload=payload, ttl=1000)
@@ -101,9 +102,19 @@ def addresult(request):
 
 def QStolist(queryset):
     temp = []
-    for j in queryset:
-        temp.append({'pk': j.pk, 'nomd': j.nomdobr, 'datecre': timezone.localtime(j.datecre).strftime('%d.%m.%Y %H:%M:%S'), 'text': j.text,
-                      'status': j.get_status_display(), 'user': f'{j.user.first_name} {j.user.last_name}'})
+    try:
+        for j in queryset:
+            texts = None
+            if j.results.filter().exists():
+                te = j.results.all().reverse()
+                for i in te:
+                    if i.text and not texts:
+                        texts = i.text
+            if not texts:
+                texts = j.text
+            temp.append({'pk': j.pk, 'nomd': j.nomdobr, 'datecre': timezone.localtime(j.datecre).strftime('%d.%m.%Y %H:%M:%S'), 'text': texts, 'status': j.get_status_display(), 'user': f'{j.user.first_name} {j.user.last_name}'})
+    except:
+        print(traceback.format_exc())
     return temp
 
 

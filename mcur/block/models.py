@@ -38,7 +38,7 @@ class Result(models.Model):
         ('3', 'Отклонено'),
         ('4', 'На согласовании')
     }
-    block = models.ForeignKey(Appeal, on_delete=models.CASCADE, null=True, verbose_name='Обращение на блокировку')
+    block = models.ForeignKey(Appeal, on_delete=models.CASCADE, null=True, verbose_name='Обращение на блокировку', related_name='results')
     text = models.TextField(verbose_name='Текст', null=True, blank=True)
     chstatus = models.CharField(max_length=50, help_text='Статус блокировки', verbose_name='Статус', default='1',
                               choices=stats)
