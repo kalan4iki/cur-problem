@@ -26,30 +26,75 @@ if __name__ != '__main__':
 
 
 class parser_save:
-    def __init__(self, target, data, *args, **kwargs):
-        self.target = target
-        self.targets = {
-            'problem': self.problem
-        }
+    def __init__(self, data, *args, **kwargs):
         self.data = data
+        self.qs = dict()
+        self.steplist = [self.category, self.podcategory, self.status,
+                        self.author, self.visible, self.problem]
+
+    def save(self):
+        for i in self.steplist:
+            i()
+
+    def category(self):
+        if not Category.objects.filter(name=self.data['category']).exists():
+            cat = Category(name=self.data['category'])
+            cat.save()
+        else:
+            cat = Category.objects.get(name=self.data['category'])
+        self.qs['category'] = cat
+
+    def podcategory(self):
+        if not Podcategory.objects.filter(name=self.data['podcategory']).exists():
+            podcat = Podcategory(name=self.data['podcategory'], categ=Category.objects.get(name=self.data['category']))
+            podcat.save()
+        else:
+            podcat = Podcategory.objects.get(name=self.data['podcategory'])
+        self.qs['podcategory'] = podcat
+
+    def status(self):
+        if not Status.objects.filter(name=self.data['status']).exists():
+            stat = Status(name=self.data['status'])
+            stat.save()
+        else:
+            stat = Status.objects.get(name=self.data['status'])
+        self.qs['status'] = stat
+
+    def author(self):
+        if self.data['author'] != None:
+            if not Status.objects.filter(name=self.data['author']).exists():
+                author = Status(name=self.data['author'])
+                author.save()
+            else:
+                author = Status.objects.get(name=self.data['author'])
+        else:
+            author = None
+        self.qs['author'] = author
+
+    def visible(self):
+        self.qs['visible'] = '1'
+        if self.qs['status'].pk in NO_VISIBLE[0]:
+            self.qs['visible'] = '0'
+        elif self.qs['status'].pk in NO_VISIBLE[1]:
+            self.qs['visible'] = '2'
 
     def problem(self):
         if Problem.objects.filter(nomdobr=self.data['nomdobr']).exists():
             prob = Problem.objects.get(nomdobr=self.data['nomdobr'])
-            prob.temat = self.data['temat']
-            prob.podcat = self.data['podcat']
+            prob.temat = self.qs['category']
+            prob.podcat = self.qs['podcategory']
             prob.text = self.data['text']
             prob.adres = self.data['adres']
             prob.datecre = self.data['datecre']
             prob.dateotv = self.data['dateotv']
-            prob.status = self.data['status']
+            prob.status = self.qs['status']
             prob.parsing = self.data['parsing']
-            prob.visible = self.data['visible']
+            prob.visible = self.qs['visible']
+            prob.author = self.qs['author']
         else:
-            prob = Problem(nomdobr=self.data['nomdobr'], temat=self.data['temat'], podcat=self.data['podcat'], text=self.data['text'],
-                           adres=self.data['adres'], datecre=self.data['datecre'], status=self.data['status'], parsing=self.data['parsing'],
-                           dateotv=self.data['dateotv'], visible=self.data['visible'], author=self.data['author'])
-
+            prob = Problem(nomdobr=self.data['nomdobr'], temat=self.qs['category'], podcat=self.qs['podcategory'], text=self.data['text'],
+                          adres=self.data['adres'], datecre=self.data['datecre'], status=self.qs['status'], parsing=self.data['parsing'],
+                          dateotv=self.data['dateotv'], visible=self.qs['visible'], author=self.qs['author'])
 
 
 class parser:
@@ -147,7 +192,7 @@ class parser:
         table = bs.find_all('tr', class_='jtable-data-row')
         if len(table) > 0:
             for i in table:
-                temp = i.find_all('td')
+                temp = i.find_all('td')  # Сделать всё дальше async
                 temp2 = []
                 iter = 0
                 for j in temp:
@@ -158,37 +203,17 @@ class parser:
                     iter += 1
                 date = temp2[9].split('.')
                 date2 = temp2[11].split('.')
-                if not Category.objects.filter(name=temp2[5]).exists():
-                    cat = Category(name=temp2[5])
-                    cat.save()
-                else:
-                    cat = Category.objects.get(name=temp2[5])
-                if not Podcategory.objects.filter(name=temp2[6]).exists():
-                    podcat = Podcategory(name=temp2[6], categ=Category.objects.get(name=temp2[5]))
-                    podcat.save()
-                else:
-                    podcat = Podcategory.objects.get(name=temp2[6])
-                if not Status.objects.filter(name=temp2[13]).exists():
-                    stat = Status(name=temp2[13])
-                    stat.save()
-                else:
-                    stat = Status.objects.get(name=temp2[13])
-                visi = '1'
-                if stat.pk in NO_VISIBLE[0]:
-                    visi = '0'
-                elif stat.pk in NO_VISIBLE[1]:
-                    visi = '2'
                 data = {}
+                data['category'] = temp2[5]
+                data['podcategory'] = temp2[6]
                 data['nomdobr'] = temp2[0]
-                data['temat'] = cat
-                data['podcat'] = podcat
                 data['text'] = temp2[3]
                 data['adres'] = temp2[2]
                 data['datecre'] = f'{date[2]}-{date[1]}-{date[0]}'
                 data['dateotv'] = f'{date2[2]}-{date2[1]}-{date2[0]}'
-                data['status'] = stat
+                data['status'] = temp2[13]
                 data['parsing'] = '1'
-                data['visible'] = visi
+                parser_save(data=data).save()
 
     def pars_card(self):
         pass
