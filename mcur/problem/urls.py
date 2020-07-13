@@ -4,13 +4,14 @@ from .views import (api_problem, api_problem_detail, api_answer_detail, prob, ad
                     zaptable, add, lk, search, Answer_approve, testrequest,
                     Answer_modify, development, resolutionadd, zapros,
                     createuser, dashboard, export_pdf, statandact, api_action,
-                    listuser, apis, dopaction, analysis, problems)
+                    listuser, apis, dopaction, analysis, problems, regya)
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
 from mcur import settings
 
 urlpatterns = [
+    path('yandex_5da7dfddfe5e8aa1.html', regya),
     url(r'^$', lk, name='lk'),
     url(r'createuser/', createuser, name='createuser'),
     path('api/problem/', api_problem),

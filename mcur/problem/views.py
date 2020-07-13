@@ -66,6 +66,10 @@ class ProblemSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
+def regya(request):
+    return render(request, 'problem/yandex_5da7dfddfe5e8aa1.html')
+
+
 @api_view(['POST'])
 def dopaction(request):
     pkstat = settings.NO_VISIBLE
