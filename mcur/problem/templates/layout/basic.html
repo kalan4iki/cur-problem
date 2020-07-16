@@ -7,32 +7,21 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="icon" href="{% static 'adminlte/dist/img/logo.png' %}" type="image/x-icon">
   <title>СКИОГ - {% block title %}Главная{% endblock %}</title>
-  <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free-last/css/all.css' %}">
-<link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free-last/css/v4-shims.css' %}">
-{#  <script src="https://kit.fontawesome.com/9495c01576.js" crossorigin="anonymous"></script>#}
+  <link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free-last/css/all.css' %}">
+  <link rel="stylesheet" href="{% static 'adminlte/plugins/fontawesome-free-last/css/v4-shims.css' %}">
   <script src="{% static 'problem/ajax.js' %}"></script>
   <script src="{% static 'adminlte/dist/js/sweetalert2.all.min.js' %}"></script>
-  <!-- Tempusdominus Bbootstrap 4 -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
-  <!-- iCheck -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-  <!-- Theme style -->
   <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.min.css' %}">
-  <!-- overlayScrollbars -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
-  <!-- Daterange picker -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/daterangepicker/daterangepicker.css' %}">
-  <!-- summernote -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/summernote/summernote-bs4.css' %}">
-  <!-- Toastr -->
   <link rel="stylesheet" href="{% static 'adminlte/plugins/toastr/toastr.min.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'adminlte/plugins/datatables/datatables.min.css' %}"/>
-  <link rel="stylesheet" type="text/css" href="{% static 'adminlte/plugins/datatables/dataTables.material.min.css' %}"/>
-  <!-- Google Font: Source Sans Pro -->
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'adminlte/plugins/datatables/dataTables.material.min.css' %}"/> -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-  <script src="http://localhost:8098"></script>
     {% block head %}{% endblock %}
 </head>
 <body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
@@ -299,45 +288,26 @@
     </div>
   </footer>
 </div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
 <script src="{% static 'adminlte/plugins/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'adminlte/plugins/jquery/jquery.cookie.js' %}"></script>
-<!-- jQuery UI 1.11.4 -->
 <script src="{% static 'adminlte/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
   $.widget.bridge('uibutton', $.ui.button)
 </script>
-<!-- Bootstrap 4 -->
 <script src="{% static 'adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<!-- Toastr -->
 <script src="{% static 'adminlte/plugins/toastr/toastr.min.js' %}"></script>
-<!-- ChartJS -->
 <script src="{% static 'adminlte/plugins/chart.js/Chart.min.js' %}"></script>
-<!-- Sparkline -->
 <script src="{% static 'adminlte/plugins/sparklines/sparkline.js' %}"></script>
-<!-- JQVMap -->
 <script src="{% static 'adminlte/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
 <script src="{% static 'adminlte/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
-<!-- jQuery Knob Chart -->
 <script src="{% static 'adminlte/plugins/jquery-knob/jquery.knob.min.js' %}"></script>
-<!-- daterangepicker -->
 <script src="{% static 'adminlte/plugins/moment/moment.min.js' %}"></script>
 <script src="{% static 'adminlte/plugins/daterangepicker/daterangepicker.js' %}"></script>
-<!-- Tempusdominus Bootstrap 4 -->
 <script src="{% static 'adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
-
-<!-- overlayScrollbars -->
 <script src="{% static 'adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
-<!-- AdminLTE App -->
 <script src="{% static 'adminlte/dist/js/adminlte.js' %}"></script>
 <script type="text/javascript" src="{% static 'adminlte/plugins/datatables/datatables.min.js' %}"></script>
-<!-- AdminLTE for demo purposes -->
-<!-- <script src="{% static 'adminlte/dist/js/demo.js' %}"></script> -->
 <script src="{% static 'problem/message.js' %}"></script>
-<script src="{% static 'problem/vue.js' %}"></script>
 <script>
     $(function () {
         var url = '{% url "dopaction" %}',
