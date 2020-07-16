@@ -108,14 +108,26 @@
         </button>
       </div>
         <div class="modal-body">
+          <div class="row">
+            <div class="col">
+              <div id="div_id_last_text" class="form-group">
+                  <label for="id_last_text" class=" requiredField">
+                      Последний комментарий
+                  </label>
+                  <div class="">
+                      <textarea name="text" cols="40" rows="3" class="textarea form-control" id="id_last_text" readonly></textarea>
+                  </div>
+              </div>
+            </div>
+          </div>
             <div class="row">
               <div class="col">
                 <div id="div_id_text" class="form-group">
                     <label for="id_text" class=" requiredField">
-                        Комментарий
+                        Начальный комментарий
                     </label>
                     <div class="">
-                        <textarea name="text" cols="40" rows="10" class="textarea form-control" id="id_text" readonly></textarea>
+                        <textarea name="text" cols="40" rows="3" class="textarea form-control" id="id_text" readonly></textarea>
                     </div>
                 </div>
               </div>
@@ -507,7 +519,8 @@ function ShowModal(datas) {
       modal.find('input[name="datecre"]').val(datas['app']['datecre']);
       modal.find('input[name="datebzm"]').val(datas['app']['datebzm']);
       modal.find('input[name="status"]').val(datas['app']['status']);
-      modal.find('textarea[name="text"]').val(datas['app']['text']);
+      modal.find('textarea[id="id_last_text"]').val(datas['app']['last_text']);
+      modal.find('textarea[id="id_text"]').val(datas['app']['text']);
       modal.find('a[name="dobrodel"]').attr('href', 'https://vmeste.mosreg.ru/CardInNewPage?show=/Topic?id='+datas['app']['nomd']);
       modal.find('button[name="image"]').removeClass('disabled');
       modal.find('button[name="message"]').removeClass('disabled');

@@ -136,6 +136,14 @@ def obr_view(request):
     if request.method == 'POST':
         if Appeal.objects.filter(nomdobr=request.POST['pk']).exists():
             app = Appeal.objects.get(nomdobr=request.POST['pk'])
+            lasttexts = None
+            if app.results.filter().exists():
+                te = app.results.all().reverse()
+                for i in te:
+                    if i.text and not lasttexts:
+                        lasttexts = i.text
+            if not lasttexts:
+                lasttexts = app.text
             image = False
             message = False
             if Image.objects.filter(otv=app).exists():
@@ -143,7 +151,7 @@ def obr_view(request):
             if Result.objects.filter(block=app).exists():
                 message = True
             temp = {'pk': app.pk, 'nomd': app.nomdobr, 'datecre': timezone.localtime(app.datecre).strftime('%d.%m.%Y %H:%M:%S'),'status': app.get_status_display(),
-                    'user': f'{app.user.first_name} {app.user.last_name}', 'text': app.text,
+                    'user': f'{app.user.first_name} {app.user.last_name}', 'text': app.text, 'last_text': lasttexts,
                     'datebzm': timezone.localtime(app.datebzm).strftime('%d.%m.%Y %H:%M:%S'), 'image': image, 'message': message}
             content = {'app': temp, 'status': 'suc'}
             return JsonResponse(content)
