@@ -96,6 +96,7 @@ class dashboard(Messages):
             'action_8': self.action_8,
             'action_9': self.action_9,
             'action_10': self.action_10,
+            'action_11': self.action_11,
         }
 
     def action_1(self):
@@ -340,6 +341,41 @@ class dashboard(Messages):
             url = f'http://127.0.0.1:8000/media/xls/{name}'
         self.title = 'Подготовка отчета'
         self.mes = 'Отчет "статистика по категориям" готов'
+        self.content['url'] = url
+
+    def action_11(self):
+        '''Отчет "выгрузка по автору"'''
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('problems')
+        row_num = 0
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+        columns = ['№ п/п', 'Номер в доброделе', 'Тематика', 'Категория', 'Текст обращения', 'Адрес',
+                   'Дата жалобы',
+                   'Дата ответа по доброделу', 'Статус в доброделе', 'Статус в системе', 'Тер управление']
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
+        font_style = xlwt.XFStyle()
+        author = Author.objects.get(pk=int(self.request.POST['pk']))
+        rows = Problem.objects.filter(author=author).values_list('pk', 'nomdobr', 'temat__name', 'podcat__name',
+                                                 'text', 'adres', 'datecre',
+                                                 'dateotv', 'status__name', 'statussys', 'ciogv__name')
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                if col_num == 6 or col_num == 7:
+                    ws.write(row_num, col_num, f'{row[col_num].day}.{row[col_num].month}.{row[col_num].year}',
+                             font_style)
+                else:
+                    ws.write(row_num, col_num, row[col_num], font_style)
+        name = f'act{self.content["action"]}-{self.other["nowdatetime"].strftime("%d%m%Y%H%M%S")}.xls'
+        wb.save(f'{settings.MEDIA_ROOT}xls/{name}')
+        if 'linux' in platform.lower():
+            url = f'https://skiog.ru/media/xls/{name}'
+        else:
+            url = f'http://127.0.0.1:8000/media/xls/{name}'
+        self.title = 'Подготовка отчета'
+        self.mes = 'Отчет "выгрузка по автору" готов'
         self.content['url'] = url
 
 

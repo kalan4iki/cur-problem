@@ -278,6 +278,16 @@ $('#report3').submit(function (event) {
         $('#modal-report1').modal('hide');
     });
 
+$('#report4').submit(function (event) {
+        event.preventDefault();
+        var $form = $( this ),
+            pk = $form.find('input[id="id_pk"]').val(),
+            CSRFtoken = $('input[name=csrfmiddlewaretoken]').val();
+            action = $form.attr('action')
+        var posting = $.post( url, {csrfmiddlewaretoken: CSRFtoken, pk: pk, action: action}, onAjaxSuccess);
+        $('#modal-report4').modal('hide');
+    });
+
 function onAjaxSuccess(data)
 {
     const dummy = document.createElement('a');

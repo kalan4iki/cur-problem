@@ -39,6 +39,9 @@
                              <div class="col-md-2">
                                 <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport3" data-toggle="modal" data-target="#modal-report3">Статистика по категориям</button>
                             </div>
+                            <div class="col-md-2">
+                               <button type="button" class="btn btn-block bg-gradient-success btn-lg" id="butreport4" data-toggle="modal" data-target="#modal-report4">Выгрузка по автору</button>
+                           </div>
                          </div>
                       </div>
                       <!-- /.card-body -->
@@ -244,6 +247,42 @@
                   <label for="id_date" class="">Дата создания обращения до<span class="asteriskField">*</span></label>
                   <div class="">
                     <input type="date" name="date" maxlength="50" class="textinput textInput form-control" id="id_date_before" required>
+                    <small id="hint_id_date"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+          <button type="submit" class="btn btn-primary">Запросить</button>
+        </div>
+        </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- Modal -->
+<div class="modal fade" id="modal-report4">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Отчет статистики по категориям за период</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+        <form role="form" action="11" method="post" id="report4">
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+              <div class="col">
+                <div id="div_id_pk" class="form-group">
+                  <label for="id_pk" class="">ID пользователя<span class="asteriskField">*</span></label>
+                  <div class="">
+                    <input type="number" name="pk" maxlength="50" class="textinput textInput form-control" id="id_pk" required>
                     <small id="hint_id_date"></small>
                   </div>
                 </div>
